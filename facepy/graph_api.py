@@ -9,7 +9,6 @@ except ImportError:
     import simplejson as json
 
 class GraphAPI(object):
-    timeout = 10
     
     def __init__(self, oauth_token=None):
         self.oauth_token = oauth_token
