@@ -29,3 +29,7 @@ Facepy is an API client for Facebook's Graph API that doesn't suck.
         term = 'the meaning of life',
         type = 'post'
     )
+
+## Dependencies
+
+* httplib2
