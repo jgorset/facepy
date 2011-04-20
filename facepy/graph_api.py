@@ -1,5 +1,4 @@
 import requests
-from urllib import urlencode
 
 from exceptions import *
 
