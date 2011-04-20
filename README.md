@@ -8,7 +8,8 @@ Facepy is an API client for Facebook's Graph API that doesn't suck.
 
     from facepy import GraphAPI
     
-    # Initialize the Graph API with a valid access token (optional).
+    # Initialize the Graph API with a valid access token (optional,
+    # but will allow you to do all sorts of fun stuff).
     graph = GraphAPI(oauth_access_token)
     
     # Get an object from the Graph API
