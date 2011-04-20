@@ -1,4 +1,4 @@
-import httplib2
+import requests
 from urllib import urlencode
 
 from exceptions import *
@@ -25,7 +25,7 @@ class GraphAPI(object):
         response = self._query(
             path = path,
             method = 'GET',
-            query_string = urlencode(options)
+            data = options
         )
         
         if response is False:
@@ -39,7 +39,7 @@ class GraphAPI(object):
         response = self._query(
             path = path,
             method = 'POST',
-            body = urlencode(data)
+            data = data
         )
         
         if response is False:
@@ -72,7 +72,7 @@ class GraphAPI(object):
         Supported types are 'post', 'user', 'page', 'event', 'group', 'place' and 'checkin'.
         """
         
-        query_variables = dict({
+        options = dict({
             'q': term,
             'type': type,
         }, **options)
@@ -80,27 +80,21 @@ class GraphAPI(object):
         response = self._query(
             path = 'search',
             method = 'GET',
-            query_string = urlencode(query_variables)
+            data = options
         )
         
         return response
         
         
-    def _query(self, method, path, query_string='', body=''):
+    def _query(self, method, path, data={}):
         """Low-level access to Facebook's Graph API."""
         
-        http = httplib2.Http(timeout=self.timeout)
-        
-        # If an OAuth token is available, append it to the query string
         if self.oauth_token:
-            query_string += '&access_token=%s' % self.oauth_token
+            data.update({'access_token': self.oauth_token })
         
-        try:
-            response, body = http.request('https://graph.facebook.com/' + path + '?' + query_string, method, body=body)
-        except httplib2.ServerNotFoundError as e:
-            raise APIUnavailableError(e.message)
+        response = requests.request(method, 'https://graph.facebook.com/' + path, data=data)
 
-        return self._parse(body)
+        return self._parse(response.content)
         
     def _parse(self, data):
         """Parse the response from Facebook's Graph API."""
