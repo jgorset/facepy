@@ -84,7 +84,7 @@ class GraphAPI(object):
         
         SUPPORTED_TYPES = ['post', 'user', 'page', 'event', 'group', 'place', 'checkin']
         if type not in SUPPORTED_TYPES:
-            raise ValueError('Supported types are %s' % ', '.join(SUPPORTED_TYPES))
+            raise ValueError('Unsupported type "%s". Supported types are %s' % (type, ', '.join(SUPPORTED_TYPES)))
         
         options = dict({
             'q': term,
@@ -113,7 +113,7 @@ class GraphAPI(object):
         # Convert option lists to comma-separated values; Facebook chokes on array-like constructs
         # in the query string (like [...]?ids=['johannes.gorset', 'atle.mo']).
         for d in data:
-            if type(data[d]) == list:
+            if type(data[d]) is list:
                 data[d] = ','.join(data[d])
         
         if self.oauth_token:
