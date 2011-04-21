@@ -20,11 +20,6 @@ class GraphAPI(object):
         path -- A string describing the path to the item.
         **options -- Graph API parameters such as 'limit', 'offset' or 'since' (see http://developers.facebook.com/docs/reference/api/).
         """
-
-        # Convert option lists to comma-separated values
-        for option in options:
-            if type(options[option]) == list:
-                options[option] = ','.join(options[option])
         
         response = self._query(
             path = path,
@@ -114,6 +109,12 @@ class GraphAPI(object):
         path -- A string describing the path.
         data -- A dictionary of HTTP GET parameters (for GET requests) or POST data (for POST requests).
         """
+        
+        # Convert option lists to comma-separated values; Facebook chokes on array-like constructs
+        # in the query string (like [...]?ids=['johannes.gorset', 'atle.mo']).
+        for d in data:
+            if type(data[d]) == list:
+                data[d] = ','.join(data[d])
         
         if self.oauth_token:
             data.update({'access_token': self.oauth_token })
