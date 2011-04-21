@@ -21,11 +21,7 @@ class GraphAPI(object):
         **options -- Graph API parameters such as 'limit', 'offset' or 'since' (see http://developers.facebook.com/docs/reference/api/).
         """
         
-        response = self._query(
-            path = path,
-            method = 'GET',
-            data = options
-        )
+        response = self._query('GET', path, options)
         
         if response is False:
             raise APIError('Could not get "%s".' % path)
@@ -41,11 +37,7 @@ class GraphAPI(object):
         **options -- Graph API publishing parameters (see http://developers.facebook.com/docs/reference/api/#publishing).
         """
         
-        response = self._query(
-            path = path,
-            method = 'POST',
-            data = data
-        )
+        response = self._query('POST', path, data)
         
         if response is False:
             raise APIError('Could not post to "%s"' % path)
@@ -60,10 +52,7 @@ class GraphAPI(object):
         path -- A string describing the path to the item.
         """
         
-        response = self._query(
-            path = path,
-            method = 'DELETE'
-        )
+        response = self._query('DELETE', path)
         
         if response is False:
             raise APIError('Could not delete "%s"' % path)
@@ -91,11 +80,7 @@ class GraphAPI(object):
             'type': type,
         }, **options)
         
-        response = self._query(
-            path = 'search',
-            method = 'GET',
-            data = options
-        )
+        response = self._query('GET', 'search', options)
         
         return response
         
