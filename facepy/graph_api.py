@@ -13,7 +13,13 @@ class GraphAPI(object):
         self.oauth_token = oauth_token
         
     def get(self, path='', **options):
-        """Get an item from the Graph API."""
+        """
+        Get an item from the Graph API.
+        
+        Arguments:
+        path -- A string describing the path to the item.
+        **options -- Graph API parameters such as 'limit', 'offset' or 'since' (see http://developers.facebook.com/docs/reference/api/).
+        """
 
         # Convert option lists to comma-separated values
         for option in options:
@@ -32,7 +38,13 @@ class GraphAPI(object):
         return response
         
     def post(self, path='', **data):
-        """Post an item to the Graph API."""
+        """
+        Post an item to the Graph API.
+        
+        Arguments:
+        path -- A string describing the path to the item.
+        **options -- Graph API publishing parameters (see http://developers.facebook.com/docs/reference/api/#publishing).
+        """
         
         response = self._query(
             path = path,
@@ -46,7 +58,12 @@ class GraphAPI(object):
         return response
         
     def delete(self, path):
-        """Delete an item in the Graph API."""
+        """
+        Delete an item in the Graph API.
+        
+        Arguments:
+        path -- A string describing the path to the item.
+        """
         
         response = self._query(
             path = path,
@@ -65,10 +82,11 @@ class GraphAPI(object):
         Arguments:
         term -- A string describing the search term.
         type -- A string describing the type of items to search for *.
-        **options -- Additional data, such as 'center' and 'distance'. See Facebook's Graph API documentation for details.
+        **options -- Additional Graph API parameters, such as 'center' and 'distance' (see http://developers.facebook.com/docs/reference/api/).
         
         Supported types are 'post', 'user', 'page', 'event', 'group', 'place' and 'checkin'.
         """
+        
         SUPPORTED_TYPES = ['post', 'user', 'page', 'event', 'group', 'place', 'checkin']
         if type not in SUPPORTED_TYPES:
             raise ValueError('Supported types are %s' % ', '.join(SUPPORTED_TYPES))
@@ -88,7 +106,14 @@ class GraphAPI(object):
         
         
     def _query(self, method, path, data={}):
-        """Low-level access to Facebook's Graph API."""
+        """
+        Low-level access to Facebook's Graph API.
+        
+        Arguments:
+        method -- A string describing the HTTP method.
+        path -- A string describing the path.
+        data -- A dictionary of HTTP GET parameters (for GET requests) or POST data (for POST requests).
+        """
         
         if self.oauth_token:
             data.update({'access_token': self.oauth_token })
@@ -98,7 +123,13 @@ class GraphAPI(object):
         return self._parse(response.content)
         
     def _parse(self, data):
-        """Parse the response from Facebook's Graph API."""
+        """
+        Parse the response from Facebook's Graph API.
+        
+        Arguments:
+        data -- A string describing the Graph API's response.
+        """
+        
         try:
             data = json.loads(data)
         except ValueError as e:
