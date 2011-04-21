@@ -69,6 +69,9 @@ class GraphAPI(object):
         
         Supported types are 'post', 'user', 'page', 'event', 'group', 'place' and 'checkin'.
         """
+        SUPPORTED_TYPES = ['post', 'user', 'page', 'event', 'group', 'place', 'checkin']
+        if type not in SUPPORTED_TYPES:
+            raise ValueError('Supported types are %s' % ', '.join(SUPPORTED_TYPES))
         
         options = dict({
             'q': term,
