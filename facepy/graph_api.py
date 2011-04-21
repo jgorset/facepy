@@ -106,7 +106,7 @@ class GraphAPI(object):
         
         # Facebook's Graph API sometimes responds with 'true' or 'false'. Facebook offers no documentation
         # as to the prerequisites for this type of response, though it seems that it responds with 'true'
-        # when objects are successfully deleted and 'false' when attempting to delete or access an item that
+        # when objects are successfully deleted and 'false' upon attempting to delete or access an item that
         # one does not have access to.
         # 
         # For example, the API would respond with 'false' upon attempting to query a feed item without having
