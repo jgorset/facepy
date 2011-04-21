@@ -18,8 +18,7 @@ Facepy is an API client for Facebook's Graph API that doesn't suck.
     # Get a list of objects from the Graph API.
     graph.get('johannes.gorset/friends')
     
-    # Post an item to the Graph API. Keyword arguments beyond 'path' correspond to
-    # publishing parameters in the Graph API (see http://developers.facebook.com/docs/reference/api/#publishing).
+    # Post an item to the Graph API.
     graph.post(
         path = 'johannes.gorset/feed',
         message = 'Why, hello.'
