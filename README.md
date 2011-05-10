@@ -33,6 +33,10 @@ Facepy is an API client for Facebook's Graph API that doesn't suck.
         type = 'post'
     )
     
+## Documentation
+
+See [Facebook's Graph API documentation](http://developers.facebook.com/docs/reference/api/).
+    
 ## Installation
 
     $ pip install git+git://github.com/jgorset/facepy
