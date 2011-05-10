@@ -104,7 +104,7 @@ class GraphAPI(object):
         if self.oauth_token:
             data.update({'access_token': self.oauth_token })
         
-        response = requests.request(method, 'https://graph.facebook.com/' + path, data=data)
+        response = requests.request(method, 'https://graph.facebook.com/%s' % path, data=data)
 
         return self._parse(response.content)
         
