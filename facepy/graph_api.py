@@ -24,7 +24,7 @@ class GraphAPI(object):
         response = self._query('GET', path, options)
         
         if response is False:
-            raise APIError('Could not get "%s".' % path)
+            raise self.Error('Could not get "%s".' % path)
             
         return response
         
@@ -40,7 +40,7 @@ class GraphAPI(object):
         response = self._query('POST', path, data)
         
         if response is False:
-            raise APIError('Could not post to "%s"' % path)
+            raise self.Error('Could not post to "%s"' % path)
             
         return response
         
@@ -55,7 +55,7 @@ class GraphAPI(object):
         response = self._query('DELETE', path)
         
         if response is False:
-            raise APIError('Could not delete "%s"' % path)
+            raise self.Error('Could not delete "%s"' % path)
             
         return response
         
@@ -119,7 +119,7 @@ class GraphAPI(object):
         try:
             data = json.loads(data)
         except ValueError as e:
-            raise APIError(e.message)
+            raise self.Error(e.message)
         
         # Facebook's Graph API sometimes responds with 'true' or 'false'. Facebook offers no documentation
         # as to the prerequisites for this type of response, though it seems that it responds with 'true'
@@ -140,10 +140,13 @@ class GraphAPI(object):
         if type(data) is dict:
             
             if 'error' in data:
-                raise APIError(data['error']['message'])
+                raise self.Error(data['error']['message'])
                 
             # If the response contains a 'data' key, strip everything else (it serves no purpose)
             if 'data' in data:
                 data = data['data']
         
             return data
+
+    class Error(FacepyError):
+        pass
