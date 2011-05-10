@@ -1,5 +1,8 @@
 CHANGELOG
 
+v0.2.1
+- Fix a bug that caused a TypeError if the 'path' argument is an integer.
+
 v0.2
 - Exceptions have been refactored:
 
