@@ -39,4 +39,4 @@ Facepy is an API client for Facebook's Graph API that doesn't suck.
 
 ## Dependencies
 
-* requests (https://github.com/kennethreitz/requests/)
+* [requests](https://github.com/kennethreitz/requests/)
