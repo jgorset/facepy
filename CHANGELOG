@@ -1,0 +1,21 @@
+CHANGELOG
+
+v0.2
+- Exceptions have been refactored:
+
+    # Pre-v0.2.0
+    from facepy import GraphAPI
+    from facepy.exceptions import APIError
+    
+    try:
+        GraphAPI().get('johannes.gorset')
+    except APIError:
+        [...]
+        
+    # Post-v0.2.0
+    from facepy import GraphAPI
+    
+    try:
+        GraphAPI().get('johannes.gorset)
+    except GraphAPI.Error:
+        [...]
