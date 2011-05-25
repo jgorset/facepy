@@ -97,9 +97,9 @@ class GraphAPI(object):
         
         # Convert option lists to comma-separated values; Facebook chokes on array-like constructs
         # in the query string (like [...]?ids=['johannes.gorset', 'atle.mo']).
-        for d in data:
-            if type(data[d]) is list and all([type(item) is str for item in data[d]]):
-                data[d] = ','.join(data[d])
+        for key, value in data.items():
+            if type(value) is list and all([type(item) is str for item in value]):
+                data[key] = ','.join(value)
         
         if self.oauth_token:
             data.update({'access_token': self.oauth_token })
