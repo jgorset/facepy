@@ -1,5 +1,8 @@
 CHANGELOG
 
+v0.2.2
+- Fix a bug that caused non-JSON data (e.g. pictures) to raise a ValueError.
+
 v0.2.1
 - Fix a bug that caused a TypeError if the 'path' argument is an integer.
 
