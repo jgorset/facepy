@@ -119,7 +119,7 @@ class GraphAPI(object):
         try:
             data = json.loads(data)
         except ValueError as e:
-            raise self.Error(e.message)
+            return data
         
         # Facebook's Graph API sometimes responds with 'true' or 'false'. Facebook offers no documentation
         # as to the prerequisites for this type of response, though it seems that it responds with 'true'

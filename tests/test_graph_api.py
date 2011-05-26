@@ -12,7 +12,8 @@ TEST_ACCESS_TOKEN = '160327664029652|71c2bc094b012a6f7f37ece4.0-100002387854815|
 def test_get():
     graph = GraphAPI(TEST_ACCESS_TOKEN)
     
-    assert graph.get('me').__class__ is dict
+    assert isinstance(graph.get('me'), dict)
+    assert isinstance(graph.get('me/picture'), str)
 
 def test_post():
     
