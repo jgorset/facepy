@@ -8,5 +8,5 @@ setup(
   author_email = "jgorset@gmail.com",
   url = "http://github.com/jgorset/facepy",
   packages = ['facepy'],
-  install_requires = ['requests']
+  install_requires = ['requests<=0.4']
 )
