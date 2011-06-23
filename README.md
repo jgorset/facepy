@@ -43,4 +43,4 @@ See [Facebook's Graph API documentation](http://developers.facebook.com/docs/ref
 
 ## Dependencies
 
-* [requests](https://github.com/kennethreitz/requests/)
+* [requests](https://github.com/kennethreitz/requests/) v0.4 or earlier
