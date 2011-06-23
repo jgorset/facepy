@@ -39,7 +39,7 @@ See [Facebook's Graph API documentation](http://developers.facebook.com/docs/ref
     
 ## Installation
 
-    $ pip install git+git://github.com/jgorset/facepy
+    $ pip install facepy
 
 ## Dependencies
 
