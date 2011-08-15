@@ -21,33 +21,29 @@ def test_signed_request():
     graph = GraphAPI(signed_request=TEST_SIGNED_REQUEST, app_secret=TEST_APP_SECRET)
 
     assert isinstance(graph.get("me"), dict)
-    print "test_signed_request() passed."
 
 def test_get():
     graph = GraphAPI(TEST_ACCESS_TOKEN)
-    
+
     assert isinstance(graph.get('me'), dict)
     assert isinstance(graph.get('me/picture'), str)
-    print "test_get() passed."
-
 
 def test_post():
-    
+
     graph = GraphAPI(TEST_ACCESS_TOKEN)
-    
+
     # Generate a random message (Facebook rejects duplicate messages within a short time frame)
     message = ''.join(random.sample('a b c d e f g h i j k l m n o p q r s t u v w x y z'.split(), 10))
-    
+
     response = graph.post(
         path = 'me/feed',
         message = message
     )
-    
+
     post = graph.get(response['id'])
-    
+
     assert post['message'] == message
-    print "test_post() passed."
-    
+
 def test_delete():
     graph = GraphAPI(TEST_ACCESS_TOKEN)
     
@@ -58,9 +54,8 @@ def test_delete():
         path = 'me/feed',
         message = message
     )
-    
+
     assert graph.delete(response['id']) is True
-    print "test_delete() passed."
 
 def test_search():
     graph = GraphAPI()
@@ -71,12 +66,3 @@ def test_search():
     )
 
     assert results.__class__ is list
-    print "test_search() passed."
-
-if __name__ == "__main__":
-    #test_signed_request()
-    test_post()
-    test_get()
-    test_search()
-    test_delete()
-
