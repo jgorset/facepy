@@ -3,6 +3,11 @@ import requests
 from exceptions import *
 from signed_request import parse_signed_request
 
+try:
+    import simplejson as json
+except ImportError:
+    import json
+
 class GraphAPI(object):
     
     def __init__(self, oauth_token=None, signed_request=None, app_secret=None):
