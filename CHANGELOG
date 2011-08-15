@@ -1,5 +1,8 @@
 CHANGELOG
 
+v0.2.3
+- The GraphAPI class may now be initialized by signed request.
+
 v0.2.2
 - Fix a bug that caused non-JSON data (e.g. pictures) to raise a ValueError.
 
