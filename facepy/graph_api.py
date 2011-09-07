@@ -1,4 +1,6 @@
 import requests
+import urlparse
+import urllib
 
 from exceptions import *
 from signed_request import parse_signed_request
@@ -119,7 +121,26 @@ class GraphAPI(object):
         
         if self.oauth_token:
             data.update({'access_token': self.oauth_token })
-        response = requests.request(method, 'https://graph.facebook.com/%s' % path, data=data)
+        
+        url = 'https://graph.facebook.com/%s' % path
+
+        # GET and DELETE methods don't send postdata, so we add it
+        # to the URL as GET parameters.
+        if method in ['GET', 'DELETE']:
+            # the URL may have params already, so rather than tacking the
+            # params on the end we have to parse and reconstruct it.
+            url_p = urlparse.urlparse(url)
+            url_params = urlparse.parse_qs(url_p.query)
+            # url_params is a dict of params already in the URL.
+            # we add the data dict to it and then generate
+            # a new URL
+            url_params.update(data)
+            url_p = url_p._replace(query=urllib.urlencode(url_params))
+            url = url_p.geturl()
+            response = requests.request(method, url)
+        else:
+            response = requests.request(method, url, data=data)
+
 
         return self._parse(response.content)
         
