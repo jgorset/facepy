@@ -119,8 +119,14 @@ class GraphAPI(object):
         
         if self.oauth_token:
             data.update({'access_token': self.oauth_token })
-        response = requests.request(method, 'https://graph.facebook.com/%s' % path, data=data)
+        
+        url = 'https://graph.facebook.com/%s' % path
 
+        if method in ['GET', 'DELETE']:
+            response = requests.request(method, url, params=data)
+        else:
+            response = requests.request(method, url, data=data)
+        
         return self._parse(response.content)
         
     def _parse(self, data):
