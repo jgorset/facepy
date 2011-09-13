@@ -29,6 +29,17 @@ class GraphAPI(object):
             self.oauth_token = oauth_token
 
     def get_all(self, path, **params):
+        """Get a generator for all the results returned by a particular query, including
+        ones beyond the first page of results returned by the API.
+
+        Arguments:
+        path -- A string describing the path to the item.
+        **options -- Graph API parameters such as 'limit', 'offset' or 'since' (see http://developers.facebook.com/docs/reference/api/).
+
+        Returns:
+        An iterator over all the objects returned by a query which lazily loads results
+        beyond the first "page" as required.
+        """
         # Convert option lists to comma-separated values; Facebook chokes on array-like constructs
         # in the query string (like [...]?ids=['johannes.gorset', 'atle.mo']).
         for key, value in params.items():
