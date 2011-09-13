@@ -28,6 +28,48 @@ class GraphAPI(object):
         else:
             self.oauth_token = oauth_token
 
+    def get_all(self, path, **params):
+        # Convert option lists to comma-separated values; Facebook chokes on array-like constructs
+        # in the query string (like [...]?ids=['johannes.gorset', 'atle.mo']).
+        for key, value in params.items():
+            if type(value) is list and all([type(item) in (str, unicode) for item in value]):
+                params[key] = ','.join(value)
+
+        if self.oauth_token:
+            params.update({'access_token': self.oauth_token })
+
+        url = 'https://graph.facebook.com/%s' % path
+
+        while url is not None:
+            response = requests.request('GET', url, params=params)
+
+            try:
+                data = json.loads(response.content)
+            except (ValueError, TypeError) as e:
+                raise self.Error('Could not parse output')
+
+            if type(data) is not dict:
+                raise self.Error('Could not get "%s" (expected dict, got %s)' % (path, type(data)))
+
+            if 'error' in data:
+                raise self.Error(data['error']['message'])
+
+            if 'data' not in data:
+                raise self.Error('Expected paginated results')
+
+            for obj in data['data']:
+                yield obj
+
+            url = None
+            if 'paging' in data:
+                if 'next' in data['paging']:
+                    # only the access_token is needed, other params are included in the
+                    # paging URL
+                    if self.oauth_token:
+                        params = {'access_token': self.oauth_token}
+                    url = data['paging']['next']
+
+
     def get(self, path='', **options):
         """
         Get an item from the Graph API.
