@@ -28,60 +28,7 @@ class GraphAPI(object):
         else:
             self.oauth_token = oauth_token
 
-    def get_all(self, path, **params):
-        """Get a generator for all the results returned by a particular query, including
-        ones beyond the first page of results returned by the API.
-
-        Arguments:
-        path -- A string describing the path to the item.
-        **options -- Graph API parameters such as 'limit', 'offset' or 'since' (see http://developers.facebook.com/docs/reference/api/).
-
-        Returns:
-        An iterator over all the objects returned by a query which lazily loads results
-        beyond the first "page" as required.
-        """
-        # Convert option lists to comma-separated values; Facebook chokes on array-like constructs
-        # in the query string (like [...]?ids=['johannes.gorset', 'atle.mo']).
-        for key, value in params.items():
-            if type(value) is list and all([type(item) in (str, unicode) for item in value]):
-                params[key] = ','.join(value)
-
-        if self.oauth_token:
-            params.update({'access_token': self.oauth_token })
-
-        url = 'https://graph.facebook.com/%s' % path
-
-        while url is not None:
-            response = requests.request('GET', url, params=params)
-
-            try:
-                data = json.loads(response.content)
-            except (ValueError, TypeError) as e:
-                raise self.Error('Could not parse output')
-
-            if type(data) is not dict:
-                raise self.Error('Could not get "%s" (expected dict, got %s)' % (path, type(data)))
-
-            if 'error' in data:
-                raise self.Error(data['error']['message'])
-
-            if 'data' not in data:
-                raise self.Error('Expected paginated results')
-
-            for obj in data['data']:
-                yield obj
-
-            url = None
-            if 'paging' in data:
-                if 'next' in data['paging']:
-                    # only the access_token is needed, other params are included in the
-                    # paging URL
-                    if self.oauth_token:
-                        params = {'access_token': self.oauth_token}
-                    url = data['paging']['next']
-
-
-    def get(self, path='', **options):
+    def get(self, path='', page=False, **options):
         """
         Get an item from the Graph API.
 
@@ -90,7 +37,7 @@ class GraphAPI(object):
         **options -- Graph API parameters such as 'limit', 'offset' or 'since' (see http://developers.facebook.com/docs/reference/api/).
         """
 
-        response = self._query('GET', path, options)
+        response = self._query('GET', path, options, page)
 
         if response is False:
             raise self.Error('Could not get "%s".' % path)
@@ -153,7 +100,40 @@ class GraphAPI(object):
 
         return response
 
-    def _query(self, method, path, data={}):
+    def _load_url(self, method, url, data):
+        """
+        Fetch an object from the Graph API and parse the output.
+
+        Arguments:
+        method -- A string describing the HTTP method.
+        url -- A string describing the URL.
+        data -- A dictionary of HTTP GET parameters (for GET requests) or POST data (for POST requests).
+
+        Returns a pair (obj, next_url) where obj is the object returned from the graph API (parsed 
+        into a python object) and next_url is the URL for more results or None if this is the last
+        page of results.
+        """
+
+        if method in ['GET', 'DELETE']:
+            response = requests.request(method, url, params=data)
+        else:
+            response = requests.request(method, url, data=data)
+
+        result = self._parse(response.content)
+
+        try:
+            obj = result['data']
+        except (KeyError, TypeError):
+            obj = result
+
+        try:
+            next_url = result['paging']['next']
+        except (KeyError, TypeError):
+            next_url = None
+
+        return obj, next_url
+
+    def _query(self, method, path, data={}, page=False):
         """
         Low-level access to Facebook's Graph API.
 
@@ -169,17 +149,21 @@ class GraphAPI(object):
             if type(value) is list and all([type(item) in (str, unicode) for item in value]):
                 data[key] = ','.join(value)
 
+        url = 'https://graph.facebook.com/%s' % path
         if self.oauth_token:
             data.update({'access_token': self.oauth_token })
-
-        url = 'https://graph.facebook.com/%s' % path
-
-        if method in ['GET', 'DELETE']:
-            response = requests.request(method, url, params=data)
+        
+        if page:
+            def make_generator(url, data):
+                while url is not None:
+                    objs, url = self._load_url(method, url, data)
+                    data = {}
+                    for obj in objs:
+                        yield objs
+            return make_generator(url, data)
         else:
-            response = requests.request(method, url, data=data)
-
-        return self._parse(response.content)
+            obj, next_url = self._load_url(method, url, data)
+            return obj
 
     def _parse(self, data):
         """
@@ -207,19 +191,12 @@ class GraphAPI(object):
         #
         # We'll handle this discrepancy as gracefully as we can by implementing logic to deal with this behavior
         # in the high-level access functions (get, post, delete etc.).
-        if type(data) is bool:
-            return data
-
         if type(data) is dict:
 
             if 'error' in data:
                 raise self.Error(data['error']['message'])
 
-            # If the response contains a 'data' key, strip everything else (it serves no purpose)
-            if 'data' in data:
-                data = data['data']
-
-            return data
+        return data
 
     class Error(FacepyError):
         pass
