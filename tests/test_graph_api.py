@@ -31,7 +31,7 @@ def test_get():
 def test_paged_get():
     graph = GraphAPI(TEST_ACCESS_TOKEN)
 
-    posts = graph.get_all('Facebook/posts', until=1314742370, limit=6)
+    posts = graph.get('Facebook/posts', until=1314742370, limit=6, page=True)
 
     for (i, post) in enumerate(posts):
         # require three pages of results
