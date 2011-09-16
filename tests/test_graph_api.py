@@ -28,6 +28,18 @@ def test_get():
     assert isinstance(graph.get('me'), dict)
     assert isinstance(graph.get('me/picture'), str)
 
+def test_paged_get():
+    graph = GraphAPI(TEST_ACCESS_TOKEN)
+
+    posts = graph.get('Facebook/posts', until=1314742370, limit=6, page=True)
+
+    for (i, post) in enumerate(posts):
+        # require three pages of results
+        if i >= 21:
+            return
+
+    assert False, 'only first page of results returned'
+
 def test_post():
 
     graph = GraphAPI(TEST_ACCESS_TOKEN)
