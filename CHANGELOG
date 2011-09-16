@@ -1,5 +1,9 @@
 CHANGELOG
 
+v0.3
+- GraphAPI#get now has a new argument 'page', which returns a generator
+  that iterates over each page of results.
+
 v0.2.3
 - The GraphAPI class may now be initialized by signed request.
 
