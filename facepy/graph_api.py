@@ -159,7 +159,7 @@ class GraphAPI(object):
                     objs, url = self._load_url(method, url, data)
                     data = {}
                     for obj in objs:
-                        yield objs
+                        yield obj
             return make_generator(url, data)
         else:
             obj, next_url = self._load_url(method, url, data)
