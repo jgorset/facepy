@@ -34,6 +34,7 @@ class GraphAPI(object):
 
         Arguments:
         path -- A string describing the path to the item.
+        page -- A boolean describing whether to return a generator that iterates over each page of results.
         **options -- Graph API parameters such as 'limit', 'offset' or 'since' (see http://developers.facebook.com/docs/reference/api/).
         """
 
