@@ -1,5 +1,9 @@
 CHANGELOG
 
+v0.3.1
+- Fixed a bug that prevented the 'page' argument to GraphAPI#get from working
+  correctly.
+
 v0.3
 - GraphAPI#get now has a new argument 'page', which returns a generator
   that iterates over each page of results.
