@@ -24,6 +24,12 @@ Facepy is an API client for Facebook's Graph API that doesn't suck.
         message = 'Why, hello.'
     )
     
+    # Upload an image to the Graph API.
+    graph.post(
+        path = 'johannes.gorset/photos',
+        source = open('parrot.jpg'),
+    )
+    
     # Delete an item from the Graph API.
     graph.delete('481213268764')
     

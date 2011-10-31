@@ -110,13 +110,28 @@ class GraphAPI(object):
         url -- A string describing the URL.
         data -- A dictionary of HTTP GET parameters (for GET requests) or POST data (for POST requests).
 
-        Returns a pair (obj, next_url) where obj is the object returned from the graph API (parsed 
+        Returns a pair (obj, next_url) where obj is the object returned from the graph API (parsed
         into a python object) and next_url is the URL for more results or None if this is the last
         page of results.
         """
+        def strip_filelike(input):
+            files = {}
+
+            for key, value in input.iteritems():
+                if hasattr(value, 'read'): # it quacks like a file!
+                    files[key] = input.popitem(value)
+
+            return files
 
         if method in ['GET', 'DELETE']:
             response = requests.request(method, url, params=data)
+        elif method in ['POST', 'PUT']:
+            files = strip_filelike(data)
+
+            if not files:
+                files = None
+
+            response = requests.request(method, url, data=data, files=files)
         else:
             response = requests.request(method, url, data=data)
 
