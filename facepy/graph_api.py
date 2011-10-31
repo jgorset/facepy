@@ -119,7 +119,13 @@ class GraphAPI(object):
 
             for key, value in input.iteritems():
                 if hasattr(value, 'read'): # it quacks like a file!
-                    files[key] = input.popitem(value)
+                    files[key] = input[key]
+
+            for key in files.iterkeys():
+                input.pop(key)
+
+            if not files:
+                files = None
 
             return files
 
@@ -127,9 +133,6 @@ class GraphAPI(object):
             response = requests.request(method, url, params=data)
         elif method in ['POST', 'PUT']:
             files = strip_filelike(data)
-
-            if not files:
-                files = None
 
             response = requests.request(method, url, data=data, files=files)
         else:
