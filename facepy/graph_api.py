@@ -1,7 +1,6 @@
 import requests
 
 from exceptions import *
-from signed_request import parse_signed_request
 
 try:
     import simplejson as json
@@ -10,23 +9,21 @@ except ImportError:
 
 class GraphAPI(object):
 
-    def __init__(self, oauth_token=None, signed_request=None, app_secret=None):
-        """Initialize GraphAPI with an oauth_token, signed request or neither.
-
-        If signed_request is given along with app_secret, oauth_token will be
-        extracted automatically from the signed_request.
+    def __init__(self, oauth_token=None, signed_request=None):
+        """
+        Initialize GraphAPI with an OAuth token, a signed request or neither.
 
         Arguments:
-        oauth_token -- OAuth 2.0 token
-        signed_request -- raw signed_request taken from POST (optional)
-        app_secret -- Application's app_secret required to parse signed_request (optional)
+        oauth_token -- A string describing an OAuth token.
+        signed_request -- A SignedRequest instance (see facepy.signed_request.SignedRequest).
         """
 
-        if not oauth_token and signed_request and app_secret:
-            sr = parse_signed_request(signed_request, app_secret)
-            self.oauth_token = sr.get("oauth_token", None)
-        else:
+        if signed_request:
+            self.oauth_token = signed_request.oauth_token.token
+        elif oauth_token:
             self.oauth_token = oauth_token
+        else:
+            self.oauth_token = False  
 
     def get(self, path='', page=False, **options):
         """
