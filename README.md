@@ -2,7 +2,7 @@
 
 ## About
 
-Facepy is an API client for Facebook's Graph API that doesn't suck.
+Facepy is a client for Facebook APIs.
 
 ## Usage
 
