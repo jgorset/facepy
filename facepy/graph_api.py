@@ -9,7 +9,7 @@ except ImportError:
 
 class GraphAPI(object):
 
-    def __init__(self, oauth_token=None, signed_request=None):
+    def __init__(self, oauth_token=False):
         """
         Initialize GraphAPI with an OAuth token, a signed request or neither.
 
@@ -17,13 +17,7 @@ class GraphAPI(object):
         oauth_token -- A string describing an OAuth token.
         signed_request -- A SignedRequest instance (see facepy.signed_request.SignedRequest).
         """
-
-        if signed_request:
-            self.oauth_token = signed_request.oauth_token.token
-        elif oauth_token:
-            self.oauth_token = oauth_token
-        else:
-            self.oauth_token = False  
+        self.oauth_token = oauth_token
 
     def get(self, path='', page=False, **options):
         """
