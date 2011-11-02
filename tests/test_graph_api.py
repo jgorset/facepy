@@ -1,32 +1,50 @@
 """Tests for facepy.GraphAPI. You can run these with py.test (http://pytest.org/latest/)."""
 
-import json
 import random
 
 from facepy import GraphAPI
-from facepy import SignedRequest
 
-import requests
-
-# Permanent access token for a test user of the Facepy Test Application (application id 160327664029652)
-TEST_ACCESS_TOKEN = '160327664029652|71c2bc094b012a6f7f37ece4.0-100002387854815|gmGJg6Sc2nBzssDrCXL_w49bDO8'
-
-TEST_SIGNED_REQUEST = '7MF856LgfXmXf0PPe4BOWq20FVVZQLAebjlWAh2e64k.eyJhbGdvcml0aG0iOiJITUFDLVNIQTI1NiIsImV4' \
-                      'cGlyZXMiOjAsImlzc3VlZF9hdCI6MTMxMzQxNDQ1MCwib2F1dGhfdG9rZW4iOiIxNjAzMjc2NjQwMjk2NTJ8' \
-                      'NzFjMmJjMDk0YjAxMmE2ZjdmMzdlY2U0LjEtMTAwMDAyMzg3ODU0ODE1fElET0RNWXpNc3JqbklPLWsxbVVy' \
-                      'Qlk4LWpDayIsInVzZXIiOnsiY291bnRyeSI6Im5vIiwibG9jYWxlIjoiZW5fVVMiLCJhZ2UiOnsibWluIjoy' \
-                      'MX19LCJ1c2VyX2lkIjoiMTAwMDAyMzg3ODU0ODE1In0'
-                      
+TEST_APP_ID = '160327664029652'
 TEST_APP_SECRET = '102d4e42d228d59c7ae4ebd874ef7757'
+TEST_USER = None
+
+def setup_module(module):
+    setattr(module, 'TEST_USER', FacebookUser.create())
+
+def teardown_module(module):
+    if TEST_USER:
+        TEST_USER.delete()
+
+class FacebookUser(object):
+
+    def __init__(self, user_id, access_token):
+        self.user_id = user_id
+        self.access_token = access_token
+        self.graph = GraphAPI(self.access_token)
+
+    def delete(self):
+        application_graph = GraphAPI('%s|%s' % (TEST_APP_ID, TEST_APP_SECRET))
+        application_graph.delete("%s/" % self.user_id)
+
+    @classmethod
+    def create(cls):
+        application_graph = GraphAPI('%s|%s' % (TEST_APP_ID, TEST_APP_SECRET))
+
+        user = application_graph.post("%s/accounts/test-users" % TEST_APP_ID,
+            installed='true',
+            permissions='publish_stream,read_stream',
+        )
+
+        return cls(user['id'], user['access_token'])
 
 def test_get():
-    graph = GraphAPI(TEST_ACCESS_TOKEN)
+    graph = TEST_USER.graph
 
     assert isinstance(graph.get('me'), dict)
     assert isinstance(graph.get('me/picture'), str)
 
 def test_paged_get():
-    graph = GraphAPI(TEST_ACCESS_TOKEN)
+    graph = TEST_USER.graph
 
     posts = graph.get('Facebook/posts', until=1314742370, limit=6, page=True)
 
@@ -38,8 +56,7 @@ def test_paged_get():
     assert False, 'only first page of results returned'
 
 def test_post():
-
-    graph = GraphAPI(TEST_ACCESS_TOKEN)
+    graph = TEST_USER.graph
 
     # Generate a random message (Facebook rejects duplicate messages within a short time frame)
     message = ''.join(random.sample('a b c d e f g h i j k l m n o p q r s t u v w x y z'.split(), 10))
@@ -54,11 +71,11 @@ def test_post():
     assert post['message'] == message
 
 def test_delete():
-    graph = GraphAPI(TEST_ACCESS_TOKEN)
-    
+    graph = TEST_USER.graph
+
     # Generate a random message (Facebook rejects duplicate messages within a short time frame)
     message = ''.join(random.sample('a b c d e f g h i j k l m n o p q r s t u v w x y z'.split(), 10))
-    
+
     response = graph.post(
         path = 'me/feed',
         message = message
@@ -68,7 +85,7 @@ def test_delete():
 
 def test_search():
     graph = GraphAPI()
-    
+
     results = graph.search(
         term = 'the meaning of life',
         type = 'post'
