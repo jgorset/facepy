@@ -194,7 +194,7 @@ class GraphAPI(object):
 
         try:
             data = json.loads(data)
-        except ValueError as e:
+        except ValueError:
             return data
 
         # Facebook's Graph API sometimes responds with 'true' or 'false'. Facebook offers no documentation
