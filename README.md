@@ -62,7 +62,10 @@ Facepy is a client for Facebook APIs.
 
 ## Documentation
 
-See [Facebook's Graph API documentation](http://developers.facebook.com/docs/reference/api/) and the docstrings.
+See Facebook's documentation on the [Graph API](http://developers.facebook.com/docs/reference/api/),
+[Signed Requests](https://developers.facebook.com/docs/authentication/signed_request/) and the
+docstrings.
+
 
 ## Installation
 
