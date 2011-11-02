@@ -1,5 +1,12 @@
 CHANGELOG
 
+v0.4.1
+- Fixed a bug that caused a TypeError upon parsing signed requests in unicode.
+
+v0.4.0
+- Added support for parsing and reverse-engineering signed requests.
+- Added support for file-like objects in POST and PUT.
+
 v0.3.1
 - Fixed a bug that prevented the 'page' argument to GraphAPI#get from working
   correctly.

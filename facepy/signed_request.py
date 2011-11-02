@@ -1,4 +1,4 @@
-from facepy.exceptions import SignedRequestError
+from facepy.exceptions import FacepyError
 
 try:
     import simplejson as json
@@ -6,112 +6,189 @@ except ImportError:
     import json
 
 from datetime import datetime
+
 import base64
 import hashlib
 import hmac
 import time
 
-def parse_signed_request(signed_request, secret):
+class SignedRequest(object):
     """
-    Parse signed_request given by Facebook (usually via POST),
-    decrypt with app secret.
+    Facebook uses 'signed requests' to communicate with applications on the Facebook platform. See Facebook's
+    documentation on authentication at https://developers.facebook.com/docs/authentication/signed_request/
+    for the nitty-gritty of signed requests.
 
-    Arguments:
-    signed_request -- Facebook's signed request given through POST
-    secret -- Application's app_secret required to decrpyt signed_request
+    Properties:
+    user -- A User instance describing the user that generated the signed request.
+    data -- A string describing the contents of the 'app_data' query string parameter.
+    page -- A Page instance describing the page that the signed request was generated from.
+    oauth_token -- An OAuthToken instance describing an OAuth access token.
     """
-    try:
-        l = signed_request.split('.', 2)
-        encoded_sig = str(l[0])
-        payload = str(l[1])
-    except IndexError:
-        raise SignedRequestError("Signed request malformed")
 
-    sig = base64.urlsafe_b64decode(encoded_sig + "=" * ((4 - len(encoded_sig) % 4) % 4))
-    data = base64.urlsafe_b64decode(payload + "=" * ((4 - len(payload) % 4) % 4))
+    def __init__(self, **kwargs):
+        for key, value in kwargs.items():
+            if key in ['user', 'issued_at', 'expires_at', 'data', 'page', 'oauth_token']:
+                setattr(self, key, value)
+            else:
+                raise TypeError('SignedRequest got an unexpected argument \'%s\'' % key)
 
-    data = json.loads(data)
+    def parse(cls, signed_request, application_secret_key):
+        try:
+            encoded_signature, encoded_payload = (str(string) for string in signed_request.split('.', 2))
+        except IndexError:
+            raise cls.Error("Signed request malformed")
 
-    if data.get('algorithm').upper() != 'HMAC-SHA256':
-        raise SignedRequestError("Signed request is using an unknown algorithm")
-    else:
-        expected_sig = hmac.new(secret, msg=payload, digestmod=hashlib.sha256).digest()
+        def decode(string):
+            return base64.urlsafe_b64decode(string + "=" * ((4 - len(string) % 4) % 4))
 
-    if sig != expected_sig:
-        raise SignedRequestError("Signed request signature mismatch")
-    else:
-        return data
+        signature = decode(encoded_signature)
+        payload = decode(encoded_payload)
 
+        psr = json.loads(payload)
 
-def create_signed_request(app_secret, user_id=1, issued_at=None, oauth_token=None, expires=None, app_data=None, page=None):
-    """
-    Returns a string that is a valid signed_request parameter specified by Facebook
-    see: http://developers.facebook.com/docs/authentication/signed_request/
+        if not psr['algorithm'] == 'HMAC-SHA256':
+            raise cls.Error("Signed request is using an unknown algorithm")
 
-    Arguments:
-    app_secret -- the secret key that Facebook assigns to each Facebook application
-    user_id -- optional a long representing the Facebook user identifier (UID) of a user
-    issued_at -- optional an int or a datetime representing a timestamp when the request was signed
-    oauth_token -- optional a String token to pass in to the Facebook graph api
-    expires -- optional an int or a datetime representing a timestamp at which the oauth token expires
-    app_data -- optional a dict containing additional application data
-    page -- optional a dict having the keys id (string), liked (boolean) if the user has liked the page and optionally admin (boolean) if the user is an admin of that page.
+        expected_signature = hmac.new(application_secret_key, msg=encoded_payload, digestmod=hashlib.sha256).digest()
+        if not signature == expected_signature:
+            raise cls.Error("Signed request signature mismatch")
 
-    Regardless of which arguments are given, the encoded JSON object will always contain the following properties:
-        -- user_id
-        -- algorithm
-        -- issued_at
+        return cls(
+            user = cls.User(
+                id = psr['user_id'] if 'user_id' in psr else None,
+                locale = psr['user']['locale'],
+                country = psr['user']['country'],
+                age = range(
+                    psr['user']['age']['min'],
+                    psr['user']['age']['max'] + 1 if 'max' in psr['user']['age'] else 100
+                )
+            ),
+            page = cls.Page(
+                id = psr['page']['id'],
+                is_liked = psr['page']['liked'],
+                is_admin = psr['page']['admin']
+            ) if 'page' in psr else None,
+            oauth_token = cls.OAuthToken(
+                token = psr['oauth_token'],
+                issued_at = datetime.fromtimestamp(psr['issued_at']),
+                expires_at = datetime.fromtimestamp(psr['expires']) if psr['expires'] > 0 else None
+            ) if 'oauth_token' in psr else None,
+            data = psr['app_data'] if 'app_data' in psr else None
+        )
 
-    Examples:
-        create_signed_request(FACEBOOK_APPLICATION_SECRET_KEY)
-        create_signed_request(FACEBOOK_APPLICATION_SECRET_KEY, user_id=199)
-        create_signed_request(FACEBOOK_APPLICATION_SECRET_KEY, user_id=199, issued_at=1254459600)
+    parse = classmethod(parse)
 
-    """
-    payload = {'user_id': user_id, 'algorithm': 'HMAC-SHA256'}
+    def generate(self, application_secret_key):
 
-    value = int(time.time())
-    if issued_at is not None and (isinstance(issued_at, datetime) or isinstance(issued_at, int)):
-        value = issued_at
-        if isinstance(issued_at, datetime):
-            value = int(time.mktime(issued_at.timetuple()))
-    payload['issued_at'] = value
+        payload = {
+            'algorithm': 'HMAC-SHA256'
+        }
 
-    if oauth_token is not None:
-        payload['oauth_token'] = oauth_token
-    if expires is not None and (isinstance(expires, datetime) or isinstance(expires, int)):
-        value = expires
-        if isinstance(expires, datetime):
-            value = int(time.mktime(expires.timetuple()))
-        payload['expires'] = value
-    if app_data is not None and isinstance(app_data, dict):
-        payload['app_data'] = app_data
-    if page is not None and isinstance(page, dict):
-        payload['page'] = page
+        if self.data:
+            payload['app_data'] = self.data
 
-    return __create_signed_request_parameter(app_secret, json.dumps(payload))
+        if self.oauth_token:
+            payload['oauth_token'] = self.oauth_token.token
+            payload['expires'] = int(time.mktime(self.oauth_token.expires_at.timetuple())) if self.oauth_token.expires_at else 0
+            payload['issued_at'] = int(time.mktime(self.oauth_token.issued_at.timetuple()))
 
-def __prepend_signature(app_secret, payload):
-    """
-        Returns a SHA256 signed and base64 encoded signature based on the given payload
+        if self.page:
+            payload['page'] = {
+                'id': self.page.id,
+                'liked': self.page.is_liked,
+                'admin': self.page.is_admin
+            }
 
-        Arguments:
-        app_secret -- the secret key that Facebook assigns to each Facebook application
-        payload -- a base64url encoded String
-    """
-    dig = hmac.new(app_secret, msg=payload, digestmod=hashlib.sha256).digest()
-    dig = base64.urlsafe_b64encode(dig)
-    return dig
+        if self.user:
+            payload['user'] = {
+                'country': self.user.country,
+                'locale': self.user.locale,
+                'age': {
+                    'min': self.user.age[0],
+                    'max': self.user.age[-1]
+                }
+            }
 
-def __create_signed_request_parameter(app_secret, payload):
-    """
-        Returns a String value usable as the Facebook signed_request parameter. The String will be based on the given payload.
-        The signed_request parameter is the concatenation of a HMAC SHA-256 signature string, a period (.), and a
-        the base64url encoded payload.
+        if self.user.id:
+            payload['user_id'] = self.user.id
 
-        Arguments:
-        app_secret -- the secret key that Facebook assigns to each Facebook application
-        payload -- a JSON formatted String
-    """
-    base64_encoded_payload = base64.urlsafe_b64encode(payload)
-    return __prepend_signature(app_secret, base64_encoded_payload) + "." + base64_encoded_payload
+        encoded_payload = base64.urlsafe_b64encode(
+            json.dumps(payload, separators=(',', ':'))
+        )
+
+        encoded_signature = base64.urlsafe_b64encode(hmac.new(application_secret_key, encoded_payload, hashlib.sha256).digest())
+
+        return '%(signature)s.%(payload)s' % {
+            'signature': encoded_signature,
+            'payload': encoded_payload
+        }
+
+    class Page(object):
+        """
+        A page represents a Page on Facebook.
+
+        Properties:
+        id -- An integer describing the page's Facebook ID.
+        is_liked -- A boolean describing whether or not the user likes the page.
+        is_admin -- A bolean describing whether or nor the user is an administrator of the page.
+        url -- A string describing the URL to the page.
+        """
+
+        def __init__(self, id, is_liked, is_admin):
+            self.id, self.is_liked, self.is_admin = id, is_liked, is_admin
+
+        def _get_url(self):
+            return 'http://facebook.com/%s' % self.id
+
+        url = property(_get_url)
+
+    class User(object):
+        """
+        A user represents a user on Facebook.
+
+        Properties:
+        id -- An integer describing the user's Facebook ID.
+        url -- A string describing the URL to the user's profile.
+        locale -- A string describing the user's locale.
+        country -- A string describing the user's country.
+        age -- A range describing the user's age.
+        """
+
+        def __init__(self, id, locale, country, age):
+            self.id, self.locale, self.country, self.age = id, locale, country, age
+
+        def _get_profile_url(self):
+            return 'http://facebook.com/%s' % self.id
+
+        profile_url = property(_get_profile_url)
+        
+        def _get_authorization_status(self):
+            return True if self.id else False
+            
+        has_authorized_application = property(_get_authorization_status)
+
+    class OAuthToken(object):
+        """
+        An OAuth token represents an access token that may be used to query
+        Facebook's Graph API on behalf of the user that issued it.
+
+        Properties:
+        token -- A string describing the access token.
+        issued_at -- A datetime instance describing when the signed request was issued.
+        expires_at -- A datetime instance describing when the OAuth token will expire, or 'None' if it doesn't.
+        """
+
+        def __init__(self, token, issued_at, expires_at):
+            self.token, self.issued_at, self.expires_at = token, issued_at, expires_at
+
+        def _has_expired(self):
+            if self.expires_at is None:
+                return False
+            else:
+                return self.expires_at < datetime.now()
+
+        has_expired = property(_has_expired)
+
+    class Error(FacepyError):
+        """Exception raised for invalid signed_request processing."""
+        pass

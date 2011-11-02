@@ -4,6 +4,8 @@ import json
 import random
 
 from facepy import GraphAPI
+from facepy import SignedRequest
+
 import requests
 
 # Permanent access token for a test user of the Facepy Test Application (application id 160327664029652)
@@ -16,11 +18,6 @@ TEST_SIGNED_REQUEST = '7MF856LgfXmXf0PPe4BOWq20FVVZQLAebjlWAh2e64k.eyJhbGdvcml0a
                       'MX19LCJ1c2VyX2lkIjoiMTAwMDAyMzg3ODU0ODE1In0'
                       
 TEST_APP_SECRET = '102d4e42d228d59c7ae4ebd874ef7757'
-
-def test_signed_request():
-    graph = GraphAPI(signed_request=TEST_SIGNED_REQUEST, app_secret=TEST_APP_SECRET)
-
-    assert isinstance(graph.get("me"), dict)
 
 def test_get():
     graph = GraphAPI(TEST_ACCESS_TOKEN)
