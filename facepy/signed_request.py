@@ -34,7 +34,7 @@ class SignedRequest(object):
 
     def parse(cls, signed_request, application_secret_key):
         try:
-            encoded_signature, encoded_payload = signed_request.split('.', 2)
+            encoded_signature, encoded_payload = (str(string) for string in signed_request.split('.', 2))
         except IndexError:
             raise cls.Error("Signed request malformed")
 
