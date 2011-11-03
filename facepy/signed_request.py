@@ -56,8 +56,8 @@ class SignedRequest(object):
         return cls(
             user = cls.User(
                 id = psr['user_id'] if 'user_id' in psr else None,
-                locale = psr['user']['locale'],
-                country = psr['user']['country'],
+                locale = psr['user'].get('locale', None),
+                country = psr['user'].get('country', None),
                 age = range(
                     psr['user']['age']['min'],
                     psr['user']['age']['max'] + 1 if 'max' in psr['user']['age'] else 100
