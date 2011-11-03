@@ -91,4 +91,4 @@ def test_search():
         type = 'post'
     )
 
-    assert results.__class__ is list
+    assert isinstance(results, list)
