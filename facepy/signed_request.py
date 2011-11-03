@@ -54,8 +54,10 @@ class SignedRequest(object):
             raise cls.Error("Signed request signature mismatch")
 
         return cls(
+
+            # Populate user data
             user = cls.User(
-                id = psr['user_id'] if 'user_id' in psr else None,
+                id = psr.get('user_id'),
                 locale = psr['user'].get('locale', None),
                 country = psr['user'].get('country', None),
                 age = range(
@@ -63,17 +65,23 @@ class SignedRequest(object):
                     psr['user']['age']['max'] + 1 if 'max' in psr['user']['age'] else 100
                 )
             ),
+
+            # Populate page data
             page = cls.Page(
                 id = psr['page']['id'],
                 is_liked = psr['page']['liked'],
                 is_admin = psr['page']['admin']
             ) if 'page' in psr else None,
+
+            # Populate oauth token data
             oauth_token = cls.OAuthToken(
                 token = psr['oauth_token'],
                 issued_at = datetime.fromtimestamp(psr['issued_at']),
                 expires_at = datetime.fromtimestamp(psr['expires']) if psr['expires'] > 0 else None
             ) if 'oauth_token' in psr else None,
-            data = psr['app_data'] if 'app_data' in psr else None
+
+            # Populate miscellaneous data
+            data = psr.get('app_data', None)
         )
 
     parse = classmethod(parse)
