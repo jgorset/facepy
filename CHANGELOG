@@ -1,5 +1,9 @@
 CHANGELOG
 
+v0.4.2
+- Facepy is now compatible with Python 2.6.
+- Fixed a bug that caused a KeyError if the user's locale or country is missing from the signed request.
+
 v0.4.1
 - Fixed a bug that caused a TypeError upon parsing signed requests in unicode.
 
