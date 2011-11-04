@@ -132,16 +132,11 @@ class GraphAPI(object):
         result = self._parse(response.content)
 
         try:
-            obj = result['data']
-        except (KeyError, TypeError):
-            obj = result
-
-        try:
             next_url = result['paging']['next']
         except (KeyError, TypeError):
             next_url = None
 
-        return obj, next_url
+        return result, next_url
 
     def _query(self, method, path, data={}, page=False):
         """

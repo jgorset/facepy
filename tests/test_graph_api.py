@@ -91,4 +91,4 @@ def test_search():
         type = 'post'
     )
 
-    assert isinstance(results, list)
+    assert isinstance(results['data'], list)
