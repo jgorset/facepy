@@ -6,53 +6,45 @@ from facepy import GraphAPI
 
 TEST_APP_ID = '160327664029652'
 TEST_APP_SECRET = '102d4e42d228d59c7ae4ebd874ef7757'
+TEST_USER = None
+
+def setup_module(module):
+    setattr(module, 'TEST_USER', FacebookUser.create())
+
+def teardown_module(module):
+    if TEST_USER:
+        TEST_USER.delete()
 
 class FacebookUser(object):
+
     def __init__(self, user_id, access_token):
         self.user_id = user_id
         self.access_token = access_token
+        self.graph = GraphAPI(self.access_token)
+
+    def delete(self):
+        application_graph = GraphAPI('%s|%s' % (TEST_APP_ID, TEST_APP_SECRET))
+        application_graph.delete("%s/" % self.user_id)
 
     @classmethod
-    def get_app_graph(cls):
-        return GraphAPI("%s|%s" % (TEST_APP_ID, TEST_APP_SECRET))
+    def create(cls):
+        application_graph = GraphAPI('%s|%s' % (TEST_APP_ID, TEST_APP_SECRET))
 
-    @classmethod
-    def delete_test_user(cls, user_id):
-        app_graph = cls.get_app_graph()
-
-        user = app_graph.delete("%s/" % user_id)
-
-    @classmethod
-    def get_test_user(cls):
-        app_graph = cls.get_app_graph()
-
-        user = app_graph.post("%s/accounts/test-users" % TEST_APP_ID,
+        user = application_graph.post("%s/accounts/test-users" % TEST_APP_ID,
             installed='true',
             permissions='publish_stream,read_stream',
         )
 
         return cls(user['id'], user['access_token'])
 
-test_user = None
-def get_test_user():
-    global test_user
-    if test_user is None:
-        test_user = FacebookUser.get_test_user()
-
-    return test_user
-
-def teardown_module(module):
-    if test_user is not None:
-        FacebookUser.delete_test_user(test_user.user_id)
-
 def test_get():
-    graph = GraphAPI(get_test_user().access_token)
+    graph = TEST_USER.graph
 
     assert isinstance(graph.get('me'), dict)
     assert isinstance(graph.get('me/picture'), str)
 
 def test_paged_get():
-    graph = GraphAPI(get_test_user().access_token)
+    graph = TEST_USER.graph
 
     posts = graph.get('Facebook/posts', until=1314742370, limit=6, page=True)
 
@@ -64,7 +56,7 @@ def test_paged_get():
     assert False, 'only first page of results returned'
 
 def test_post():
-    graph = GraphAPI(get_test_user().access_token)
+    graph = TEST_USER.graph
 
     # Generate a random message (Facebook rejects duplicate messages within a short time frame)
     message = ''.join(random.sample('a b c d e f g h i j k l m n o p q r s t u v w x y z'.split(), 10))
@@ -79,7 +71,7 @@ def test_post():
     assert post['message'] == message
 
 def test_delete():
-    graph = GraphAPI(get_test_user().access_token)
+    graph = TEST_USER.graph
 
     # Generate a random message (Facebook rejects duplicate messages within a short time frame)
     message = ''.join(random.sample('a b c d e f g h i j k l m n o p q r s t u v w x y z'.split(), 10))
@@ -99,4 +91,4 @@ def test_search():
         type = 'post'
     )
 
-    assert results.__class__ is list
+    assert isinstance(results, list)
