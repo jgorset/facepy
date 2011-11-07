@@ -185,6 +185,7 @@ class SignedRequest(object):
         token -- A string describing the access token.
         issued_at -- A datetime instance describing when the signed request was issued.
         expires_at -- A datetime instance describing when the OAuth token will expire, or 'None' if it doesn't.
+        has_expired -- A boolean describing whether the OAuth token has expired.
         """
 
         def __init__(self, token, issued_at, expires_at):
