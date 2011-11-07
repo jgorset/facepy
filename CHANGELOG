@@ -1,5 +1,10 @@
 CHANGELOG
 
+v0.5
+- Facepy now returns the complete API response instead of just its "data" attribute.
+
+Note: This release is backwards-incompatible.
+
 v0.4.2
 - Facepy is now compatible with Python 2.6.
 - Fixed a bug that caused a KeyError if the user's locale or country is missing from the signed request.

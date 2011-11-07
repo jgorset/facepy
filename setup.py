@@ -2,7 +2,7 @@ from setuptools import setup
 
 setup(
     name = 'facepy',
-    version = '0.4.2',
+    version = '0.5',
     description = "Facepy is a client for Facebook APIs.",
     author = "Johannes Gorset",
     author_email = "jgorset@gmail.com",
