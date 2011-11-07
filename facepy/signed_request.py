@@ -156,10 +156,11 @@ class SignedRequest(object):
 
         Properties:
         id -- An integer describing the user's Facebook ID.
-        url -- A string describing the URL to the user's profile.
+        profile_url -- A string describing the URL to the user's profile.
         locale -- A string describing the user's locale.
         country -- A string describing the user's country.
         age -- A range describing the user's age.
+        has_authorized_application -- A boolean describing whether the user has authorized the application.
         """
 
         def __init__(self, id, locale, country, age):
