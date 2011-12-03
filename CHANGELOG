@@ -1,5 +1,8 @@
 CHANGELOG
 
+v0.5.1
+- It is now considerably easier to create signed requests programmatically.
+
 v0.5
 - Facepy now returns the complete API response instead of just its "data" attribute.
 
