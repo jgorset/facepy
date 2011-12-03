@@ -22,7 +22,7 @@ def test_parse_signed_request():
     assert signed_request.oauth_token.expires_at == None
     assert signed_request.oauth_token.issued_at == datetime(2011, 5, 23, 21, 45, 4)
 
-def test_create_signed_request():
+def test_generate_signed_request():
     from facepy import SignedRequest
     from datetime import datetime
 
