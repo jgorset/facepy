@@ -25,12 +25,8 @@ class SignedRequest(object):
     oauth_token -- An OAuthToken instance describing an OAuth access token.
     """
 
-    def __init__(self, **kwargs):
-        for key, value in kwargs.items():
-            if key in ['user', 'issued_at', 'expires_at', 'data', 'page', 'oauth_token']:
-                setattr(self, key, value)
-            else:
-                raise TypeError('SignedRequest got an unexpected argument \'%s\'' % key)
+    def __init__(self, user, data=None, page=None, oauth_token=None):
+        self.user, self.data, self.page, self.oauth_token = user, data, page, oauth_token
 
     def parse(cls, signed_request, application_secret_key):
         try:
@@ -142,7 +138,7 @@ class SignedRequest(object):
         url -- A string describing the URL to the page.
         """
 
-        def __init__(self, id, is_liked, is_admin):
+        def __init__(self, id, is_liked=False, is_admin=False):
             self.id, self.is_liked, self.is_admin = id, is_liked, is_admin
 
         def _get_url(self):
@@ -163,7 +159,7 @@ class SignedRequest(object):
         has_authorized_application -- A boolean describing whether the user has authorized the application.
         """
 
-        def __init__(self, id, locale, country, age):
+        def __init__(self, id, age, locale=None, country=None):
             self.id, self.locale, self.country, self.age = id, locale, country, age
 
         def _get_profile_url(self):
