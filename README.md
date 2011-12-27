@@ -2,7 +2,7 @@
 
 ## About
 
-Facepy makes it absurdly easy to interact with Facebook APIs
+Facepy makes it absurdly easy to interact with Facebook APIs.
 
 ## Usage
 
