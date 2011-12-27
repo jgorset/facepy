@@ -14,21 +14,29 @@ import time
 
 class SignedRequest(object):
     """
-    Facebook uses 'signed requests' to communicate with applications on the Facebook platform. See Facebook's
-    documentation on authentication at https://developers.facebook.com/docs/authentication/signed_request/
-    for the nitty-gritty of signed requests.
-
-    Properties:
-    user -- A User instance describing the user that generated the signed request.
-    data -- A string describing the contents of the 'app_data' query string parameter.
-    page -- A Page instance describing the page that the signed request was generated from.
-    oauth_token -- An OAuthToken instance describing an OAuth access token.
+    Facebook uses 'signed requests' to communicate with applications on the Facebook platform. See ``Facebook's
+    documentation on authentication <https://developers.facebook.com/docs/authentication/signed_request/>``_
+    for more information.
     """
+    
+    user = None
+    """A ``SignedRequest.User`` instance describing the user that generated the signed request."""
+    
+    data = None
+    """A string describing the contents of the ``app_data`` query string parameter."""
+    
+    page = None
+    """A ``SignedRequest.Page`` instance describing the Facebook page that the signed request was generated from."""
+    
+    oauth_token = None
+    """A ``SignedRequest.OAuthToken`` instance describing an OAuth access token."""
 
     def __init__(self, user, data=None, page=None, oauth_token=None):
+        """Initialize an instance from arbitrary data."""
         self.user, self.data, self.page, self.oauth_token = user, data, page, oauth_token
 
     def parse(cls, signed_request, application_secret_key):
+        """Initialize an instance from a signed request."""
         try:
             encoded_signature, encoded_payload = (str(string) for string in signed_request.split('.', 2))
         except IndexError:
@@ -83,7 +91,7 @@ class SignedRequest(object):
     parse = classmethod(parse)
 
     def generate(self, application_secret_key):
-
+        """Generate a signed request from this instance."""
         payload = {
             'algorithm': 'HMAC-SHA256'
         }
@@ -129,14 +137,20 @@ class SignedRequest(object):
 
     class Page(object):
         """
-        A page represents a Page on Facebook.
-
-        Properties:
-        id -- An integer describing the page's Facebook ID.
-        is_liked -- A boolean describing whether or not the user likes the page.
-        is_admin -- A bolean describing whether or nor the user is an administrator of the page.
-        url -- A string describing the URL to the page.
+        A ``Page`` instance represents a Facebook page.
         """
+        
+        id = None
+        """An integer describing the page's Facebook ID."""
+        
+        is_liked = None
+        """A boolean describing whether or not the user likes the page."""
+        
+        is_admin = None
+        """A bolean describing whether or nor the user is an administrator of the page."""
+        
+        url = None
+        """A string describing the URL to the page."""
 
         def __init__(self, id, is_liked=False, is_admin=False):
             self.id, self.is_liked, self.is_admin = id, is_liked, is_admin
@@ -148,53 +162,59 @@ class SignedRequest(object):
 
     class User(object):
         """
-        A user represents a user on Facebook.
-
-        Properties:
-        id -- An integer describing the user's Facebook ID.
-        profile_url -- A string describing the URL to the user's profile.
-        locale -- A string describing the user's locale.
-        country -- A string describing the user's country.
-        age -- A range describing the user's age.
-        has_authorized_application -- A boolean describing whether the user has authorized the application.
+        A ``User`` instance represents a Facebook user.
         """
+
+        id = None
+        """An integer describing the user's Facebook ID."""
+
+        age = None
+        """A range describing the user's age."""
+
+        locale = None
+        """A string describing the user's locale."""
+
+        country = None
+        """A string describing the user's country."""
 
         def __init__(self, id, age, locale=None, country=None):
             self.id, self.locale, self.country, self.age = id, locale, country, age
 
-        def _get_profile_url(self):
+        @property
+        def profile_url(self):
+            """A string describing the URL to the user's Facebook profile."""
             return 'http://facebook.com/%s' % self.id
 
-        profile_url = property(_get_profile_url)
-        
-        def _get_authorization_status(self):
+        @property
+        def has_authorized_application(self):
+            """A boolean describing whether the user has authorized the application."""
             return True if self.id else False
-            
-        has_authorized_application = property(_get_authorization_status)
 
     class OAuthToken(object):
         """
         An OAuth token represents an access token that may be used to query
         Facebook's Graph API on behalf of the user that issued it.
-
-        Properties:
-        token -- A string describing the access token.
-        issued_at -- A datetime instance describing when the signed request was issued.
-        expires_at -- A datetime instance describing when the OAuth token will expire, or 'None' if it doesn't.
-        has_expired -- A boolean describing whether the OAuth token has expired.
         """
+
+        token = None
+        """A string describing the access token."""
+
+        issued_at = None
+        """A ``datetime`` instance describing when the access token was issued."""
+
+        expires_at = None
+        """A ``datetime`` instance describing when the access token will expire, or ``None`` if it won't."""
 
         def __init__(self, token, issued_at, expires_at):
             self.token, self.issued_at, self.expires_at = token, issued_at, expires_at
 
-        def _has_expired(self):
+        @property
+        def has_expired(self):
+            """A boolean describing whether the access token has expired."""
             if self.expires_at is None:
                 return False
             else:
                 return self.expires_at < datetime.now()
 
-        has_expired = property(_has_expired)
-
     class Error(FacepyError):
         """Exception raised for invalid signed_request processing."""
-        pass

@@ -13,9 +13,8 @@ class GraphAPI(object):
         """
         Initialize GraphAPI with an OAuth token, a signed request or neither.
 
-        Arguments:
-        oauth_token -- A string describing an OAuth token.
-        signed_request -- A SignedRequest instance (see facepy.signed_request.SignedRequest).
+        :param oauth_token: A string describing an OAuth access token.
+        :param signed_request: A ``SignedRequest`` instance.
         """
         self.oauth_token = oauth_token
 
@@ -24,9 +23,13 @@ class GraphAPI(object):
         Get an item from the Graph API.
 
         Arguments:
-        path -- A string describing the path to the item.
-        page -- A boolean describing whether to return a generator that iterates over each page of results.
-        **options -- Graph API parameters such as 'limit', 'offset' or 'since' (see http://developers.facebook.com/docs/reference/api/).
+        :param path: A string describing the path to the item.
+        :param page: A boolean describing whether to return a generator that
+                     iterates over each page of results.
+        :param **options: Graph API parameters* such as 'limit', 'offset' or 'since'.
+
+        * See ``Facebook's Graph API documentation <http://developers.facebook.com/docs/reference/api/>``_
+          for an exhaustive list of parameters.
         """
 
         response = self._query('GET', path, options, page)
@@ -40,9 +43,11 @@ class GraphAPI(object):
         """
         Post an item to the Graph API.
 
-        Arguments:
-        path -- A string describing the path to the item.
-        **options -- Graph API publishing parameters (see http://developers.facebook.com/docs/reference/api/#publishing).
+        :param path: A string describing the path to the item.
+        :param **options: Graph API parameters*.
+
+        * See ``Facebook's Graph API documentation <http://developers.facebook.com/docs/reference/api/>``_
+          for an exhaustive list of options.
         """
 
         response = self._query('POST', path, data)
@@ -56,8 +61,7 @@ class GraphAPI(object):
         """
         Delete an item in the Graph API.
 
-        Arguments:
-        path -- A string describing the path to the item.
+        :param path: A string describing the path to the item.
         """
 
         response = self._query('DELETE', path)
@@ -72,11 +76,14 @@ class GraphAPI(object):
         Search for an item in the Graph API.
 
         Arguments:
-        term -- A string describing the search term.
-        type -- A string describing the type of items to search for *.
-        **options -- Additional Graph API parameters, such as 'center' and 'distance' (see http://developers.facebook.com/docs/reference/api/).
+        :param term: A string describing the search term.
+        :param type: A string describing the type of items to search for*.
+        :param **options: Graph API parameters*, such as 'center' and 'distance'.
 
-        Supported types are 'post', 'user', 'page', 'event', 'group', 'place' and 'checkin'.
+        * Supported types are 'post', 'user', 'page', 'event', 'group', 'place' and 'checkin'.
+
+        ** See ``Facebook's Graph API documentation <http://developers.facebook.com/docs/reference/api/>``_
+           for an exhaustive list of options.
         """
 
         SUPPORTED_TYPES = ['post', 'user', 'page', 'event', 'group', 'place', 'checkin']
@@ -94,16 +101,14 @@ class GraphAPI(object):
 
     def _load_url(self, method, url, data):
         """
-        Fetch an object from the Graph API and parse the output.
+        Fetch an object from the Graph API and parse the output, returning a tuple where the first item
+        is the object yielded by the Graph API and the second is the URL for the next page of results, or
+        ``None`` if results have been exhausted.
 
         Arguments:
-        method -- A string describing the HTTP method.
-        url -- A string describing the URL.
-        data -- A dictionary of HTTP GET parameters (for GET requests) or POST data (for POST requests).
-
-        Returns a pair (obj, next_url) where obj is the object returned from the graph API (parsed
-        into a python object) and next_url is the URL for more results or None if this is the last
-        page of results.
+        :param method: A string describing the HTTP method.
+        :param url: A string describing the URL.
+        :param data: A dictionary of HTTP GET parameters (for GET requests) or POST data (for POST requests).
         """
         def strip_filelike(input):
             files = {}
@@ -142,10 +147,9 @@ class GraphAPI(object):
         """
         Low-level access to Facebook's Graph API.
 
-        Arguments:
-        method -- A string describing the HTTP method.
-        path -- A string describing the path.
-        data -- A dictionary of HTTP GET parameters (for GET requests) or POST data (for POST requests).
+        :param method: A string describing the HTTP method.
+        :param path: A string describing the path.
+        :param data: A dictionary of HTTP GET parameters (for GET requests) or POST data (for POST requests).
         """
 
         # Convert option lists to comma-separated values; Facebook chokes on array-like constructs
@@ -174,8 +178,7 @@ class GraphAPI(object):
         """
         Parse the response from Facebook's Graph API.
 
-        Arguments:
-        data -- A string describing the Graph API's response.
+        :param data: A string describing the Graph API's response.
         """
 
         try:
