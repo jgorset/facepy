@@ -14,8 +14,8 @@ import time
 
 class SignedRequest(object):
     """
-    Facebook uses 'signed requests' to communicate with applications on the Facebook platform. See ``Facebook's
-    documentation on authentication <https://developers.facebook.com/docs/authentication/signed_request/>``_
+    Facebook uses 'signed requests' to communicate with applications on the Facebook platform. See `Facebook's
+    documentation on authentication <https://developers.facebook.com/docs/authentication/signed_request/>`_
     for more information.
     """
     

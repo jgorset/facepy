@@ -6,71 +6,24 @@ Facepy makes it absurdly easy to interact with Facebook APIs
 
 ## Usage
 
-### Graph API
-
     from facepy import GraphAPI
 
     # Initialize the Graph API with a valid access token (optional,
     # but will allow you to do all sorts of fun stuff).
     graph = GraphAPI(oauth_access_token)
 
-    # Get an object from the Graph API.
-    graph.get('johannes.gorset')
+    # Get my latest posts
+    graph.get('me/posts')
 
-    # Get a list of objects from the Graph API.
-    graph.get('johannes.gorset/friends')
-
-    # Post an item to the Graph API.
+    # Post a photo of a parrot
     graph.post(
-        path = 'johannes.gorset/feed',
-        message = 'Why, hello.'
+        path = 'me/photos',
+        source = open('parrot.jpg')
     )
 
-    # Upload an image to the Graph API.
-    graph.post(
-        path = 'johannes.gorset/photos',
-        source = open('parrot.jpg'),
-    )
-
-    # Delete an item from the Graph API.
-    graph.delete('481213268764')
-
-    # Search the Graph API for posts describing the meaning of life.
-    graph.search(
-        term = 'the meaning of life',
-        type = 'post'
-    )
-
-### Signed requests
-
-    from facepy import SignedRequest
-
-    # Parse a signed request
-    signed_request = SignedRequest.parse(signed_request, facebook_application_secret_key)
-
-    # Print the Facebook ID of the user that issued the signed request
-    print signed_request.user.id
-    
-    # Print the OAuth token contained within the signed request
-    print signed_request.oauth_token.token
-    
-    # Print whether or not the OAuth token has expired
-    print signed_request.oauth_token.has_expired
-
-    # Reverse-engineer the signed request
-    signed_request.generate(facebook_application_secret_key)
-
-## Documentation
-
-See Facebook's documentation on the [Graph API](http://developers.facebook.com/docs/reference/api/),
-[Signed Requests](https://developers.facebook.com/docs/authentication/signed_request/) and the
-docstrings.
-
+Facepy can do more than reading your latest posts and posting photographs of parrots. You should
+[read the documentation](http://readthedocs.org/docs/facepy) to find out how.
 
 ## Installation
 
     $ pip install facepy
-
-## Dependencies
-
-* [requests](https://github.com/kennethreitz/requests/)

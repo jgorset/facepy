@@ -11,10 +11,9 @@ class GraphAPI(object):
 
     def __init__(self, oauth_token=False):
         """
-        Initialize GraphAPI with an OAuth token, a signed request or neither.
+        Initialize GraphAPI with an OAuth access token.
 
         :param oauth_token: A string describing an OAuth access token.
-        :param signed_request: A ``SignedRequest`` instance.
         """
         self.oauth_token = oauth_token
 
@@ -22,14 +21,13 @@ class GraphAPI(object):
         """
         Get an item from the Graph API.
 
-        Arguments:
         :param path: A string describing the path to the item.
         :param page: A boolean describing whether to return a generator that
                      iterates over each page of results.
-        :param **options: Graph API parameters* such as 'limit', 'offset' or 'since'.
+        :param options: Graph API parameters such as 'limit', 'offset' or 'since'.
 
-        * See ``Facebook's Graph API documentation <http://developers.facebook.com/docs/reference/api/>``_
-          for an exhaustive list of parameters.
+        See `Facebook's Graph API documentation <http://developers.facebook.com/docs/reference/api/>`_
+        for an exhaustive list of parameters.
         """
 
         response = self._query('GET', path, options, page)
@@ -44,10 +42,10 @@ class GraphAPI(object):
         Post an item to the Graph API.
 
         :param path: A string describing the path to the item.
-        :param **options: Graph API parameters*.
+        :param options: Graph API parameters.
 
-        * See ``Facebook's Graph API documentation <http://developers.facebook.com/docs/reference/api/>``_
-          for an exhaustive list of options.
+        See `Facebook's Graph API documentation <http://developers.facebook.com/docs/reference/api/>`_
+        for an exhaustive list of options.
         """
 
         response = self._query('POST', path, data)
@@ -75,17 +73,16 @@ class GraphAPI(object):
         """
         Search for an item in the Graph API.
 
-        Arguments:
         :param term: A string describing the search term.
-        :param type: A string describing the type of items to search for*.
+        :param type: A string describing the type of items to search for.
         :param page: A boolean describing whether to return a generator that
                      iterates over each page of results.
-        :param **options: Graph API parameters**, such as 'center' and 'distance'.
+        :param options: Graph API parameters, such as 'center' and 'distance'.
 
-        * Supported types are 'post', 'user', 'page', 'event', 'group', 'place' and 'checkin'.
+        Supported types are ``post``, ``user``, ``page``, ``event``, ``group``, ``place`` and ``checkin``.
 
-        ** See ``Facebook's Graph API documentation <http://developers.facebook.com/docs/reference/api/>``_
-           for an exhaustive list of options.
+        See `Facebook's Graph API documentation <http://developers.facebook.com/docs/reference/api/>`_
+        for an exhaustive list of options.
         """
 
         SUPPORTED_TYPES = ['post', 'user', 'page', 'event', 'group', 'place', 'checkin']
