@@ -2,4 +2,4 @@ from graph_api import GraphAPI
 from signed_request import SignedRequest
 from exceptions import FacepyError
 
-VERSION = '0.5.1'
+__version__ = '0.5.1'
