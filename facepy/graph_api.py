@@ -80,7 +80,7 @@ class GraphAPI(object):
         :param type: A string describing the type of items to search for*.
         :param page: A boolean describing whether to return a generator that
                      iterates over each page of results.
-        :param **options: Graph API parameters*, such as 'center' and 'distance'.
+        :param **options: Graph API parameters**, such as 'center' and 'distance'.
 
         * Supported types are 'post', 'user', 'page', 'event', 'group', 'place' and 'checkin'.
 
