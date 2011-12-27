@@ -46,11 +46,10 @@ def test_get():
 def test_paged_get():
     graph = TEST_USER.graph
 
-    posts = graph.get('Facebook/posts', until=1314742370, limit=6, page=True)
+    posts = graph.get('facebook/posts', page=True)
 
-    for (i, post) in enumerate(posts):
-        # require three pages of results
-        if i >= 21:
+    for index, post in enumerate(posts):
+        if index > 3:
             return
 
     assert False, 'only first page of results returned'
