@@ -21,7 +21,7 @@ Facepy makes it absurdly easy to interact with Facebook APIs.
         source = open('parrot.jpg')
     )
 
-Facepy can do more than reading your latest posts and posting photographs of parrots. You should
+Facepy can do more than reading your latest posts and posting photographs of parrots, but you'll have to
 [read the documentation](http://readthedocs.org/docs/facepy) to find out how.
 
 ## Installation
