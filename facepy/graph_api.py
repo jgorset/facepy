@@ -71,13 +71,15 @@ class GraphAPI(object):
 
         return response
 
-    def search(self, term, type, **options):
+    def search(self, term, type, page=False, **options):
         """
         Search for an item in the Graph API.
 
         Arguments:
         :param term: A string describing the search term.
         :param type: A string describing the type of items to search for*.
+        :param page: A boolean describing whether to return a generator that
+                     iterates over each page of results.
         :param **options: Graph API parameters*, such as 'center' and 'distance'.
 
         * Supported types are 'post', 'user', 'page', 'event', 'group', 'place' and 'checkin'.
@@ -95,7 +97,7 @@ class GraphAPI(object):
             'type': type,
         }, **options)
 
-        response = self._query('GET', 'search', options)
+        response = self._query('GET', 'search', options, page)
 
         return response
 
