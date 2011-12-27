@@ -99,80 +99,71 @@ class GraphAPI(object):
 
         return response
 
-    def _load_url(self, method, url, data):
+    def _query(self, method, path, data={}, page=False):
         """
         Fetch an object from the Graph API and parse the output, returning a tuple where the first item
         is the object yielded by the Graph API and the second is the URL for the next page of results, or
         ``None`` if results have been exhausted.
 
-        Arguments:
         :param method: A string describing the HTTP method.
         :param url: A string describing the URL.
         :param data: A dictionary of HTTP GET parameters (for GET requests) or POST data (for POST requests).
+        :param page: A boolean describing whether to return an iterator that iterates over each page of results.
         """
-        def strip_filelike(input):
-            files = {}
 
-            for key, value in input.iteritems():
-                if hasattr(value, 'read'): # it quacks like a file!
-                    files[key] = input[key]
+        def load(method, url, data):
+            if method in ['GET', 'DELETE']:
+                response = requests.request(method, url, params=data)
 
-            for key in files.iterkeys():
-                input.pop(key)
+            if method in ['POST', 'PUT']:
+                files = {}
 
-            if not files:
-                files = None
+                for key in data:
+                    if hasattr(data[key], 'read'):
+                        files[key] = data[key]
 
-            return files
+                for key in files:
+                    data.pop(key)
 
-        if method in ['GET', 'DELETE']:
-            response = requests.request(method, url, params=data)
-        elif method in ['POST', 'PUT']:
-            files = strip_filelike(data)
+                response = requests.request(method, url, data=data, files=files)
 
-            response = requests.request(method, url, data=data, files=files)
-        else:
-            response = requests.request(method, url, data=data)
+            result = self._parse(response.content)
 
-        result = self._parse(response.content)
+            try:
+                next_url = result['paging']['next']
+            except (KeyError, TypeError):
+                next_url = None
 
-        try:
-            next_url = result['paging']['next']
-        except (KeyError, TypeError):
-            next_url = None
+            return result, next_url
 
-        return result, next_url
+        def paginate(method, url, data):
+            while url:
+                result, url = load(method, url, data)
 
-    def _query(self, method, path, data={}, page=False):
-        """
-        Low-level access to Facebook's Graph API.
+                # Reset pagination parameters.
+                for key in ['offset', 'until', 'since']:
+                    try:
+                        del data[key]
+                    except KeyError:
+                        pass
 
-        :param method: A string describing the HTTP method.
-        :param path: A string describing the path.
-        :param data: A dictionary of HTTP GET parameters (for GET requests) or POST data (for POST requests).
-        """
+                yield result
 
         # Convert option lists to comma-separated values; Facebook chokes on array-like constructs
         # in the query string (like [...]?ids=['johannes.gorset', 'atle.mo']).
-        for key, value in data.items():
-            if type(value) is list and all([type(item) in (str, unicode) for item in value]):
+        for key in data:
+            if isinstance(data[key], list) and all([type(item) in (str, unicode) for item in data[key]]):
                 data[key] = ','.join(value)
 
         url = 'https://graph.facebook.com/%s' % path
+
         if self.oauth_token:
-            data.update({'access_token': self.oauth_token })
-        
+            data['access_token'] = self.oauth_token
+
         if page:
-            def make_generator(url, data):
-                while url is not None:
-                    objs, url = self._load_url(method, url, data)
-                    data = {}
-                    for obj in objs:
-                        yield obj
-            return make_generator(url, data)
+            return paginate(method, url, data)
         else:
-            obj, next_url = self._load_url(method, url, data)
-            return obj
+            return load(method, url, data)[0]
 
     def _parse(self, data):
         """
