@@ -1,4 +1,4 @@
-"""Tests for signed requests. You can run these with py.test (http://pytest.org/latest/)."""
+"""Tests for the ``signed_request`` module."""
 
 TEST_ACCESS_TOKEN = '181259711925270|1570a553ad6605705d1b7a5f.1-499729129|8XqMRhCWDKtpG-i_zRkHBDSsqqk'
 

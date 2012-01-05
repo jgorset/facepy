@@ -1,4 +1,4 @@
-"""Tests for facepy.GraphAPI. You can run these with py.test (http://pytest.org/latest/)."""
+"""Tests for the ``graph_api`` module."""
 
 import random
 
