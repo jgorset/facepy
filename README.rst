@@ -1,10 +1,15 @@
-# Facepy
+Facepy
+======
 
-## About
+About
+-----
 
 Facepy makes it absurdly easy to interact with Facebook APIs.
 
-## Usage
+Usage
+-----
+
+::
 
     from facepy import GraphAPI
 
@@ -22,8 +27,11 @@ Facepy makes it absurdly easy to interact with Facebook APIs.
     )
 
 Facepy can do more than reading your latest posts and posting photographs of parrots, but you'll have to
-[read the documentation](http://readthedocs.org/docs/facepy) to find out how.
+`read the documentation <http://readthedocs.org/docs/facepy>`_ to find out how.
 
-## Installation
+Installation
+------------
+
+::
 
     $ pip install facepy
