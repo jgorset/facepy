@@ -152,7 +152,7 @@ class GraphAPI(object):
         # in the query string (like [...]?ids=['johannes.gorset', 'atle.mo']).
         for key in data:
             if isinstance(data[key], list) and all([type(item) in (str, unicode) for item in data[key]]):
-                data[key] = ','.join(value)
+                data[key] = ','.join(data[key])
 
         url = 'https://graph.facebook.com/%s' % path
 
