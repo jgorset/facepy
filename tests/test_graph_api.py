@@ -38,6 +38,9 @@ def test_get():
     # Test a simple get
     assert graph.get('me')
 
+    # Test a get that specifies fields
+    assert len(graph.get('me', fields=['id', 'first_name', 'last_name'])) == 3
+
     # Test a paged get
     pages = graph.get('facebook/posts', page=True)
 
