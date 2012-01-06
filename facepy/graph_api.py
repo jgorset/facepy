@@ -1,6 +1,6 @@
 import requests
 
-from exceptions import FacepyError
+from .exceptions import FacepyError
 
 try:
     import simplejson as json
