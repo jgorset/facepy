@@ -148,10 +148,9 @@ class GraphAPI(object):
 
                 yield result
 
-        # Convert option lists to comma-separated values; Facebook chokes on array-like constructs
-        # in the query string (like [...]?ids=['johannes.gorset', 'atle.mo']).
+        # Convert option lists to comma-separated values.
         for key in data:
-            if isinstance(data[key], list) and all([type(item) in (str, unicode) for item in data[key]]):
+            if isinstance(data[key], list) and all([isinstance(item, basestring) for item in data[key]]):
                 data[key] = ','.join(data[key])
 
         url = 'https://graph.facebook.com/%s' % path
