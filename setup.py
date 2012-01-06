@@ -1,9 +1,13 @@
 from setuptools import setup
 
+readme = open('README.rst').read()
+history = open('HISTORY.rst').read()
+
 setup(
     name = 'facepy',
     version = '0.6',
     description = 'Facepy makes it absurdly easy to interact with Facebook APIs',
+    long_description = readme + '\n\n' + history,
     author = 'Johannes Gorset',
     author_email = 'jgorset@gmail.com',
     url = 'http://github.com/jgorset/facepy',
