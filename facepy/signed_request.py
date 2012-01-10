@@ -18,16 +18,16 @@ class SignedRequest(object):
     documentation on authentication <https://developers.facebook.com/docs/authentication/signed_request/>`_
     for more information.
     """
-    
+
     user = None
     """A ``SignedRequest.User`` instance describing the user that generated the signed request."""
-    
+
     data = None
     """A string describing the contents of the ``app_data`` query string parameter."""
-    
+
     page = None
     """A ``SignedRequest.Page`` instance describing the Facebook page that the signed request was generated from."""
-    
+
     oauth_token = None
     """A ``SignedRequest.OAuthToken`` instance describing an OAuth access token."""
 
@@ -67,7 +67,7 @@ class SignedRequest(object):
                 age = range(
                     psr['user']['age']['min'],
                     psr['user']['age']['max'] + 1 if 'max' in psr['user']['age'] else 100
-                )
+                ) if 'age' in psr['user'] else None
             ),
 
             # Populate page data
@@ -96,32 +96,48 @@ class SignedRequest(object):
             'algorithm': 'HMAC-SHA256'
         }
 
-        if self.data:
+        if self.data is not None:
             payload['app_data'] = self.data
 
-        if self.oauth_token:
+        if self.oauth_token is not None:
             payload['oauth_token'] = self.oauth_token.token
-            payload['expires'] = int(time.mktime(self.oauth_token.expires_at.timetuple())) if self.oauth_token.expires_at else 0
+
+        if self.oauth_token.expires_at is not None:
+            payload['expires'] = int(time.mktime(self.oauth_token.expires_at.timetuple()))
+        else:
+            payload['expires'] = 0
+
+        if self.oauth_token.issued_at is not None:
             payload['issued_at'] = int(time.mktime(self.oauth_token.issued_at.timetuple()))
 
-        if self.page:
-            payload['page'] = {
-                'id': self.page.id,
-                'liked': self.page.is_liked,
-                'admin': self.page.is_admin
-            }
+        if self.page is not None:
+            payload['page'] = {}
 
-        if self.user:
-            payload['user'] = {
-                'country': self.user.country,
-                'locale': self.user.locale,
-                'age': {
+            if self.page.id is not None:
+                payload['page']['id'] = self.page.id
+
+            if self.page.is_liked is not None:
+                payload['page']['liked'] = self.page.is_liked
+
+            if self.page.is_admin is not None:
+                payload['page']['admin'] = self.page.is_admin
+
+        if self.user is not None:
+            payload['user'] = {}
+
+            if self.user.country is not None:
+                payload['user']['country'] = self.user.country
+
+            if self.user.locale is not None:
+                payload['user']['locale'] = self.user.locale
+
+            if self.user.age is not None:
+                payload['user']['age'] = {
                     'min': self.user.age[0],
                     'max': self.user.age[-1]
                 }
-            }
 
-        if self.user.id:
+        if self.user.id is not None:
             payload['user_id'] = self.user.id
 
         encoded_payload = base64.urlsafe_b64encode(
@@ -139,16 +155,16 @@ class SignedRequest(object):
         """
         A ``Page`` instance represents a Facebook page.
         """
-        
+
         id = None
         """An integer describing the page's Facebook ID."""
-        
+
         is_liked = None
         """A boolean describing whether or not the user likes the page."""
-        
+
         is_admin = None
         """A bolean describing whether or nor the user is an administrator of the page."""
-        
+
         url = None
         """A string describing the URL to the page."""
 
@@ -177,7 +193,7 @@ class SignedRequest(object):
         country = None
         """A string describing the user's country."""
 
-        def __init__(self, id, age, locale=None, country=None):
+        def __init__(self, id, age=None, locale=None, country=None):
             self.id, self.locale, self.country, self.age = id, locale, country, age
 
         @property
