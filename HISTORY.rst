@@ -9,7 +9,7 @@ History
 0.6.1
 ++++++
 
-*Fixed a bug that caused a NameError upon providing a list of strings as a Graph API parameter.
+* Fixed a bug that caused a NameError upon providing a list of strings as a Graph API parameter.
 
 0.6.0
 +++++
