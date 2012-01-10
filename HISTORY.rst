@@ -1,6 +1,11 @@
 History
 -------
 
+0.6.2
++++++
+
+* Fixed a bug that caused a KeyError upon parsing a signed request that didn't include the user's age.
+
 0.6.1
 ++++++
 
