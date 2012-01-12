@@ -1,6 +1,11 @@
 History
 -------
 
+0.6.3
++++++
+
+* Fixed a bug that caused installation to fail in some circumstances.
+
 0.6.2
 +++++
 
