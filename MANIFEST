@@ -1,6 +1,0 @@
-setup.py
-README.md
-LICENSE
-facepy/__init__.py
-facepy/exceptions.py
-facepy/graph_api.py
