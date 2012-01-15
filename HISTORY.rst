@@ -1,6 +1,13 @@
 History
 -------
 
+0.6.4
++++++
+
+* Fixed a bug that caused SignedRequest.User#has_authorized_application to be incorrect for
+  signed requests with an user id, but no OAuth Token.
+* Fixed a bug that caused queries that returned 3xx status codes to yield a blank string
+
 0.6.3
 +++++
 

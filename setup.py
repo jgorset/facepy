@@ -5,7 +5,7 @@ history = open('HISTORY.rst').read()
 
 setup(
     name = 'facepy',
-    version = '0.6.3',
+    version = '0.6.4',
     description = 'Facepy makes it absurdly easy to interact with Facebook APIs',
     long_description = readme + '\n\n' + history,
     author = 'Johannes Gorset',
