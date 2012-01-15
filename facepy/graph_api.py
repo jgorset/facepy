@@ -112,7 +112,7 @@ class GraphAPI(object):
 
         def load(method, url, data):
             if method in ['GET', 'DELETE']:
-                response = requests.request(method, url, params=data)
+                response = requests.request(method, url, params=data, allow_redirects=True)
 
             if method in ['POST', 'PUT']:
                 files = {}

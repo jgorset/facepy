@@ -41,6 +41,9 @@ def test_get():
     # Test a get that specifies fields
     assert len(graph.get('me', fields=['id', 'first_name', 'last_name'])) == 3
 
+    # Test a get to a resource that returns a 3xx status code
+    assert graph.get('me/picture')
+
     # Test a paged get
     pages = graph.get('facebook/posts', page=True)
 
