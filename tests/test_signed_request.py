@@ -21,12 +21,12 @@ def test_construct_signed_request():
             id = 1,
             age = range(0, 100),
             locale = 'en_US',
-            country = 'US'
-        ),
-        oauth_token = SignedRequest.OAuthToken(
-            token = 'AAAAAAITEghMBAFjv7aoQrdnxDkYyNwpwGXSZBvoWH57Q0f...',
-            issued_at = datetime.now(),
-            expires_at = None
+            country = 'US',
+            oauth_token = SignedRequest.User.OAuthToken(
+                token = 'AAAAAAITEghMBAFjv7aoQrdnxDkYyNwpwGXSZBvoWH57Q0f...',
+                issued_at = datetime.now(),
+                expires_at = None
+            )
         )
     )
 
@@ -37,9 +37,9 @@ def test_parse_signed_request():
     )
 
     assert signed_request.user.id == '499729129'
-    assert signed_request.oauth_token.token == TEST_ACCESS_TOKEN
-    assert signed_request.oauth_token.expires_at == None
-    assert signed_request.oauth_token.issued_at == datetime(2011, 5, 23, 21, 45, 4)
+    assert signed_request.user.oauth_token.token == TEST_ACCESS_TOKEN
+    assert signed_request.user.oauth_token.expires_at == None
+    assert signed_request.user.oauth_token.issued_at == datetime(2011, 5, 23, 21, 45, 4)
 
 def test_generate_signed_request():
     signed_request = SignedRequest.parse(
@@ -47,9 +47,9 @@ def test_generate_signed_request():
         application_secret_key = TEST_FACEBOOK_APPLICATION_SECRET_KEY
     )
 
-    assert signed_request.oauth_token.token == '181259711925270|1570a553ad6605705d1b7a5f.1-499729129|8XqMRhCWDKtpG-i_zRkHBDSsqqk'
-    assert signed_request.oauth_token.expires_at == None
-    assert signed_request.oauth_token.issued_at == datetime(2011, 5, 23, 21, 45, 4)
+    assert signed_request.user.oauth_token.token == '181259711925270|1570a553ad6605705d1b7a5f.1-499729129|8XqMRhCWDKtpG-i_zRkHBDSsqqk'
+    assert signed_request.user.oauth_token.expires_at == None
+    assert signed_request.user.oauth_token.issued_at == datetime(2011, 5, 23, 21, 45, 4)
     assert signed_request.user.locale == 'en_US'
     assert signed_request.user.country == 'no'
     assert signed_request.user.age == range(21, 100)
@@ -72,10 +72,10 @@ def test_generate_signed_request():
         application_secret_key = TEST_FACEBOOK_APPLICATION_SECRET_KEY
     )
 
-    assert signed_request.oauth_token.token == '181259711925270|1570a553ad6605705d1b7a5f.1-499729129|8XqMRhCWDKtpG-i_zRkHBDSsqqk'
-    assert signed_request.oauth_token.expires_at == None
-    assert signed_request.oauth_token.has_expired == False
-    assert signed_request.oauth_token.issued_at == datetime(2011, 5, 23, 21, 45, 4)
+    assert signed_request.user.oauth_token.token == '181259711925270|1570a553ad6605705d1b7a5f.1-499729129|8XqMRhCWDKtpG-i_zRkHBDSsqqk'
+    assert signed_request.user.oauth_token.expires_at == None
+    assert signed_request.user.oauth_token.has_expired == False
+    assert signed_request.user.oauth_token.issued_at == datetime(2011, 5, 23, 21, 45, 4)
     assert signed_request.user.locale == 'en_US'
     assert signed_request.user.country == 'no'
     assert signed_request.user.age == range(21, 100)

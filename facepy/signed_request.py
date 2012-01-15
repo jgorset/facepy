@@ -1,16 +1,17 @@
-from .exceptions import FacepyError
-
-try:
-    import simplejson as json
-except ImportError:
-    import json
-
 from datetime import datetime
 
 import base64
 import hashlib
 import hmac
 import time
+import warnings
+
+try:
+    import simplejson as json
+except ImportError:
+    import json
+
+from .exceptions import FacepyError
 
 class SignedRequest(object):
     """
@@ -28,12 +29,27 @@ class SignedRequest(object):
     page = None
     """A ``SignedRequest.Page`` instance describing the Facebook page that the signed request was generated from."""
 
-    oauth_token = None
-    """A ``SignedRequest.OAuthToken`` instance describing an OAuth access token."""
-
     def __init__(self, user, data=None, page=None, oauth_token=None):
         """Initialize an instance from arbitrary data."""
-        self.user, self.data, self.page, self.oauth_token = user, data, page, oauth_token
+
+        if oauth_token and not user:
+            raise ArgumentError('Signed requests that have an OAuth token must also have a user')
+
+        if oauth_token:
+            warnings.warn('The \'oauth_token\' argument to SignedRequest#__init__ is deprecated; pass it to SignedRequest.User#__init__ instead')
+
+            self.user = self.User(
+                id = user.id,
+                age = user.age,
+                locale = user.locale,
+                country = user.country,
+                oauth_token = oauth_token
+            )
+        else:
+            self.user = user
+
+        self.data = data
+        self.page = page
 
     def parse(cls, signed_request, application_secret_key):
         """Initialize an instance from a signed request."""
@@ -67,7 +83,12 @@ class SignedRequest(object):
                 age = range(
                     psr['user']['age']['min'],
                     psr['user']['age']['max'] + 1 if 'max' in psr['user']['age'] else 100
-                ) if 'age' in psr['user'] else None
+                ) if 'age' in psr['user'] else None,
+                oauth_token = cls.User.OAuthToken(
+                    token = psr['oauth_token'],
+                    issued_at = datetime.fromtimestamp(psr['issued_at']),
+                    expires_at = datetime.fromtimestamp(psr['expires']) if psr['expires'] > 0 else None
+                ) if 'oauth_token' in psr else None,
             ),
 
             # Populate page data
@@ -77,18 +98,21 @@ class SignedRequest(object):
                 is_admin = psr['page']['admin']
             ) if 'page' in psr else None,
 
-            # Populate oauth token data
-            oauth_token = cls.OAuthToken(
-                token = psr['oauth_token'],
-                issued_at = datetime.fromtimestamp(psr['issued_at']),
-                expires_at = datetime.fromtimestamp(psr['expires']) if psr['expires'] > 0 else None
-            ) if 'oauth_token' in psr else None,
-
             # Populate miscellaneous data
             data = psr.get('app_data', None)
         )
 
     parse = classmethod(parse)
+
+    @property
+    def oauth_token(self):
+        warnings.warn('SignedRequest#oauth_token is deprecated; use SignedRequest.User#oauth_token instead.')
+        return self.user.oauth_token
+
+    @classmethod
+    def OAuthToken(cls, *args, **kwargs):
+        warnings.warn('SignedRequest.OAuthToken is deprecated; use SignedRequest.User.OAuthToken instead.')
+        return cls.User.OAuthToken(*args, **kwargs)
 
     def generate(self, application_secret_key):
         """Generate a signed request from this instance."""
@@ -96,48 +120,50 @@ class SignedRequest(object):
             'algorithm': 'HMAC-SHA256'
         }
 
-        if self.data is not None:
+        if self.data:
             payload['app_data'] = self.data
 
-        if self.oauth_token is not None:
-            payload['oauth_token'] = self.oauth_token.token
-
-        if self.oauth_token.expires_at is not None:
-            payload['expires'] = int(time.mktime(self.oauth_token.expires_at.timetuple()))
-        else:
-            payload['expires'] = 0
-
-        if self.oauth_token.issued_at is not None:
-            payload['issued_at'] = int(time.mktime(self.oauth_token.issued_at.timetuple()))
-
-        if self.page is not None:
+        if self.page:
             payload['page'] = {}
 
-            if self.page.id is not None:
+            if self.page.id:
                 payload['page']['id'] = self.page.id
 
-            if self.page.is_liked is not None:
+            if self.page.is_liked:
                 payload['page']['liked'] = self.page.is_liked
 
-            if self.page.is_admin is not None:
+            if self.page.is_admin:
                 payload['page']['admin'] = self.page.is_admin
 
-        if self.user is not None:
+        if self.user:
             payload['user'] = {}
 
-            if self.user.country is not None:
+            if self.user.country:
                 payload['user']['country'] = self.user.country
 
-            if self.user.locale is not None:
+            if self.user.locale:
                 payload['user']['locale'] = self.user.locale
 
-            if self.user.age is not None:
+            if self.user.age:
                 payload['user']['age'] = {
                     'min': self.user.age[0],
                     'max': self.user.age[-1]
                 }
 
-        if self.user.id is not None:
+            if self.user.oauth_token:
+
+                if self.user.oauth_token.token:
+                    payload['oauth_token'] = self.user.oauth_token.token
+
+                if self.user.oauth_token.expires_at is None:
+                    payload['expires'] = 0
+                else:
+                    payload['expires'] = int(time.mktime(self.user.oauth_token.expires_at.timetuple()))
+
+                if self.user.oauth_token.issued_at:
+                    payload['issued_at'] = int(time.mktime(self.user.oauth_token.issued_at.timetuple()))
+
+        if self.user.id:
             payload['user_id'] = self.user.id
 
         encoded_payload = base64.urlsafe_b64encode(
@@ -193,8 +219,15 @@ class SignedRequest(object):
         country = None
         """A string describing the user's country."""
 
-        def __init__(self, id, age=None, locale=None, country=None):
-            self.id, self.locale, self.country, self.age = id, locale, country, age
+        oauth_token = None
+        """A ``SignedRequest.User.OAuthToken`` instance describing an OAuth access token."""
+
+        def __init__(self, id, age=None, locale=None, country=None, oauth_token=None):
+            self.id = id
+            self.locale = locale
+            self.country = country
+            self.age = age
+            self.oauth_token = oauth_token
 
         @property
         def profile_url(self):
@@ -204,33 +237,33 @@ class SignedRequest(object):
         @property
         def has_authorized_application(self):
             """A boolean describing whether the user has authorized the application."""
-            return True if self.id else False
+            return bool(self.oauth_token)
 
-    class OAuthToken(object):
-        """
-        An OAuth token represents an access token that may be used to query
-        Facebook's Graph API on behalf of the user that issued it.
-        """
+        class OAuthToken(object):
+            """
+            An OAuth token represents an access token that may be used to query
+            Facebook's Graph API on behalf of the user that issued it.
+            """
 
-        token = None
-        """A string describing the access token."""
+            token = None
+            """A string describing the access token."""
 
-        issued_at = None
-        """A ``datetime`` instance describing when the access token was issued."""
+            issued_at = None
+            """A ``datetime`` instance describing when the access token was issued."""
 
-        expires_at = None
-        """A ``datetime`` instance describing when the access token will expire, or ``None`` if it won't."""
+            expires_at = None
+            """A ``datetime`` instance describing when the access token will expire, or ``None`` if it won't."""
 
-        def __init__(self, token, issued_at, expires_at):
-            self.token, self.issued_at, self.expires_at = token, issued_at, expires_at
+            def __init__(self, token, issued_at, expires_at):
+                self.token, self.issued_at, self.expires_at = token, issued_at, expires_at
 
-        @property
-        def has_expired(self):
-            """A boolean describing whether the access token has expired."""
-            if self.expires_at is None:
-                return False
-            else:
-                return self.expires_at < datetime.now()
+            @property
+            def has_expired(self):
+                """A boolean describing whether the access token has expired."""
+                if self.expires_at is None:
+                    return False
+                else:
+                    return self.expires_at < datetime.now()
 
     class Error(FacepyError):
         """Exception raised for invalid signed_request processing."""
