@@ -1,6 +1,8 @@
 Facepy
 ======
 
+.. image:: https://secure.travis-ci.org/jgorset/facepy.png?branch=master
+
 About
 -----
 
