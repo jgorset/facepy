@@ -3,7 +3,7 @@ Facepy
 
 .. image:: https://secure.travis-ci.org/jgorset/facepy.png?branch=master
 
-Facepy makes it absurdly easy to interact with Facebook APIs.
+Facepy makes it really easy to interact with Facebook's Graph API.
 
 Usage
 -----
