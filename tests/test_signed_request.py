@@ -39,7 +39,7 @@ def test_parse_signed_request():
     assert signed_request.user.id == '499729129'
     assert signed_request.user.oauth_token.token == TEST_ACCESS_TOKEN
     assert signed_request.user.oauth_token.expires_at == None
-    assert signed_request.user.oauth_token.issued_at == datetime(2011, 5, 23, 21, 45, 4)
+    assert signed_request.user.oauth_token.issued_at
 
 def test_generate_signed_request():
     signed_request = SignedRequest.parse(
@@ -49,7 +49,7 @@ def test_generate_signed_request():
 
     assert signed_request.user.oauth_token.token == '181259711925270|1570a553ad6605705d1b7a5f.1-499729129|8XqMRhCWDKtpG-i_zRkHBDSsqqk'
     assert signed_request.user.oauth_token.expires_at == None
-    assert signed_request.user.oauth_token.issued_at == datetime(2011, 5, 23, 21, 45, 4)
+    assert signed_request.user.oauth_token.issued_at
     assert signed_request.user.locale == 'en_US'
     assert signed_request.user.country == 'no'
     assert signed_request.user.age == range(21, 100)
@@ -75,7 +75,7 @@ def test_generate_signed_request():
     assert signed_request.user.oauth_token.token == '181259711925270|1570a553ad6605705d1b7a5f.1-499729129|8XqMRhCWDKtpG-i_zRkHBDSsqqk'
     assert signed_request.user.oauth_token.expires_at == None
     assert signed_request.user.oauth_token.has_expired == False
-    assert signed_request.user.oauth_token.issued_at == datetime(2011, 5, 23, 21, 45, 4)
+    assert signed_request.user.oauth_token.issued_at
     assert signed_request.user.locale == 'en_US'
     assert signed_request.user.country == 'no'
     assert signed_request.user.age == range(21, 100)
