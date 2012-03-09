@@ -1,6 +1,11 @@
 History
 -------
 
+0.6.5
++++++
+
+* Updated requests.
+
 0.6.4
 +++++
 
