@@ -98,6 +98,30 @@ class GraphAPI(object):
 
         return response
 
+    def batch(self, batch):
+        res = self.post(batch=batch)
+        reqs = json.loads(batch)
+        for item,request in zip(res,reqs):
+            if item is None:
+                yield None
+                continue
+            datum = json.loads(item['body'])
+            if item['code'] != 200:
+                yield self.Error(
+                    '{_type} error on {method} "{path}": {msg}.'.format(
+                        _type=datum['error']['type'],
+                        method=request['method'].lower(),
+                        path=request['relative_url'],
+                        msg=datum['error']['message'],
+                        )
+                    )
+                continue
+            if datum is False:
+                yield False
+                continue
+
+            yield datum
+
     def _query(self, method, path, data={}, page=False):
         """
         Fetch an object from the Graph API and parse the output, returning a tuple where the first item
