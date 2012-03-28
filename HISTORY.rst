@@ -1,6 +1,11 @@
 History
 -------
 
+0.6.6
++++++
+
+* Facepy now supports batch requests.
+
 0.6.5
 +++++
 
