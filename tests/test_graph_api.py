@@ -148,3 +148,35 @@ def test_search():
         }
     )
 
+def test_batch():
+    graph = GraphAPI(TEST_USER_ACCESS_TOKEN)
+
+    response.content = json.dumps([
+        {
+            'code': 200,
+            'headers': [
+                { 'name': 'Content-Type', 'value': 'text/javascript; charset=UTF-8' }
+            ],
+            'body': '{"foo": "bar"}'
+        }
+    ])
+
+    requests = [
+        { 'method': 'GET', 'relative_url': 'me/friends' },
+        { 'method': 'GET', 'relative_url': 'me/photos' }
+    ]
+
+    batch = graph.batch(
+        requests = requests
+    )
+
+    for item in batch:
+        pass
+
+    mock_request.assert_called_with('POST', 'https://graph.facebook.com/',
+        files = {},
+        data = {
+            'batch': json.dumps(requests),
+            'access_token': TEST_USER_ACCESS_TOKEN
+        }
+    )

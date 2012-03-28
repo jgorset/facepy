@@ -98,6 +98,35 @@ class GraphAPI(object):
 
         return response
 
+    def batch(self, requests):
+        """
+        Make a batch request.
+
+        :param requests: A list of dictionaries with keys 'method', 'relative_url' and optionally 'body'.
+
+        Yields a list of responses and/or GraphAPI.Error instances.
+        """
+        responses = self.post(
+            batch = json.dumps(requests)
+        )
+
+        for response, request in zip(responses, requests):
+            data = json.loads(response['body'])
+
+            if not response['code'] == 200:
+                yield self.Error(
+                    '{type} error on {method} "{path}": {msg}.'.format(
+                        type = data['error']['type'],
+                        method = request['method'],
+                        path = request['relative_url'],
+                        msg = data['error']['message']
+                    )
+                )
+
+                continue
+
+            yield data
+
     def _query(self, method, path, data={}, page=False):
         """
         Fetch an object from the Graph API and parse the output, returning a tuple where the first item
