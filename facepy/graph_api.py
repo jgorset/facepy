@@ -98,29 +98,34 @@ class GraphAPI(object):
 
         return response
 
-    def batch(self, batch):
-        res = self.post(batch=batch)
-        reqs = json.loads(batch)
-        for item,request in zip(res,reqs):
-            if item is None:
-                yield None
-                continue
-            datum = json.loads(item['body'])
-            if item['code'] != 200:
+    def batch(self, requests):
+        """
+        Make a batch request.
+
+        :param requests: A list of dictionaries with keys 'method', 'relative_url' and optionally 'body'.
+
+        Yields a list of responses and/or GraphAPI.Error instances.
+        """
+        responses = self.post(
+            batch = json.dumps(requests)
+        )
+
+        for response, request in zip(responses, requests):
+            data = json.loads(response['body'])
+
+            if not response['code'] == 200:
                 yield self.Error(
-                    '{_type} error on {method} "{path}": {msg}.'.format(
-                        _type=datum['error']['type'],
-                        method=request['method'].lower(),
-                        path=request['relative_url'],
-                        msg=datum['error']['message'],
-                        )
+                    '{type} error on {method} "{path}": {msg}.'.format(
+                        type = data['error']['type'],
+                        method = request['method'],
+                        path = request['relative_url'],
+                        msg = data['error']['message']
                     )
-                continue
-            if datum is False:
-                yield False
+                )
+
                 continue
 
-            yield datum
+            yield data
 
     def _query(self, method, path, data={}, page=False):
         """
