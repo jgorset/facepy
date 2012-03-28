@@ -1,98 +1,182 @@
 """Tests for the ``graph_api`` module."""
 
 import random
+import json
+from mock import patch, Mock as mock
 
 from facepy import GraphAPI
 
-TEST_APPLICATION_ID = '160327664029652'
-TEST_APPLICATION_SECRET = '102d4e42d228d59c7ae4ebd874ef7757'
+TEST_USER_ACCESS_TOKEN = '...'
 
-def setup_module(module):
-    """
-    Create a Facebook test user.
-    """
-    global TEST_USER_ID
-    global TEST_USER_ACCESS_TOKEN
+patch = patch('requests.request')
 
-    graph = GraphAPI('%s|%s' % (TEST_APPLICATION_ID, TEST_APPLICATION_SECRET))
+def setup_module():
+    global mock_request
+    global response
 
-    user = graph.post('%s/accounts/test-users' % TEST_APPLICATION_ID,
-        installed = 'true',
-        permissions = 'publish_stream, read_stream'
-    )
+    mock_request = patch.start()
+    mock_request.return_value = response = mock()
 
-    TEST_USER_ID = user['id']
-    TEST_USER_ACCESS_TOKEN = user['access_token']
-
-def teardown_module(module):
-    """
-    Delete the Facebook test user.
-    """
-    GraphAPI('%s|%s' % (TEST_APPLICATION_ID, TEST_APPLICATION_SECRET)).delete(
-        path = TEST_USER_ID
-    )
+def teardown_module():
+    patch.stop()
 
 def test_get():
     graph = GraphAPI(TEST_USER_ACCESS_TOKEN)
 
     # Test a simple get
-    assert graph.get('me')
+    response.content = json.dumps({
+        'id': 1,
+        'name': 'Thomas \'Herc\' Hauk',
+        'first_name': 'Thomas',
+        'last_name': 'Hauk',
+        'link': 'http://facebook.com/herc',
+        'username': 'herc',
+    })
+
+    graph.get('me')
+
+    mock_request.assert_called_with('GET', 'https://graph.facebook.com/me',
+        allow_redirects = True,
+        params = {
+          'access_token': TEST_USER_ACCESS_TOKEN
+        }
+    )
 
     # Test a get that specifies fields
-    assert len(graph.get('me', fields=['id', 'first_name', 'last_name'])) == 3
+    response.content = json.dumps({
+        'id': 1,
+        'first_name': 'Thomas',
+        'last_name': 'Hauk'
+    })
 
-    # Test a get to a resource that returns a 3xx status code
-    assert graph.get('me/picture')
+    graph.get('me', fields=['id', 'first_name', 'last_name'])
+
+    mock_request.assert_called_with('GET', 'https://graph.facebook.com/me',
+        allow_redirects = True,
+        params = {
+            'access_token': TEST_USER_ACCESS_TOKEN,
+            'fields': 'id,first_name,last_name'
+        }
+    )
 
     # Test a paged get
-    pages = graph.get('facebook/posts', page=True)
+    response.content = json.dumps({
+        'data': [
+            {
+                'message': 'He\'s a complicated man. And the only one that understands him is his woman'
+            }
+        ] * 100,
+        'paging': {
+            'next': '...'
+        }
+    })
+
+    pages = graph.get('herc/posts', page=True)
 
     for index, page in enumerate(pages):
-        if index == 3:
-            break
+        break
 
-    assert index == 3
+    mock_request.assert_called_with('GET', 'https://graph.facebook.com/herc/posts',
+        allow_redirects = True,
+        params = {
+            'access_token': TEST_USER_ACCESS_TOKEN
+        }
+    )
 
 def test_post():
     graph = GraphAPI(TEST_USER_ACCESS_TOKEN)
 
-    message = ''.join(random.sample('a b c d e f g h i j k l m n o p q r s t u v w x y z'.split(), 10))
+    response.content = json.dumps({
+        'id': 1
+    })
 
-    response = graph.post(
+    graph.post(
         path = 'me/feed',
-        message = message
+        message = 'He\'s a complicated man. And the only one that understands him is his woman'
     )
 
-    post = graph.get(response['id'])
-
-    assert post['message'] == message
+    mock_request.assert_called_with('POST', 'https://graph.facebook.com/me/feed',
+        files = {},
+        data = {
+            'message': 'He\'s a complicated man. And the only one that understands him is his woman',
+            'access_token': TEST_USER_ACCESS_TOKEN
+        }
+    )
 
 def test_delete():
     graph = GraphAPI(TEST_USER_ACCESS_TOKEN)
 
-    response = graph.post(
-        path = 'me/feed',
-        message = ''.join(random.sample('a b c d e f g h i j k l m n o p q r s t u v w x y z'.split(), 10))
-    )
+    # Yes; this is, in fact, what the Graph API returns upon successfully
+    # deleting an item.
+    response.content = 'true'
 
-    assert graph.delete(
-        path = response['id']
+    graph.delete(1)
+
+    mock_request.assert_called_with('DELETE', 'https://graph.facebook.com/1',
+        allow_redirects = True,
+        params = {
+            'access_token': TEST_USER_ACCESS_TOKEN
+        }
     )
 
 def test_search():
     graph = GraphAPI(TEST_USER_ACCESS_TOKEN)
 
+    response.content = json.dumps({
+        'data': [
+            {
+                'message': 'I don\'t like your chair.'
+            },
+            {
+                'message': 'Don\'t let your mouth get your ass in trouble.'
+            }
+        ]
+    })
+
     # Test a simple search
-    assert graph.search(
-        term = 'the meaning of life',
+    graph.search(
+        term = 'shaft quotes',
         type = 'post'
     )
 
-    # Test a paged search
-    pages = graph.get('facebook/posts', page=True)
+    mock_request.assert_called_with('GET', 'https://graph.facebook.com/search',
+        allow_redirects = True,
+        params = {
+            'q': 'shaft quotes',
+            'type': 'post',
+            'access_token': TEST_USER_ACCESS_TOKEN
+        }
+    )
 
-    for index, page in enumerate(pages):
-        if index == 3:
-            break
+def test_batch():
+    graph = GraphAPI(TEST_USER_ACCESS_TOKEN)
 
-    assert index == 3
+    response.content = json.dumps([
+        {
+            'code': 200,
+            'headers': [
+                { 'name': 'Content-Type', 'value': 'text/javascript; charset=UTF-8' }
+            ],
+            'body': '{"foo": "bar"}'
+        }
+    ])
+
+    requests = [
+        { 'method': 'GET', 'relative_url': 'me/friends' },
+        { 'method': 'GET', 'relative_url': 'me/photos' }
+    ]
+
+    batch = graph.batch(
+        requests = requests
+    )
+
+    for item in batch:
+        pass
+
+    mock_request.assert_called_with('POST', 'https://graph.facebook.com/',
+        files = {},
+        data = {
+            'batch': json.dumps(requests),
+            'access_token': TEST_USER_ACCESS_TOKEN
+        }
+    )
