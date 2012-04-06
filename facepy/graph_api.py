@@ -221,6 +221,8 @@ class GraphAPI(object):
 
             if 'error' in data:
                 raise self.Error(data['error']['message'])
+            if 'error_msg' in data:
+                raise self.Error(data['error_msg'])
 
         return data
 
