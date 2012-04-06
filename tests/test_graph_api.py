@@ -4,7 +4,7 @@ import random
 import json
 from mock import patch, Mock as mock
 
-from facepy import GraphAPI
+from facepy import FacepyError, GraphAPI
 
 TEST_USER_ACCESS_TOKEN = '...'
 
@@ -80,6 +80,26 @@ def test_get():
         allow_redirects = True,
         params = {
             'access_token': TEST_USER_ACCESS_TOKEN
+        }
+    )
+
+    # Test rasing errors
+    response.content = json.dumps({
+        'error_code': 1,
+        'error_msg': 'An unknown error occurred',
+    })
+
+    try:
+        graph.get('me')
+    except FacepyError:
+        pass
+    else:
+        assert False, "Error shoud have been raised."
+
+    mock_request.assert_called_with('GET', 'https://graph.facebook.com/me',
+        allow_redirects = True,
+        params = {
+          'access_token': TEST_USER_ACCESS_TOKEN
         }
     )
 
