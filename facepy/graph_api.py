@@ -144,7 +144,7 @@ class GraphAPI(object):
 
                 try:
                     response = requests.request(method, url, params=data, allow_redirects=True)
-                except Exception as exception:
+                except requests.RequestException as exception:
                     raise self.HTTPError(exception.message)
 
 
@@ -160,7 +160,7 @@ class GraphAPI(object):
 
                 try:
                     response = requests.request(method, url, data=data, files=files)
-                except Exception as exception:
+                except requests.RequestException as exception:
                     raise self.HTTPError(exception.message)
 
             result = self._parse(response.content)
