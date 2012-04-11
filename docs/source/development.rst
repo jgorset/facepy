@@ -26,7 +26,7 @@ There are a number of ways to get involved with Facepy:
 Tests
 -----
 
-Facepy has an exhaustive test suite that you may run with `nose`_::
+Facepy has an exhaustive test suite that you should run with `nose`_::
 
     $ nosetests
 
