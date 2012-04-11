@@ -33,7 +33,7 @@ class GraphAPI(object):
         response = self._query('GET', path, options, page)
 
         if response is False:
-            raise self.HttpError('Could not get "%s".' % path)
+            raise self.HTTPError('Could not get "%s".' % path)
 
         return response
 
@@ -51,7 +51,7 @@ class GraphAPI(object):
         response = self._query('POST', path, data)
 
         if response is False:
-            raise self.HttpError('Could not post to "%s"' % path)
+            raise self.HTTPError('Could not post to "%s"' % path)
 
         return response
 
@@ -65,7 +65,7 @@ class GraphAPI(object):
         response = self._query('DELETE', path)
 
         if response is False:
-            raise self.HttpError('Could not delete "%s"' % path)
+            raise self.HTTPError('Could not delete "%s"' % path)
 
         return response
 
@@ -104,7 +104,7 @@ class GraphAPI(object):
 
         :param requests: A list of dictionaries with keys 'method', 'relative_url' and optionally 'body'.
 
-        Yields a list of responses and/or GraphAPI.FacebookError, GraphAPI.HttpError instances.
+        Yields a list of responses and/or GraphAPI.FacebookError, GraphAPI.HTTPError instances.
         """
         responses = self.post(
             batch = json.dumps(requests)
@@ -234,5 +234,5 @@ class GraphAPI(object):
 
             self.code = code
 
-    class HttpError(FacepyError):
+    class HTTPError(FacepyError):
         """Exception for transport errors."""
