@@ -1,6 +1,6 @@
 import requests
 
-from .exceptions import FacebookError, HttpError
+from .exceptions import FacepyError
 
 try:
     import simplejson as json
@@ -226,7 +226,13 @@ class GraphAPI(object):
 
         return data
 
-    class FacebookError(FacebookError):
-        pass
-    class HttpError(HttpError):
-        pass
+    class FacebookError(FacepyError):
+        """Exception for errors returned by the Graph API."""
+
+        def __init__(self, message, code):
+            super(GraphAPI.FacebookError, self).__init__(message)
+
+            self.code = code
+
+    class HttpError(FacepyError):
+        """Exception for transport errors."""

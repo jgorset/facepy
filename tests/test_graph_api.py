@@ -4,7 +4,7 @@ import random
 import json
 from mock import patch, Mock as mock
 
-from facepy import FacebookError, GraphAPI
+from facepy import GraphAPI
 
 TEST_USER_ACCESS_TOKEN = '...'
 
@@ -91,7 +91,7 @@ def test_get():
 
     try:
         graph.get('me')
-    except FacebookError as e:
+    except GraphAPI.FacebookError as e:
         assert e.code == 1
     else:
         assert False, "Error shoud have been raised."
