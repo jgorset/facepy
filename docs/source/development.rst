@@ -30,6 +30,10 @@ Facepy has an exhaustive test suite that you should run with `nose`_::
 
     $ nosetests
 
+.. note::
+
+  You will need to install the `nose`_ and `mock`_  libraries in order to run the tests.
+
 Releases
 --------
 
@@ -71,3 +75,4 @@ Major and minor releases do not mark the end of the previous line or lines of de
 .. _issue tracker: https://github.com/jgorset/facepy/issues
 .. _Github: http://github.com
 .. _PEP-8: http://www.python.org/dev/peps/pep-0008/
+.. _mock: http://www.voidspace.org.uk/python/mock/
