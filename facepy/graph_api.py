@@ -1,6 +1,6 @@
 import requests
 
-from .exceptions import FacepyError
+from .exceptions import FacebookError, HttpError
 
 try:
     import simplejson as json
@@ -33,7 +33,7 @@ class GraphAPI(object):
         response = self._query('GET', path, options, page)
 
         if response is False:
-            raise self.Error('Could not get "%s".' % path)
+            raise self.HttpError('Could not get "%s".' % path)
 
         return response
 
@@ -51,7 +51,7 @@ class GraphAPI(object):
         response = self._query('POST', path, data)
 
         if response is False:
-            raise self.Error('Could not post to "%s"' % path)
+            raise self.HttpError('Could not post to "%s"' % path)
 
         return response
 
@@ -65,7 +65,7 @@ class GraphAPI(object):
         response = self._query('DELETE', path)
 
         if response is False:
-            raise self.Error('Could not delete "%s"' % path)
+            raise self.HttpError('Could not delete "%s"' % path)
 
         return response
 
@@ -104,7 +104,7 @@ class GraphAPI(object):
 
         :param requests: A list of dictionaries with keys 'method', 'relative_url' and optionally 'body'.
 
-        Yields a list of responses and/or GraphAPI.Error instances.
+        Yields a list of responses and/or GraphAPI.FacebookError, GraphAPI.HttpError instances.
         """
         responses = self.post(
             batch = json.dumps(requests)
@@ -114,13 +114,13 @@ class GraphAPI(object):
             data = json.loads(response['body'])
 
             if not response['code'] == 200:
-                yield self.Error(
+                yield self.FacebookError(
                     '{type} error on {method} "{path}": {msg}.'.format(
                         type = data['error']['type'],
                         method = request['method'],
                         path = request['relative_url'],
                         msg = data['error']['message']
-                    )
+                    ), data['error']['code']
                 )
 
                 continue
@@ -220,11 +220,13 @@ class GraphAPI(object):
         if type(data) is dict:
 
             if 'error' in data:
-                raise self.Error(data['error']['message'])
+                raise self.FacebookError(data['error']['message'], data['error']['code'])
             if 'error_msg' in data:
-                raise self.Error(data['error_msg'])
+                raise self.FacebookError(data['error_msg'], data['error_code'])
 
         return data
 
-    class Error(FacepyError):
+    class FacebookError(FacebookError):
+        pass
+    class HttpError(HttpError):
         pass
