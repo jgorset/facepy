@@ -141,7 +141,12 @@ class GraphAPI(object):
 
         def load(method, url, data):
             if method in ['GET', 'DELETE']:
-                response = requests.request(method, url, params=data, allow_redirects=True)
+
+                try:
+                    response = requests.request(method, url, params=data, allow_redirects=True)
+                except Exception as exception:
+                    raise self.HTTPError(exception.message)
+
 
             if method in ['POST', 'PUT']:
                 files = {}
@@ -153,7 +158,10 @@ class GraphAPI(object):
                 for key in files:
                     data.pop(key)
 
-                response = requests.request(method, url, data=data, files=files)
+                try:
+                    response = requests.request(method, url, data=data, files=files)
+                except Exception as exception:
+                    raise self.HTTPError(exception.message)
 
             result = self._parse(response.content)
 
