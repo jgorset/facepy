@@ -39,7 +39,7 @@ some or all of the following packages:
 
 For an up-to-date list of exact testing/development requirements, including version numbers, please
 see the ``DEPENDENCIES`` file included with the source distribution. This file is intended to be used
-with ``pip``, e.g. ``pip install -r DEPENDENCIES``.
+with ``pip``, e.g. ``pip install -r requirements.txt``.
 
 .. _Nose: http://readthedocs.org/docs/nose/en/latest/
 .. _Sphinx: http://www.pip-installer.org/en/latest/
