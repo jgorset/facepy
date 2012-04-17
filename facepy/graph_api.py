@@ -111,7 +111,11 @@ class GraphAPI(object):
         )
 
         for response, request in zip(responses, requests):
-            data = json.loads(response['body'])
+            if response:
+                data = json.loads(response['body'])
+            else:
+                yield None
+                continue
 
             if not response['code'] == 200:
                 yield self.FacebookError(
@@ -216,11 +220,11 @@ class GraphAPI(object):
         # as to the prerequisites for this type of response, though it seems that it responds with 'true'
         # when objects are successfully deleted and 'false' upon attempting to delete or access an item that
         # one does not have access to.
-        # 
+        #
         # For example, the API would respond with 'false' upon attempting to query a feed item without having
         # the 'read_stream' extended permission. If you were to query the entire feed, however, it would respond
         # with an empty list instead.
-        # 
+        #
         # Genius.
         #
         # We'll handle this discrepancy as gracefully as we can by implementing logic to deal with this behavior
