@@ -111,7 +111,7 @@ class GraphAPI(object):
         )
 
         for response, request in zip(responses, requests):
-            if 'body' in response:
+            if response:
                 data = json.loads(response['body'])
             else:
                 yield None
