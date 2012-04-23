@@ -1,6 +1,14 @@
 History
 -------
 
+0.6.7
++++++
+
+* Fixed a bug that caused some errors to be ignored.
+* Facepy now raises ``GraphAPI.HTTPError`` for requests whose transport failed,
+  and ``GraphAPI.FacebookError`` for requests that produced an error in Facebook's API.
+* Fixed a bug that caused an error for empty batch responses.
+
 0.6.6
 +++++
 
