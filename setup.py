@@ -8,7 +8,7 @@ execfile('facepy/version.py')
 setup(
     name = 'facepy',
     version = __version__,
-    description = 'Facepy makes it absurdly easy to interact with Facebook APIs',
+    description = 'Facepy makes it really easy to interact with Facebook\'s Graph API',
     long_description = readme + '\n\n' + history,
     author = 'Johannes Gorset',
     author_email = 'jgorset@gmail.com',
