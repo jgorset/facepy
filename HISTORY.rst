@@ -1,6 +1,11 @@
 History
 -------
 
+0.6.8
++++++
+
+* Fixed a bug that caused a KeyError upon parsing errors without an error code.
+
 0.6.7
 +++++
 
