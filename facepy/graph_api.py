@@ -230,11 +230,16 @@ class GraphAPI(object):
         # We'll handle this discrepancy as gracefully as we can by implementing logic to deal with this behavior
         # in the high-level access functions (get, post, delete etc.).
         if type(data) is dict:
-
             if 'error' in data:
                 error = data['error']
+                error_type = error.get('type')
 
-                raise self.FacebookError(
+                if error_type == "OAuthException":
+                    exception = self.OAuthException
+                else:
+                    exception = self.FacebookError
+
+                raise exception( 
                     error.get('message'),
                     error.get('code', None)
                 )
@@ -253,6 +258,9 @@ class GraphAPI(object):
             super(GraphAPI.FacebookError, self).__init__(message)
 
             self.code = code
+
+    class OAuthException(FacebookError):
+        """ Exception for errors specifically related to OAuth. """
 
     class HTTPError(FacepyError):
         """Exception for transport errors."""
