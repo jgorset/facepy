@@ -103,6 +103,26 @@ def test_get():
         }
     )
 
+    # Test raising errors without an error code
+    response.content = json.dumps({
+        'error_msg': 'The action you\'re trying to publish is invalid'
+    })
+
+    try:
+        graph.get('me')
+    except GraphAPI.FacebookError as e:
+        assert e.message == 'The action you\'re trying to publish is invalid'
+        assert e.code == None
+    else:
+        assert False, "Error without error code should have been raised"
+
+    mock_request.assert_called_with('GET', 'https://graph.facebook.com/me',
+        allow_redirects = True,
+        params = {
+          'access_token': TEST_USER_ACCESS_TOKEN
+        }
+    )
+
 def test_post():
     graph = GraphAPI(TEST_USER_ACCESS_TOKEN)
 
