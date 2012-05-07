@@ -1,4 +1,4 @@
-requests==0.8.3
+requests==0.12
 nose==1.1.2
 sphinx==1.0.7
 mock==0.8.0
