@@ -259,7 +259,7 @@ class GraphAPI(object):
 
             self.code = code
 
-    class OAuthException(FacebookError):
+    class OAuthError(FacebookError):
         """ Exception for errors specifically related to OAuth. """
 
     class HTTPError(FacepyError):
