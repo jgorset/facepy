@@ -235,11 +235,11 @@ class GraphAPI(object):
                 error_type = error.get('type')
 
                 if error_type == "OAuthException":
-                    exception = self.OAuthException
+                    exception = self.OAuthError
                 else:
                     exception = self.FacebookError
 
-                raise exception( 
+                raise exception(
                     error.get('message'),
                     error.get('code', None)
                 )
