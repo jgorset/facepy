@@ -8,13 +8,15 @@ from facepy import GraphAPI
 
 TEST_USER_ACCESS_TOKEN = '...'
 
-patch = patch('requests.request')
+patch = patch('requests.session')
 
 def setup_module():
     global mock_request
     global response
 
     mock_request = patch.start()
+    mock_request = mock_request()
+    mock_request = mock_request.request
     mock_request.return_value = response = mock()
 
 def teardown_module():
