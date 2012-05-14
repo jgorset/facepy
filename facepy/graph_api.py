@@ -16,6 +16,7 @@ class GraphAPI(object):
         :param oauth_token: A string describing an OAuth access token.
         """
         self.oauth_token = oauth_token
+        self.session = requests.session()
 
     def get(self, path='', page=False, **options):
         """
@@ -147,7 +148,7 @@ class GraphAPI(object):
             if method in ['GET', 'DELETE']:
 
                 try:
-                    response = requests.request(method, url, params=data, allow_redirects=True)
+                    response = self.session.request(method, url, params=data, allow_redirects=True)
                 except requests.RequestException as exception:
                     raise self.HTTPError(exception.message)
 
@@ -163,7 +164,7 @@ class GraphAPI(object):
                     data.pop(key)
 
                 try:
-                    response = requests.request(method, url, data=data, files=files)
+                    response = self.session.request(method, url, data=data, files=files)
                 except requests.RequestException as exception:
                     raise self.HTTPError(exception.message)
 
