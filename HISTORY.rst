@@ -1,6 +1,12 @@
 History
 -------
 
+0.6.9
++++++
+
+* Facepy will now raise ``OAuthError`` for authorization-related errors.
+* Facepy will now reuse the connection to Facebook.
+
 0.6.8
 +++++
 
