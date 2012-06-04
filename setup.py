@@ -14,7 +14,7 @@ setup(
     author_email = 'jgorset@gmail.com',
     url = 'http://github.com/jgorset/facepy',
     packages = ['facepy'],
-    install_requires = ['requests >=0.8, < 0.13'],
+    install_requires = ['requests >=0.8, < 0.14'],
     classifiers = [
         'Development Status :: 5 - Production/Stable',
         'Intended Audience :: Developers',
