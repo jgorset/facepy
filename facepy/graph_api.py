@@ -247,6 +247,8 @@ class GraphAPI(object):
                     error.get('message'),
                     error.get('code', None)
                 )
+
+            # Facebook occasionally reports errors in its legacy error format.
             if 'error_msg' in data:
                 raise self.FacebookError(
                     data.get('error_msg'),
