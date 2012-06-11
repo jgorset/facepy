@@ -13,12 +13,8 @@ patch = patch('requests.session')
 
 def setup_module():
     global mock_request
-    global response
 
-    mock_request = patch.start()
-    mock_request = mock_request()
-    mock_request = mock_request.request
-    mock_request.return_value = response = mock()
+    mock_request = patch.start()().request
 
 def teardown_module():
     patch.stop()
@@ -27,7 +23,7 @@ def test_get():
     graph = GraphAPI(TEST_USER_ACCESS_TOKEN)
 
     # Test a simple get
-    response.content = json.dumps({
+    mock_request.return_value.content = json.dumps({
         'id': 1,
         'name': 'Thomas \'Herc\' Hauk',
         'first_name': 'Thomas',
@@ -46,7 +42,7 @@ def test_get():
     )
 
     # Test a get that specifies fields
-    response.content = json.dumps({
+    mock_request.return_value.content = json.dumps({
         'id': 1,
         'first_name': 'Thomas',
         'last_name': 'Hauk'
@@ -63,7 +59,7 @@ def test_get():
     )
 
     # Test a paged get
-    response.content = json.dumps({
+    mock_request.return_value.content = json.dumps({
         'data': [
             {
                 'message': 'He\'s a complicated man. And the only one that understands him is his woman'
@@ -87,7 +83,7 @@ def test_get():
     )
 
     # Test rasing errors
-    response.content = json.dumps({
+    mock_request.return_value.content = json.dumps({
         'error_code': 1,
         'error_msg': 'An unknown error occurred',
     })
@@ -107,7 +103,7 @@ def test_get():
     )
 
     # Test raising errors without an error code
-    response.content = json.dumps({
+    mock_request.return_value.content = json.dumps({
         'error_msg': 'The action you\'re trying to publish is invalid'
     })
 
@@ -129,7 +125,7 @@ def test_get():
 def test_post():
     graph = GraphAPI(TEST_USER_ACCESS_TOKEN)
 
-    response.content = json.dumps({
+    mock_request.return_value.content = json.dumps({
         'id': 1
     })
 
@@ -151,7 +147,7 @@ def test_delete():
 
     # Yes; this is, in fact, what the Graph API returns upon successfully
     # deleting an item.
-    response.content = 'true'
+    mock_request.return_value.content = 'true'
 
     graph.delete(1)
 
@@ -165,7 +161,7 @@ def test_delete():
 def test_search():
     graph = GraphAPI(TEST_USER_ACCESS_TOKEN)
 
-    response.content = json.dumps({
+    mock_request.return_value.content = json.dumps({
         'data': [
             {
                 'message': 'I don\'t like your chair.'
@@ -194,7 +190,7 @@ def test_search():
 def test_batch():
     graph = GraphAPI(TEST_USER_ACCESS_TOKEN)
 
-    response.content = json.dumps([
+    mock_request.return_value.content = json.dumps([
         {
             'code': 200,
             'headers': [
@@ -227,7 +223,7 @@ def test_batch():
 def test_batch_with_errors():
     graph = GraphAPI(TEST_USER_ACCESS_TOKEN)
 
-    response.content = json.dumps([
+    mock_request.return_value.content = json.dumps([
         {
             'code': 500,
             'headers': [
