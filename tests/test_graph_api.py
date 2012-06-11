@@ -224,7 +224,6 @@ def test_batch():
         }
     )
 
-@raises(GraphAPI.FacebookError)
 def test_batch_with_errors():
     graph = GraphAPI(TEST_USER_ACCESS_TOKEN)
 
@@ -238,9 +237,10 @@ def test_batch_with_errors():
         }
     ])
 
-    batch = graph.batch(
-        requests = [{ 'method': 'GET', 'relative_url': 'me' }]
-    )
+    requests = [{ 'method': 'GET', 'relative_url': 'me' }]
+
+    batch = graph.batch(requests)
 
     for item in batch:
-        pass
+        assert isinstance(item, Exception)
+        assert_equal(requests[0], item.request)

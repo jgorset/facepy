@@ -33,6 +33,9 @@ class GraphAPI(object):
 
         response = self._query('GET', path, options, page)
 
+        if isinstance(response, Exception):
+            raise response
+
         if response is False:
             raise self.FacebookError('Could not get "%s".' % path)
 
@@ -122,16 +125,10 @@ class GraphAPI(object):
 
             data = self._parse(response['body'])
 
-            if not response['code'] == 200:
-                yield self.FacebookError(
-                    '{type} error on {method} "{path}": {msg}.'.format(
-                        type = data['error']['type'],
-                        method = request['method'],
-                        path = request['relative_url'],
-                        msg = data['error']['message']
-                    ), data['error']['code']
-                )
+            if isinstance(data, Exception):
+                data.request = request
 
+                yield data
                 continue
 
             yield data
@@ -243,14 +240,14 @@ class GraphAPI(object):
                 else:
                     exception = self.FacebookError
 
-                raise exception(
+                return exception(
                     error.get('message'),
                     error.get('code', None)
                 )
 
             # Facebook occasionally reports errors in its legacy error format.
             if 'error_msg' in data:
-                raise self.FacebookError(
+                return self.FacebookError(
                     data.get('error_msg'),
                     data.get('error_code', None)
                 )
