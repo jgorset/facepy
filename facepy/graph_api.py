@@ -112,11 +112,15 @@ class GraphAPI(object):
         )
 
         for response, request in zip(responses, requests):
-            if response:
-                data = json.loads(response['body'])
-            else:
+
+            # Facilitate for empty Graph API responses.
+            #
+            # https://github.com/jgorset/facepy/pull/30
+            if not response:
                 yield None
                 continue
+
+            data = json.loads(response['body'])
 
             if not response['code'] == 200:
                 yield self.FacebookError(
