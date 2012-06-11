@@ -120,7 +120,7 @@ class GraphAPI(object):
                 yield None
                 continue
 
-            data = json.loads(response['body'])
+            data = self._parse(response['body'])
 
             if not response['code'] == 200:
                 yield self.FacebookError(

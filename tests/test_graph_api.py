@@ -3,6 +3,7 @@
 import random
 import json
 from mock import patch, Mock as mock
+from nose.tools import *
 
 from facepy import GraphAPI
 
@@ -222,3 +223,24 @@ def test_batch():
             'access_token': TEST_USER_ACCESS_TOKEN
         }
     )
+
+@raises(GraphAPI.FacebookError)
+def test_batch_with_errors():
+    graph = GraphAPI(TEST_USER_ACCESS_TOKEN)
+
+    response.content = json.dumps([
+        {
+            'code': 500,
+            'headers': [
+                { 'name': 'Content-Type', 'value': 'text/javascript; charset=UTF-8' }
+            ],
+            'body': '{"error_code": 1, "error_msg": "An unknown error occurred"}'
+        }
+    ])
+
+    batch = graph.batch(
+        requests = [{ 'method': 'GET', 'relative_url': 'me' }]
+    )
+
+    for item in batch:
+        pass
