@@ -1,5 +1,5 @@
 test:
-	DJANGO_SETTINGS_MODULE=tests.project.settings nosetests
+	nosetests --with-color
 
 release:
 	python setup.py sdist register upload
