@@ -237,9 +237,8 @@ class GraphAPI(object):
         if type(data) is dict:
             if 'error' in data:
                 error = data['error']
-                error_type = error.get('type')
 
-                if error_type == "OAuthException":
+                if error.get('type') == "OAuthException":
                     exception = self.OAuthError
                 else:
                     exception = self.FacebookError
