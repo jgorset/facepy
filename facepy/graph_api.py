@@ -134,6 +134,17 @@ class GraphAPI(object):
 
             yield data
 
+    def fql(self, query):
+        """
+        Use FQL to powerfully extract data from Facebook.
+
+        :param query: A FQL query or FQL multiquery ({'query_name': "query",...})
+
+        See `Facebook's FQL documentation <http://developers.facebook.com/docs/reference/fql/>`_
+        for an exhaustive list of details.
+        """
+        return self._query('GET', 'fql?%s' % urlencode({'q': query}))
+
     def _query(self, method, path, data=None, page=False):
         """
         Fetch an object from the Graph API and parse the output, returning a tuple where the first item
