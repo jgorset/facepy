@@ -1,5 +1,5 @@
 test:
-	nosetests --with-color
+	nosetests
 
 release:
 	python setup.py sdist register upload
