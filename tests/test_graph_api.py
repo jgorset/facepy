@@ -2,7 +2,7 @@
 
 import random
 import json
-from mock import patch, Mock as mock
+from mock import patch, call, Mock as mock
 from nose.tools import *
 
 from facepy import GraphAPI
@@ -11,14 +11,15 @@ TEST_USER_ACCESS_TOKEN = '...'
 
 patch = patch('requests.session')
 
-def setup_module():
+def mock():
     global mock_request
 
     mock_request = patch.start()().request
 
-def teardown_module():
+def unmock():
     patch.stop()
 
+@with_setup(mock, unmock)
 def test_get():
     graph = GraphAPI(TEST_USER_ACCESS_TOKEN)
 
@@ -122,6 +123,32 @@ def test_get():
         }
     )
 
+@with_setup(mock, unmock)
+def test_get_with_retries():
+    graph = GraphAPI(TEST_USER_ACCESS_TOKEN)
+
+    mock_request.return_value.content = json.dumps({
+        'error': {
+            'message': 'An unknown error occurred.',
+            'code': 500
+        }
+    })
+
+    try:
+        graph.get('me', retry=3)
+    except GraphAPI.FacebookError:
+        pass
+
+    assert mock_request.call_args_list == [
+        call('GET', 'https://graph.facebook.com/me',
+            allow_redirects = True, params = {
+                'access_token': TEST_USER_ACCESS_TOKEN
+            }
+        )
+    ] * 3
+
+
+@with_setup(mock, unmock)
 def test_post():
     graph = GraphAPI(TEST_USER_ACCESS_TOKEN)
 
@@ -142,6 +169,7 @@ def test_post():
         }
     )
 
+@with_setup(mock, unmock)
 def test_delete():
     graph = GraphAPI(TEST_USER_ACCESS_TOKEN)
 
@@ -158,6 +186,7 @@ def test_delete():
         }
     )
 
+@with_setup(mock, unmock)
 def test_search():
     graph = GraphAPI(TEST_USER_ACCESS_TOKEN)
 
@@ -187,6 +216,7 @@ def test_search():
         }
     )
 
+@with_setup(mock, unmock)
 def test_batch():
     graph = GraphAPI(TEST_USER_ACCESS_TOKEN)
 
@@ -220,6 +250,7 @@ def test_batch():
         }
     )
 
+@with_setup(mock, unmock)
 def test_batch_with_errors():
     graph = GraphAPI(TEST_USER_ACCESS_TOKEN)
 
