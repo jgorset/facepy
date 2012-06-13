@@ -57,28 +57,27 @@ class SignedRequest(object):
 
         If the signed_request is malformed or corrupted, an Error exception is raised.
         """
-        try:
-            encoded_signature, encoded_payload = (str(string) for string in signed_request.split('.', 2))
-        except IndexError:
-            raise cls.Error("Signed request malformed")
-
         def decode(encoded):
             padding = '=' * (len(encoded) % 4)
             return base64.urlsafe_b64decode(encoded + padding)
 
-        signature = decode(encoded_signature)
-        payload = decode(encoded_payload)
+        try:
+            encoded_signature, encoded_payload = (str(string) for string in signed_request.split('.', 2))
+            signature = decode(encoded_signature)
+            data = json.loads(decode(encoded_payload))
+        except IndexError:
+            raise cls.Error("Signed request malformed")
+        except (TypeError, ValueError):
+            raise cls.Error("Signed request had a corrupted payload")
 
-        psr = json.loads(payload)
-
-        if not psr['algorithm'] == 'HMAC-SHA256':
+        if data.get('algorithm', '').upper() != 'HMAC-SHA256':
             raise cls.Error("Signed request is using an unknown algorithm")
 
         expected_signature = hmac.new(application_secret_key, msg=encoded_payload, digestmod=hashlib.sha256).digest()
-        if not signature == expected_signature:
+        if signature != expected_signature:
             raise cls.Error("Signed request signature mismatch")
 
-        return psr
+        return data
 
     get_fb_data = classmethod(get_fb_data)
 
