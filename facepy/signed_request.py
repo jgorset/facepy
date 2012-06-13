@@ -62,8 +62,9 @@ class SignedRequest(object):
         except IndexError:
             raise cls.Error("Signed request malformed")
 
-        def decode(string):
-            return base64.urlsafe_b64decode(string + "=" * ((4 - len(string) % 4) % 4))
+        def decode(encoded):
+            padding = '=' * (len(encoded) % 4)
+            return base64.urlsafe_b64decode(encoded + padding)
 
         signature = decode(encoded_signature)
         payload = decode(encoded_payload)
