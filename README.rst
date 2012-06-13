@@ -35,6 +35,14 @@ Installation
 
     $ pip install facepy
 
+Contribute
+----------
+
+* Fork `the repository <http://github.com/jgorset/facepy>`_.
+* Do your thing (preferably on a feature branch).
+* Write a test that demonstrates that the bug was fixed or the feature works as expected.
+* Send a pull request and bug me until I merge it!
+
 I love you
 ----------
 
