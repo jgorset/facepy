@@ -1,6 +1,15 @@
 History
 -------
 
+0.7.0
++++++
+
+* You may now access the original data of the signed request from ``SignedRequest#raw``.
+* You may now issue FQL queries with ``GraphAPI#fql``.
+* Fixed a bug that caused ``GraphAPI#batch`` to crash upon receiving legacy errors from Facebook.
+* ``FacebookError`` exceptions yielded from ``GraphAPI#batch`` now include the request that
+  produced the error.
+
 0.6.9
 +++++
 
