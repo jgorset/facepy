@@ -41,6 +41,19 @@ def test_parse_signed_request():
     assert signed_request.user.oauth_token.expires_at == None
     assert signed_request.user.oauth_token.issued_at
 
+    assert signed_request.raw == {
+        'user_id': '499729129',
+        'algorithm': 'HMAC-SHA256',
+        'expires': 0,
+        'oauth_token': '181259711925270|1570a553ad6605705d1b7a5f.1-499729129|8XqMRhCWDKtpG-i_zRkHBDSsqqk',
+        'user': {
+            'locale': 'en_US',
+            'country': 'no',
+            'age': { 'min': 21 }
+        },
+        'issued_at': 1306179904
+    }
+
 def test_generate_signed_request():
     signed_request = SignedRequest.parse(
         signed_request = TEST_SIGNED_REQUEST,
