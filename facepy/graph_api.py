@@ -134,7 +134,7 @@ class GraphAPI(object):
 
             yield data
 
-    def _query(self, method, path, data={}, page=False):
+    def _query(self, method, path, data=None, page=False):
         """
         Fetch an object from the Graph API and parse the output, returning a tuple where the first item
         is the object yielded by the Graph API and the second is the URL for the next page of results, or
@@ -145,6 +145,7 @@ class GraphAPI(object):
         :param data: A dictionary of HTTP GET parameters (for GET requests) or POST data (for POST requests).
         :param page: A boolean describing whether to return an iterator that iterates over each page of results.
         """
+        data = data or {}
 
         def load(method, url, data):
             if method in ['GET', 'DELETE']:
