@@ -9,7 +9,7 @@ except ImportError:
 
 class GraphAPI(object):
 
-    def __init__(self, oauth_token=False):
+    def __init__(self, oauth_token=False, url='https://graph.facebook.com'):
         """
         Initialize GraphAPI with an OAuth access token.
 
@@ -17,6 +17,7 @@ class GraphAPI(object):
         """
         self.oauth_token = oauth_token
         self.session = requests.session()
+        self.url = url.strip('/')
 
     def get(self, path='', page=False, **options):
         """
@@ -196,7 +197,7 @@ class GraphAPI(object):
             if isinstance(data[key], list) and all([isinstance(item, basestring) for item in data[key]]):
                 data[key] = ','.join(data[key])
 
-        url = 'https://graph.facebook.com/%s' % path
+        url = '%s/%s' % (self.url, path)
 
         if self.oauth_token:
             data['access_token'] = self.oauth_token
