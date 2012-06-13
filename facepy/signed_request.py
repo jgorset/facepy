@@ -29,6 +29,9 @@ class SignedRequest(object):
     page = None
     """A ``SignedRequest.Page`` instance describing the Facebook page that the signed request was generated from."""
 
+    raw = None
+    """A string describing the signed request in its original format."""
+
     def __init__(self, user, data=None, page=None, oauth_token=None):
         """Initialize an instance from arbitrary data."""
 
@@ -51,12 +54,8 @@ class SignedRequest(object):
         self.data = data
         self.page = page
 
-    def get_fb_data(cls, signed_request, application_secret_key):
-        """
-        Returns a dict with the data inside a signed request.
-
-        If the signed_request is malformed or corrupted, an Error exception is raised.
-        """
+    def parse(cls, signed_request, application_secret_key):
+        """Initialize an instance from a signed request."""
         def decode(encoded):
             padding = '=' * (len(encoded) % 4)
             return base64.urlsafe_b64decode(encoded + padding)
@@ -77,43 +76,37 @@ class SignedRequest(object):
         if signature != expected_signature:
             raise cls.Error("Signed request signature mismatch")
 
-        return data
-
-    get_fb_data = classmethod(get_fb_data)
-
-    def parse(cls, signed_request, application_secret_key):
-        """Initialize an instance from a signed request."""
-
-        psr = cls.get_fb_data(signed_request, application_secret_key)
-
-        return cls(
-
+        signed_request = cls(
             # Populate user data
             user = cls.User(
-                id = psr.get('user_id'),
-                locale = psr['user'].get('locale', None),
-                country = psr['user'].get('country', None),
+                id = data.get('user_id'),
+                locale = data['user'].get('locale', None),
+                country = data['user'].get('country', None),
                 age = range(
-                    psr['user']['age']['min'],
-                    psr['user']['age']['max'] + 1 if 'max' in psr['user']['age'] else 100
-                ) if 'age' in psr['user'] else None,
+                    data['user']['age']['min'],
+                    data['user']['age']['max'] + 1 if 'max' in data['user']['age'] else 100
+                ) if 'age' in data['user'] else None,
                 oauth_token = cls.User.OAuthToken(
-                    token = psr['oauth_token'],
-                    issued_at = datetime.fromtimestamp(psr['issued_at']),
-                    expires_at = datetime.fromtimestamp(psr['expires']) if psr['expires'] > 0 else None
-                ) if 'oauth_token' in psr else None,
+                    token = data['oauth_token'],
+                    issued_at = datetime.fromtimestamp(data['issued_at']),
+                    expires_at = datetime.fromtimestamp(data['expires']) if data['expires'] > 0 else None
+                ) if 'oauth_token' in data else None,
             ),
 
             # Populate page data
             page = cls.Page(
-                id = psr['page']['id'],
-                is_liked = psr['page']['liked'],
-                is_admin = psr['page']['admin']
-            ) if 'page' in psr else None,
+                id = data['page']['id'],
+                is_liked = data['page']['liked'],
+                is_admin = data['page']['admin']
+            ) if 'page' in data else None,
 
             # Populate miscellaneous data
-            data = psr.get('app_data', None)
+            data = data.get('app_data', None)
         )
+
+        signed_request.raw = data
+
+        return signed_request
 
     parse = classmethod(parse)
 
