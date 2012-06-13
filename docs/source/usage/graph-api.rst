@@ -19,7 +19,7 @@ You may interact with Facebook's Graph API using the ``GraphAPI`` class::
     )
 
 .. autoclass:: facepy.GraphAPI
-    :members: get, post, delete, search
+    :members: get, post, delete, search, batch
 
 .. admonition:: See also
 
