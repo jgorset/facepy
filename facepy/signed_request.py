@@ -51,8 +51,12 @@ class SignedRequest(object):
         self.data = data
         self.page = page
 
-    def parse(cls, signed_request, application_secret_key):
-        """Initialize an instance from a signed request."""
+    def get_fb_data(cls, signed_request, application_secret_key):
+        """
+        Returns a dict with the data inside a signed request.
+
+        If the signed_request is malformed or corrupted, an Error exception is raised.
+        """
         try:
             encoded_signature, encoded_payload = (str(string) for string in signed_request.split('.', 2))
         except IndexError:
@@ -72,6 +76,15 @@ class SignedRequest(object):
         expected_signature = hmac.new(application_secret_key, msg=encoded_payload, digestmod=hashlib.sha256).digest()
         if not signature == expected_signature:
             raise cls.Error("Signed request signature mismatch")
+
+        return psr
+
+    get_fb_data = classmethod(get_fb_data)
+
+    def parse(cls, signed_request, application_secret_key):
+        """Initialize an instance from a signed request."""
+
+        psr = cls.get_fb_data(signed_request, application_secret_key)
 
         return cls(
 
