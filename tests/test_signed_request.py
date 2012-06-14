@@ -15,21 +15,6 @@ TEST_SIGNED_REQUEST = u'mnrG8Wc9CH_rh-GCqq97GFAPOh6AY7cMO8IYVKb6Pa4.eyJhbGdvcml0
 
 TEST_FACEBOOK_APPLICATION_SECRET_KEY = '214e4cb484c28c35f18a70a3d735999b'
 
-def test_construct_signed_request():
-    assert SignedRequest(
-        user = SignedRequest.User(
-            id = 1,
-            age = range(0, 100),
-            locale = 'en_US',
-            country = 'US',
-            oauth_token = SignedRequest.User.OAuthToken(
-                token = 'AAAAAAITEghMBAFjv7aoQrdnxDkYyNwpwGXSZBvoWH57Q0f...',
-                issued_at = datetime.now(),
-                expires_at = None
-            )
-        )
-    )
-
 def test_parse_signed_request():
     signed_request = SignedRequest.parse(
         signed_request = TEST_SIGNED_REQUEST,
@@ -49,7 +34,7 @@ def test_parse_signed_request():
         'issued_at': 1306179904
     }
 
-def test_init_signed_request():
+def test_initialize_signed_request():
     signed_request = SignedRequest(
         signed_request = TEST_SIGNED_REQUEST,
         application_secret_key = TEST_FACEBOOK_APPLICATION_SECRET_KEY
@@ -58,7 +43,6 @@ def test_init_signed_request():
     assert signed_request.user.id == '499729129'
     assert signed_request.user.oauth_token.token == TEST_ACCESS_TOKEN
     assert signed_request.user.oauth_token.expires_at == None
-    assert signed_request.user.oauth_token.issued_at
 
     assert signed_request.raw == {
         'user_id': '499729129',
@@ -79,14 +63,6 @@ def test_generate_signed_request():
         application_secret_key = TEST_FACEBOOK_APPLICATION_SECRET_KEY
     )
 
-    assert signed_request.user.oauth_token.token == '181259711925270|1570a553ad6605705d1b7a5f.1-499729129|8XqMRhCWDKtpG-i_zRkHBDSsqqk'
-    assert signed_request.user.oauth_token.expires_at == None
-    assert signed_request.user.oauth_token.issued_at
-    assert signed_request.user.locale == 'en_US'
-    assert signed_request.user.country == 'no'
-    assert signed_request.user.age == range(21, 100)
-    assert signed_request.user.id == '499729129'
-
     signed_request = signed_request.generate(TEST_FACEBOOK_APPLICATION_SECRET_KEY)
 
     assert signed_request == '_BI1k2IFKMlIqbUdtr85034LlIZxMu7iS1xF-K8pYkE=.' \
@@ -98,18 +74,3 @@ def test_generate_signed_request():
                              '2NhbGUiOiJlbl9VUyIsImNvdW50cnkiOiJubyIsImFnZS' \
                              'I6eyJtYXgiOjk5LCJtaW4iOjIxfX0sImlzc3VlZF9hdCI' \
                              '6MTMwNjE3OTkwNH0='
-
-    signed_request = SignedRequest(
-        signed_request = signed_request,
-        application_secret_key = TEST_FACEBOOK_APPLICATION_SECRET_KEY
-    )
-
-    assert signed_request.user.oauth_token.token == '181259711925270|1570a553ad6605705d1b7a5f.1-499729129|8XqMRhCWDKtpG-i_zRkHBDSsqqk'
-    assert signed_request.user.oauth_token.expires_at == None
-    assert signed_request.user.oauth_token.has_expired == False
-    assert signed_request.user.oauth_token.issued_at
-    assert signed_request.user.locale == 'en_US'
-    assert signed_request.user.country == 'no'
-    assert signed_request.user.age == range(21, 100)
-    assert signed_request.user.id == '499729129'
-    assert signed_request.user.has_authorized_application == True

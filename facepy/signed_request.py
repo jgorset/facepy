@@ -32,57 +32,38 @@ class SignedRequest(object):
     raw = None
     """A string describing the signed request in its original format."""
 
-    def __init__(self, signed_request=None, application_secret_key=None, user=None, oauth_token=None, data=None, page=None, raw=None):
-        """Initialize an instance from arbitrary data."""
+    def __init__(self, signed_request=None, application_secret_key=None):
+        """
+        Initialize a signed request.
+        
+        :param signed_request: A string describing a signed request.
+        :param application_secret_key: A string describing a Facebook application's secret key.
+        """
 
-        if oauth_token and not user:
-            raise ArgumentError('Signed requests that have an OAuth token must also have a user')
+        self.raw = self.parse(signed_request, application_secret_key)
 
-        if signed_request and not application_secret_key or not signed_request and application_secret_key:
-            raise ArgumentError('Signed requests that have a signed_request must also have an application_secret_key and vice-versa')
+        self.data = self.raw.get('app_data', None)
 
-        if signed_request and application_secret_key:
-            self.raw = self.parse(signed_request, application_secret_key)
+        self.page = self.Page(
+            id = self.raw['page']['id'],
+            is_liked = self.raw['page']['liked'],
+            is_admin = self.raw['page']['admin']
+        ) if 'page' in self.raw else None
 
-            self.data = self.raw.get('app_data', None)
-
-            self.page = self.Page(
-                id = self.raw['page']['id'],
-                is_liked = self.raw['page']['liked'],
-                is_admin = self.raw['page']['admin']
-            ) if 'page' in self.raw else None
-
-            self.user = self.User(
-                id = self.raw.get('user_id'),
-                locale = self.raw['user'].get('locale', None),
-                country = self.raw['user'].get('country', None),
-                age = range(
-                    self.raw['user']['age']['min'],
-                    self.raw['user']['age']['max'] + 1 if 'max' in self.raw['user']['age'] else 100
-                ) if 'age' in self.raw['user'] else None,
-                oauth_token = self.User.OAuthToken(
-                    token = self.raw['oauth_token'],
-                    issued_at = datetime.fromtimestamp(self.raw['issued_at']),
-                    expires_at = datetime.fromtimestamp(self.raw['expires']) if self.raw['expires'] > 0 else None
-                ) if 'oauth_token' in self.raw else None,
-            )
-        elif user:
-            self.raw = raw
-            self.data = data
-            self.page = page
-
-            if oauth_token:
-                warnings.warn('The \'oauth_token\' argument to SignedRequest#__init__ is deprecated; pass it to SignedRequest.User#__init__ instead')
-
-                self.user = self.User(
-                    id = user.id,
-                    age = user.age,
-                    locale = user.locale,
-                    country = user.country,
-                    oauth_token = oauth_token
-                )
-            else:
-                self.user = user
+        self.user = self.User(
+            id = self.raw.get('user_id'),
+            locale = self.raw['user'].get('locale', None),
+            country = self.raw['user'].get('country', None),
+            age = range(
+                self.raw['user']['age']['min'],
+                self.raw['user']['age']['max'] + 1 if 'max' in self.raw['user']['age'] else 100
+            ) if 'age' in self.raw['user'] else None,
+            oauth_token = self.User.OAuthToken(
+                token = self.raw['oauth_token'],
+                issued_at = datetime.fromtimestamp(self.raw['issued_at']),
+                expires_at = datetime.fromtimestamp(self.raw['expires']) if self.raw['expires'] > 0 else None
+            ) if 'oauth_token' in self.raw else None,
+        )
 
     def parse(cls, signed_request, application_secret_key):
         """Initialize an instance from a signed request."""
