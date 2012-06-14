@@ -32,27 +32,57 @@ class SignedRequest(object):
     raw = None
     """A string describing the signed request in its original format."""
 
-    def __init__(self, user, data=None, page=None, oauth_token=None):
+    def __init__(self, signed_request=None, application_secret_key=None, user=None, oauth_token=None, data=None, page=None, raw=None):
         """Initialize an instance from arbitrary data."""
 
         if oauth_token and not user:
             raise ArgumentError('Signed requests that have an OAuth token must also have a user')
 
-        if oauth_token:
-            warnings.warn('The \'oauth_token\' argument to SignedRequest#__init__ is deprecated; pass it to SignedRequest.User#__init__ instead')
+        if signed_request and not application_secret_key or not signed_request and application_secret_key:
+            raise ArgumentError('Signed requests that have a signed_request must also have an application_secret_key and vice-versa')
+
+        if signed_request and application_secret_key:
+            self.raw = self.parse(signed_request, application_secret_key)
+
+            self.data = self.raw.get('app_signed_request_data', None)
+
+            self.page = self.Page(
+                id = self.raw['page']['id'],
+                is_liked = self.raw['page']['liked'],
+                is_admin = self.raw['page']['admin']
+            ) if 'page' in self.raw else None
 
             self.user = self.User(
-                id = user.id,
-                age = user.age,
-                locale = user.locale,
-                country = user.country,
-                oauth_token = oauth_token
+                id = self.raw.get('user_id'),
+                locale = self.raw['user'].get('locale', None),
+                country = self.raw['user'].get('country', None),
+                age = range(
+                    self.raw['user']['age']['min'],
+                    self.raw['user']['age']['max'] + 1 if 'max' in self.raw['user']['age'] else 100
+                ) if 'age' in self.raw['user'] else None,
+                oauth_token = self.User.OAuthToken(
+                    token = self.raw['oauth_token'],
+                    issued_at = datetime.fromtimestamp(self.raw['issued_at']),
+                    expires_at = datetime.fromtimestamp(self.raw['expires']) if self.raw['expires'] > 0 else None
+                ) if 'oauth_token' in self.raw else None,
             )
-        else:
-            self.user = user
+        elif user:
+            self.raw = raw
+            self.data = data
+            self.page = page
 
-        self.data = data
-        self.page = page
+            if oauth_token:
+                warnings.warn('The \'oauth_token\' argument to SignedRequest#__init__ is deprecated; pass it to SignedRequest.User#__init__ instead')
+
+                self.user = self.User(
+                    id = user.id,
+                    age = user.age,
+                    locale = user.locale,
+                    country = user.country,
+                    oauth_token = oauth_token
+                )
+            else:
+                self.user = user
 
     def parse(cls, signed_request, application_secret_key):
         """Initialize an instance from a signed request."""
@@ -63,50 +93,20 @@ class SignedRequest(object):
         try:
             encoded_signature, encoded_payload = (str(string) for string in signed_request.split('.', 2))
             signature = decode(encoded_signature)
-            data = json.loads(decode(encoded_payload))
+            signed_request_data = json.loads(decode(encoded_payload))
         except IndexError:
             raise cls.Error("Signed request malformed")
         except (TypeError, ValueError):
             raise cls.Error("Signed request had a corrupted payload")
 
-        if data.get('algorithm', '').upper() != 'HMAC-SHA256':
+        if signed_request_data.get('algorithm', '').upper() != 'HMAC-SHA256':
             raise cls.Error("Signed request is using an unknown algorithm")
 
         expected_signature = hmac.new(application_secret_key, msg=encoded_payload, digestmod=hashlib.sha256).digest()
         if signature != expected_signature:
             raise cls.Error("Signed request signature mismatch")
 
-        signed_request = cls(
-            # Populate user data
-            user = cls.User(
-                id = data.get('user_id'),
-                locale = data['user'].get('locale', None),
-                country = data['user'].get('country', None),
-                age = range(
-                    data['user']['age']['min'],
-                    data['user']['age']['max'] + 1 if 'max' in data['user']['age'] else 100
-                ) if 'age' in data['user'] else None,
-                oauth_token = cls.User.OAuthToken(
-                    token = data['oauth_token'],
-                    issued_at = datetime.fromtimestamp(data['issued_at']),
-                    expires_at = datetime.fromtimestamp(data['expires']) if data['expires'] > 0 else None
-                ) if 'oauth_token' in data else None,
-            ),
-
-            # Populate page data
-            page = cls.Page(
-                id = data['page']['id'],
-                is_liked = data['page']['liked'],
-                is_admin = data['page']['admin']
-            ) if 'page' in data else None,
-
-            # Populate miscellaneous data
-            data = data.get('app_data', None)
-        )
-
-        signed_request.raw = data
-
-        return signed_request
+        return signed_request_data
 
     parse = classmethod(parse)
 
