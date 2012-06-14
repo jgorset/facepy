@@ -30,9 +30,18 @@ Facepy has an exhaustive test suite that you should run with `nose`_::
 
     $ nosetests
 
+If you want to get a coverage report, just do::
+
+    $ nosetests --with-cov --cov-config tests/coveragerc
+
+To get a coverage report showing the lines missing coverage, do::
+
+    $ nosetests --with-cov --cov-config tests/coveragerc --cov-report term-missing
+
 .. note::
 
-  You will need to install the `nose`_ and `mock`_  libraries in order to run the tests.
+  To run the tests, you will need to install the `nose`_ and `mock`_ libraries.
+  To get the coverage report, you will also need the `nose-cov`_ plugin.
 
 Releases
 --------
@@ -72,6 +81,7 @@ Major and minor releases do not mark the end of the previous line or lines of de
   were found in 1.1 that affected 0.9 and could be easily applied, a new 0.9.x version might be released.
 
 .. _nose: http://readthedocs.org/docs/nose/en/latest/
+.. _nose-cov: http://pypi.python.org/pypi/nose-cov/
 .. _issue tracker: https://github.com/jgorset/facepy/issues
 .. _Github: http://github.com
 .. _PEP-8: http://www.python.org/dev/peps/pep-0008/
