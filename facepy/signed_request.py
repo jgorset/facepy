@@ -44,7 +44,7 @@ class SignedRequest(object):
         if signed_request and application_secret_key:
             self.raw = self.parse(signed_request, application_secret_key)
 
-            self.data = self.raw.get('app_signed_request_data', None)
+            self.data = self.raw.get('app_data', None)
 
             self.page = self.Page(
                 id = self.raw['page']['id'],
