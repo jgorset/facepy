@@ -1,0 +1,14 @@
+# http://nedbatchelder.com/code/coverage/config.html
+
+[run]
+branch = True
+source = facepy/
+omit = tests/*
+
+[paths]
+source = facepy/
+
+[report]
+precision = 1
+show_missing = True
+ignore_errors = True
