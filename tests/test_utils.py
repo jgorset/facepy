@@ -7,14 +7,15 @@ from facepy import *
 
 patch = patch('requests.session')
 
-def setup_module():
+def mock():
     global mock_request
 
     mock_request = patch.start()().request
 
-def teardown_module():
+def unmock():
     patch.stop()
 
+@with_setup(mock, unmock)
 def test_get_application_access_token():
     mock_request.return_value.content = 'access_token=...'
 
@@ -30,3 +31,10 @@ def test_get_application_access_token():
     )
 
     assert access_token == '...'
+
+@with_setup(mock, unmock)
+def test_get_application_access_token_raises_error():
+    mock_request.return_value.content = 'An unknown error occurred'
+
+    with assert_raises(GraphAPI.FacebookError):
+        get_application_access_token('<application id>', '<application secret key>')
