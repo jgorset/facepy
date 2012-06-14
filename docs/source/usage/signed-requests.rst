@@ -8,8 +8,11 @@ You may parse `signed requests <http://developers.facebook.com/docs/authenticati
 
     from facepy import SignedRequest
     
-    # Parse a signed request
-    signed_request = SignedRequest.parse(signed_request, facebook_application_secret_key)
+    # Parse a signed request into a Python dict
+    signed_request_data = SignedRequest.parse(signed_request, facebook_application_secret_key)
+
+    # Get a SignedRequest object
+    signed_request = SignedRequest(signed_request, facebook_application_secret_key)
     
     # Print the Facebook ID of the user that generated the signed request
     print signed_request.user.id

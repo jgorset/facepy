@@ -36,6 +36,25 @@ def test_parse_signed_request():
         application_secret_key = TEST_FACEBOOK_APPLICATION_SECRET_KEY
     )
 
+    assert signed_request == {
+        'user_id': '499729129',
+        'algorithm': 'HMAC-SHA256',
+        'expires': 0,
+        'oauth_token': '181259711925270|1570a553ad6605705d1b7a5f.1-499729129|8XqMRhCWDKtpG-i_zRkHBDSsqqk',
+        'user': {
+            'locale': 'en_US',
+            'country': 'no',
+            'age': { 'min': 21 }
+        },
+        'issued_at': 1306179904
+    }
+
+def test_init_signed_request():
+    signed_request = SignedRequest(
+        signed_request = TEST_SIGNED_REQUEST,
+        application_secret_key = TEST_FACEBOOK_APPLICATION_SECRET_KEY
+    )
+
     assert signed_request.user.id == '499729129'
     assert signed_request.user.oauth_token.token == TEST_ACCESS_TOKEN
     assert signed_request.user.oauth_token.expires_at == None
@@ -55,7 +74,7 @@ def test_parse_signed_request():
     }
 
 def test_generate_signed_request():
-    signed_request = SignedRequest.parse(
+    signed_request = SignedRequest(
         signed_request = TEST_SIGNED_REQUEST,
         application_secret_key = TEST_FACEBOOK_APPLICATION_SECRET_KEY
     )
@@ -80,7 +99,7 @@ def test_generate_signed_request():
                              'I6eyJtYXgiOjk5LCJtaW4iOjIxfX0sImlzc3VlZF9hdCI' \
                              '6MTMwNjE3OTkwNH0='
 
-    signed_request = SignedRequest.parse(
+    signed_request = SignedRequest(
         signed_request = signed_request,
         application_secret_key = TEST_FACEBOOK_APPLICATION_SECRET_KEY
     )
