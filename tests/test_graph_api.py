@@ -196,6 +196,17 @@ def test_post():
     )
 
 @with_setup(mock, unmock)
+def test_post_with_files():
+    graph = GraphAPI('<access token>')
+
+    mock_request.return_value.content = 'true'
+
+    graph.post(
+        path = 'me/photos',
+        source = open('tests/fixtures/parrot.jpg')
+    )
+
+@with_setup(mock, unmock)
 def test_forbidden_post():
     graph = GraphAPI('<access token>')
 
