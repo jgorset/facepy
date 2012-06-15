@@ -4,6 +4,7 @@ import random
 import json
 from mock import patch, call, Mock as mock
 from nose.tools import *
+from requests.exceptions import ConnectionError
 
 from facepy import GraphAPI
 
@@ -341,3 +342,11 @@ def test_batch_with_errors():
     for item in batch:
         assert isinstance(item, Exception)
         assert_equal(requests[0], item.request)
+
+@with_setup(mock, unmock)
+def test_query_transport_error():
+    graph = GraphAPI('<access token>')
+
+    mock_request.side_effect = ConnectionError('Max retries exceeded with url: /')
+
+    assert_raises(GraphAPI.HTTPError, graph.get, 'me')
