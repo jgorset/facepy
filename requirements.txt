@@ -1,5 +1,5 @@
-requests==0.12
-nose==1.1.2
-nose-cov==1.5
-sphinx==1.0.7
-mock==0.8.0
+requests
+nose
+nose-cov
+sphinx
+mock
