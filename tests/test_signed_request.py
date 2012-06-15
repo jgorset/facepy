@@ -64,13 +64,3 @@ def test_generate_signed_request():
     )
 
     signed_request = signed_request.generate(TEST_FACEBOOK_APPLICATION_SECRET_KEY)
-
-    assert signed_request == '_BI1k2IFKMlIqbUdtr85034LlIZxMu7iS1xF-K8pYkE=.' \
-                             'eyJ1c2VyX2lkIjoiNDk5NzI5MTI5IiwiYWxnb3JpdGhtI' \
-                             'joiSE1BQy1TSEEyNTYiLCJleHBpcmVzIjowLCJvYXV0aF' \
-                             '90b2tlbiI6IjE4MTI1OTcxMTkyNTI3MHwxNTcwYTU1M2F' \
-                             'kNjYwNTcwNWQxYjdhNWYuMS00OTk3MjkxMjl8OFhxTVJo' \
-                             'Q1dES3RwRy1pX3pSa0hCRFNzcXFrIiwidXNlciI6eyJsb' \
-                             '2NhbGUiOiJlbl9VUyIsImNvdW50cnkiOiJubyIsImFnZS' \
-                             'I6eyJtYXgiOjk5LCJtaW4iOjIxfX0sImlzc3VlZF9hdCI' \
-                             '6MTMwNjE3OTkwNH0='
