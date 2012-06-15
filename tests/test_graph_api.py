@@ -60,6 +60,14 @@ def test_get_with_fields():
     )
 
 @with_setup(mock, unmock)
+def test_forbidden_get():
+    graph = GraphAPI('<access token>')
+
+    mock_request.return_value.content = 'false'
+
+    assert_raises(GraphAPI.FacebookError, graph.get, 'me')
+
+@with_setup(mock, unmock)
 def test_paged_get():
     graph = GraphAPI('<access token>')
 
