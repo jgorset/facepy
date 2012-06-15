@@ -3,3 +3,4 @@ nose
 nose-cov
 sphinx
 mock
+tox
