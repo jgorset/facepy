@@ -295,6 +295,32 @@ def test_batch():
     )
 
 @with_setup(mock, unmock)
+def test_batch_with_empty_responses():
+    graph = GraphAPI('<access token>')
+
+    mock_request.return_value.content = json.dumps([
+        None,
+        {
+            'code': 200,
+            'headers': [
+                { 'name': 'Content-Type', 'value': 'text/javascript; charset=UTF-8' }
+            ],
+            'body': '{"foo": "bar"}'
+        }
+    ])
+
+    requests = [
+        { 'method': 'GET', 'relative_url': 'me/friends' },
+        { 'method': 'GET', 'relative_url': 'me/photos' }
+    ]
+
+    batch = graph.batch(
+        requests = requests
+    )
+
+    assert list(batch) == [None, { 'foo': 'bar' }]
+
+@with_setup(mock, unmock)
 def test_batch_with_errors():
     graph = GraphAPI('<access token>')
 
