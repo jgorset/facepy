@@ -170,7 +170,6 @@ class GraphAPI(object):
                 except requests.RequestException as exception:
                     raise self.HTTPError(exception.message)
 
-
             if method in ['POST', 'PUT']:
                 files = {}
 
