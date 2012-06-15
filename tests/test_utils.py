@@ -36,5 +36,7 @@ def test_get_application_access_token():
 def test_get_application_access_token_raises_error():
     mock_request.return_value.content = 'An unknown error occurred'
 
-    with assert_raises(GraphAPI.FacebookError):
-        get_application_access_token('<application id>', '<application secret key>')
+    assert_raises(
+        GraphAPI.FacebookError, get_application_access_token,
+        '<application id>', '<application secret key>'
+    )
