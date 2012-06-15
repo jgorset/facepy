@@ -176,10 +176,9 @@ class SignedRequest(object):
         def __init__(self, id, is_liked=False, is_admin=False):
             self.id, self.is_liked, self.is_admin = id, is_liked, is_admin
 
-        def _get_url(self):
+        @property
+        def url(self):
             return 'http://facebook.com/%s' % self.id
-
-        url = property(_get_url)
 
     class User(object):
         """
