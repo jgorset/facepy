@@ -1,7 +1,7 @@
 test:
 	nosetests
 
-coverage:
+report:
 	nosetests --with-cov --cov-config tests/coveragerc --cov-report term-missing
 
 release:
