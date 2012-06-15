@@ -163,27 +163,24 @@ class GraphAPI(object):
         data = data or {}
 
         def load(method, url, data):
-            if method in ['GET', 'DELETE']:
 
-                try:
+            try:
+                if method in ['GET', 'DELETE']:
                     response = self.session.request(method, url, params=data, allow_redirects=True)
-                except requests.RequestException as exception:
-                    raise self.HTTPError(exception.message)
 
-            if method in ['POST', 'PUT']:
-                files = {}
+                if method in ['POST', 'PUT']:
+                    files = {}
 
-                for key in data:
-                    if hasattr(data[key], 'read'):
-                        files[key] = data[key]
+                    for key in data:
+                        if hasattr(data[key], 'read'):
+                            files[key] = data[key]
 
-                for key in files:
-                    data.pop(key)
+                    for key in files:
+                        data.pop(key)
 
-                try:
                     response = self.session.request(method, url, data=data, files=files)
-                except requests.RequestException as exception:
-                    raise self.HTTPError(exception.message)
+            except requests.RequestException as exception:
+                raise self.HTTPError(exception.message)
 
             result = self._parse(response.content)
 
