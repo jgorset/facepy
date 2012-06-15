@@ -1,6 +1,6 @@
 """Tests for the ``signed_request`` module."""
 
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from facepy import SignedRequest
 
@@ -43,7 +43,6 @@ def test_initialize_signed_request():
     assert signed_request.user.id == '499729129'
     assert signed_request.user.oauth_token.token == TEST_ACCESS_TOKEN
     assert signed_request.user.oauth_token.expires_at == None
-    assert signed_request.user.oauth_token.has_expired == False
 
     assert signed_request.raw == {
         'user_id': '499729129',
@@ -57,6 +56,35 @@ def test_initialize_signed_request():
         },
         'issued_at': 1306179904
     }
+
+def test_signed_request_user_oauth_token_has_expired():
+    today = datetime.now()
+    yesterday = today - timedelta(days=1)
+    tomorrow = today + timedelta(days=1)
+
+    oauth_token = SignedRequest.User.OAuthToken(
+        token = '<token>',
+        issued_at = yesterday,
+        expires_at = None,
+    )
+
+    assert oauth_token.has_expired == False
+
+    oauth_token = SignedRequest.User.OAuthToken(
+        token = '<token>',
+        issued_at = yesterday,
+        expires_at = tomorrow
+    )
+
+    assert oauth_token.has_expired == False
+
+    oauth_token = SignedRequest.User.OAuthToken(
+        token = '<token>',
+        issued_at = yesterday,
+        expires_at = yesterday
+    )
+
+    assert oauth_token.has_expired == True
 
 def test_generate_signed_request():
     signed_request = SignedRequest(
