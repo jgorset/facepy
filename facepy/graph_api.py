@@ -276,8 +276,7 @@ class GraphAPI(object):
         """Exception for errors returned by the Graph API."""
 
         def __init__(self, message=None, code=None):
-            super(GraphAPI.FacebookError, self).__init__(message)
-
+            self.message = message
             self.code = code
 
     class OAuthError(FacebookError):
