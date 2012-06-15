@@ -57,6 +57,11 @@ def test_initialize_signed_request():
         'issued_at': 1306179904
     }
 
+def test_signed_request_page_url():
+    page = SignedRequest.Page(id=1)
+
+    assert page.url == 'http://facebook.com/1'
+
 def test_signed_request_user_profile_url():
     user = SignedRequest.User(id=1)
 
