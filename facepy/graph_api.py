@@ -1,5 +1,6 @@
-import requests
+from urllib import urlencode
 
+import requests
 from .exceptions import FacepyError
 
 try:

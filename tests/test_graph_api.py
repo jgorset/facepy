@@ -149,6 +149,31 @@ def test_get_with_retries():
 
 
 @with_setup(mock, unmock)
+def test_fql():
+    graph = GraphAPI(TEST_USER_ACCESS_TOKEN)
+    mock_request.return_value.content = json.dumps({
+        'id': 1,
+        'name': 'Thomas \'Herc\' Hauk',
+        'first_name': 'Thomas',
+        'last_name': 'Hauk',
+        'link': 'http://facebook.com/herc',
+        'username': 'herc',
+    })
+
+    try:
+        graph.fql('SELECT id,name,first_name,last_name,username FROM user WHERE uid=me()')
+    except GraphAPI.FacebookError:
+        pass
+
+    mock_request.assert_called_with('GET', 'https://graph.facebook.com/fql?q=SELECT+id%2Cname%2Cfirst_name%2Clast_name%2Cusername+FROM+user+WHERE+uid%3Dme%28%29',
+        allow_redirects = True,
+        params = {
+            'access_token': TEST_USER_ACCESS_TOKEN
+        }
+    )
+
+
+@with_setup(mock, unmock)
 def test_post():
     graph = GraphAPI(TEST_USER_ACCESS_TOKEN)
 
