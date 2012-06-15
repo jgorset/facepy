@@ -4,7 +4,6 @@ import base64
 import hashlib
 import hmac
 import time
-import warnings
 
 try:
     import simplejson as json
@@ -93,16 +92,6 @@ class SignedRequest(object):
         return signed_request_data
 
     parse = classmethod(parse)
-
-    @property
-    def oauth_token(self):
-        warnings.warn('SignedRequest#oauth_token is deprecated; use SignedRequest.User#oauth_token instead.')
-        return self.user.oauth_token
-
-    @classmethod
-    def OAuthToken(cls, *args, **kwargs):
-        warnings.warn('SignedRequest.OAuthToken is deprecated; use SignedRequest.User.OAuthToken instead.')
-        return cls.User.OAuthToken(*args, **kwargs)
 
     def generate(self):
         """Generate a signed request from this instance."""
