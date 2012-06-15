@@ -355,6 +355,20 @@ def test_batch_with_errors():
         assert_equal(requests[0], item.request)
 
 @with_setup(mock, unmock)
+def test_oauth_error():
+    graph = GraphAPI('<access token>')
+
+    mock_request.return_value.content = json.dumps({
+        'error': {
+            'message': 'An active access token must be used to query information about the current user.',
+            'type': 'OAuthException',
+            'code': 2500
+        }
+    })
+
+    assert_raises(GraphAPI.OAuthError, graph.get, 'me')
+
+@with_setup(mock, unmock)
 def test_query_transport_error():
     graph = GraphAPI('<access token>')
 
