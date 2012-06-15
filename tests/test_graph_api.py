@@ -7,8 +7,6 @@ from nose.tools import *
 
 from facepy import GraphAPI
 
-TEST_USER_ACCESS_TOKEN = '...'
-
 patch = patch('requests.session')
 
 def mock():
@@ -21,7 +19,7 @@ def unmock():
 
 @with_setup(mock, unmock)
 def test_get():
-    graph = GraphAPI(TEST_USER_ACCESS_TOKEN)
+    graph = GraphAPI('<access token>')
 
     # Test a simple get
     mock_request.return_value.content = json.dumps({
@@ -38,7 +36,7 @@ def test_get():
     mock_request.assert_called_with('GET', 'https://graph.facebook.com/me',
         allow_redirects = True,
         params = {
-          'access_token': TEST_USER_ACCESS_TOKEN
+          'access_token': '<access token>'
         }
     )
 
@@ -54,7 +52,7 @@ def test_get():
     mock_request.assert_called_with('GET', 'https://graph.facebook.com/me',
         allow_redirects = True,
         params = {
-            'access_token': TEST_USER_ACCESS_TOKEN,
+            'access_token': '<access token>',
             'fields': 'id,first_name,last_name'
         }
     )
@@ -79,7 +77,7 @@ def test_get():
     mock_request.assert_called_with('GET', 'https://graph.facebook.com/herc/posts',
         allow_redirects = True,
         params = {
-            'access_token': TEST_USER_ACCESS_TOKEN
+            'access_token': '<access token>'
         }
     )
 
@@ -99,7 +97,7 @@ def test_get():
     mock_request.assert_called_with('GET', 'https://graph.facebook.com/me',
         allow_redirects = True,
         params = {
-          'access_token': TEST_USER_ACCESS_TOKEN
+          'access_token': '<access token>'
         }
     )
 
@@ -119,13 +117,13 @@ def test_get():
     mock_request.assert_called_with('GET', 'https://graph.facebook.com/me',
         allow_redirects = True,
         params = {
-          'access_token': TEST_USER_ACCESS_TOKEN
+          'access_token': '<access token>'
         }
     )
 
 @with_setup(mock, unmock)
 def test_get_with_retries():
-    graph = GraphAPI(TEST_USER_ACCESS_TOKEN)
+    graph = GraphAPI('<access token>')
 
     mock_request.return_value.content = json.dumps({
         'error': {
@@ -142,7 +140,7 @@ def test_get_with_retries():
     assert mock_request.call_args_list == [
         call('GET', 'https://graph.facebook.com/me',
             allow_redirects = True, params = {
-                'access_token': TEST_USER_ACCESS_TOKEN
+                'access_token': '<access token>'
             }
         )
     ] * 3
@@ -150,7 +148,7 @@ def test_get_with_retries():
 
 @with_setup(mock, unmock)
 def test_fql():
-    graph = GraphAPI(TEST_USER_ACCESS_TOKEN)
+    graph = GraphAPI('<access token>')
     mock_request.return_value.content = json.dumps({
         'id': 1,
         'name': 'Thomas \'Herc\' Hauk',
@@ -168,14 +166,14 @@ def test_fql():
     mock_request.assert_called_with('GET', 'https://graph.facebook.com/fql?q=SELECT+id%2Cname%2Cfirst_name%2Clast_name%2Cusername+FROM+user+WHERE+uid%3Dme%28%29',
         allow_redirects = True,
         params = {
-            'access_token': TEST_USER_ACCESS_TOKEN
+            'access_token': '<access token>'
         }
     )
 
 
 @with_setup(mock, unmock)
 def test_post():
-    graph = GraphAPI(TEST_USER_ACCESS_TOKEN)
+    graph = GraphAPI('<access token>')
 
     mock_request.return_value.content = json.dumps({
         'id': 1
@@ -190,13 +188,13 @@ def test_post():
         files = {},
         data = {
             'message': 'He\'s a complicated man. And the only one that understands him is his woman',
-            'access_token': TEST_USER_ACCESS_TOKEN
+            'access_token': '<access token>'
         }
     )
 
 @with_setup(mock, unmock)
 def test_delete():
-    graph = GraphAPI(TEST_USER_ACCESS_TOKEN)
+    graph = GraphAPI('<access token>')
 
     # Yes; this is, in fact, what the Graph API returns upon successfully
     # deleting an item.
@@ -207,13 +205,13 @@ def test_delete():
     mock_request.assert_called_with('DELETE', 'https://graph.facebook.com/1',
         allow_redirects = True,
         params = {
-            'access_token': TEST_USER_ACCESS_TOKEN
+            'access_token': '<access token>'
         }
     )
 
 @with_setup(mock, unmock)
 def test_search():
-    graph = GraphAPI(TEST_USER_ACCESS_TOKEN)
+    graph = GraphAPI('<access token>')
 
     mock_request.return_value.content = json.dumps({
         'data': [
@@ -237,13 +235,13 @@ def test_search():
         params = {
             'q': 'shaft quotes',
             'type': 'post',
-            'access_token': TEST_USER_ACCESS_TOKEN
+            'access_token': '<access token>'
         }
     )
 
 @with_setup(mock, unmock)
 def test_batch():
-    graph = GraphAPI(TEST_USER_ACCESS_TOKEN)
+    graph = GraphAPI('<access token>')
 
     mock_request.return_value.content = json.dumps([
         {
@@ -271,13 +269,13 @@ def test_batch():
         files = {},
         data = {
             'batch': json.dumps(requests),
-            'access_token': TEST_USER_ACCESS_TOKEN
+            'access_token': '<access token>'
         }
     )
 
 @with_setup(mock, unmock)
 def test_batch_with_errors():
-    graph = GraphAPI(TEST_USER_ACCESS_TOKEN)
+    graph = GraphAPI('<access token>')
 
     mock_request.return_value.content = json.dumps([
         {
