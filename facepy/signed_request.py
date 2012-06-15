@@ -40,6 +40,9 @@ class SignedRequest(object):
         :param application_secret_key: A string describing a Facebook application's secret key.
         """
 
+        self.signed_request = signed_request
+        self.application_secret_key = application_secret_key
+
         self.raw = self.parse(signed_request, application_secret_key)
 
         self.data = self.raw.get('app_data', None)
@@ -101,7 +104,7 @@ class SignedRequest(object):
         warnings.warn('SignedRequest.OAuthToken is deprecated; use SignedRequest.User.OAuthToken instead.')
         return cls.User.OAuthToken(*args, **kwargs)
 
-    def generate(self, application_secret_key):
+    def generate(self):
         """Generate a signed request from this instance."""
         payload = {
             'algorithm': 'HMAC-SHA256'
@@ -157,7 +160,7 @@ class SignedRequest(object):
             json.dumps(payload, separators=(',', ':'))
         )
 
-        encoded_signature = base64.urlsafe_b64encode(hmac.new(application_secret_key, encoded_payload, hashlib.sha256).digest())
+        encoded_signature = base64.urlsafe_b64encode(hmac.new(self.application_secret_key, encoded_payload, hashlib.sha256).digest())
 
         return '%(signature)s.%(payload)s' % {
             'signature': encoded_signature,

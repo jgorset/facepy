@@ -63,4 +63,4 @@ def test_generate_signed_request():
         application_secret_key = TEST_FACEBOOK_APPLICATION_SECRET_KEY
     )
 
-    signed_request = signed_request.generate(TEST_FACEBOOK_APPLICATION_SECRET_KEY)
+    signed_request = signed_request.generate()
