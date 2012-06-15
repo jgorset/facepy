@@ -15,7 +15,7 @@ from .exceptions import FacepyError
 
 class SignedRequest(object):
     """
-    Facebook uses 'signed requests' to communicate with applications on the Facebook platform. See `Facebook's
+    Facebook uses "signed requests" to communicate with applications on the Facebook platform. See `Facebook's
     documentation on authentication <https://developers.facebook.com/docs/authentication/signed_request/>`_
     for more information.
     """
