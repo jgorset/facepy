@@ -66,7 +66,7 @@ class SignedRequest(object):
         )
 
     def parse(cls, signed_request, application_secret_key):
-        """Initialize an instance from a signed request."""
+        """Parse a signed request, returning a dictionary describing its payload."""
         def decode(encoded):
             padding = '=' * (len(encoded) % 4)
             return base64.urlsafe_b64decode(encoded + padding)
