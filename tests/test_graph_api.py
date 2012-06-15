@@ -255,6 +255,12 @@ def test_search():
     )
 
 @with_setup(mock, unmock)
+def test_invalid_search():
+    graph = GraphAPI('<access token>')
+
+    assert_raises(ValueError, graph.search, 'shaft', 'movies')
+
+@with_setup(mock, unmock)
 def test_batch():
     graph = GraphAPI('<access token>')
 
