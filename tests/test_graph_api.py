@@ -90,7 +90,7 @@ def test_paged_get():
 def test_get_with_errors():
     graph = GraphAPI('<access token>')
 
-    # Test errors 
+    # Test errors
     mock_request.return_value.content = json.dumps({
         'error': {
             'code': 1,
@@ -100,7 +100,7 @@ def test_get_with_errors():
 
     assert_raises(GraphAPI.FacebookError, graph.get, 'me')
 
-    # Test legacy errors 
+    # Test legacy errors
     mock_request.return_value.content = json.dumps({
         'error_code': 1,
         'error_msg': 'An unknown error occurred',
