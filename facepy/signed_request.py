@@ -35,7 +35,7 @@ class SignedRequest(object):
     def __init__(self, signed_request=None, application_secret_key=None):
         """
         Initialize a signed request.
-        
+
         :param signed_request: A string describing a signed request.
         :param application_secret_key: A string describing a Facebook application's secret key.
         """
