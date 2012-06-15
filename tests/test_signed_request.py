@@ -43,6 +43,7 @@ def test_initialize_signed_request():
     assert signed_request.user.id == '499729129'
     assert signed_request.user.oauth_token.token == TEST_ACCESS_TOKEN
     assert signed_request.user.oauth_token.expires_at == None
+    assert signed_request.user.oauth_token.has_expired == False
 
     assert signed_request.raw == {
         'user_id': '499729129',
