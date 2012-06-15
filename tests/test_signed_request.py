@@ -57,6 +57,21 @@ def test_initialize_signed_request():
         'issued_at': 1306179904
     }
 
+def test_signed_request_user_has_authorized_application():
+    oauth_token = SignedRequest.User.OAuthToken(
+        token = '<token>',
+        issued_at = datetime.now(),
+        expires_at = None
+    )
+
+    user = SignedRequest.User(id=1, oauth_token=oauth_token)
+
+    assert user.has_authorized_application == True
+
+    user = SignedRequest.User(id=1, oauth_token=None)
+
+    assert user.has_authorized_application == False
+
 def test_signed_request_user_oauth_token_has_expired():
     today = datetime.now()
     yesterday = today - timedelta(days=1)
