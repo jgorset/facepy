@@ -60,6 +60,16 @@ def test_get_with_fields():
         }
     )
 
+    graph.get('me', fields=('id', 'first_name', 'last_name'))
+
+    mock_request.assert_called_with('GET', 'https://graph.facebook.com/me',
+        allow_redirects = True,
+        params = {
+            'access_token': '<access token>',
+            'fields': 'id,first_name,last_name'
+        }
+    )
+
 @with_setup(mock, unmock)
 def test_forbidden_get():
     graph = GraphAPI('<access token>')
