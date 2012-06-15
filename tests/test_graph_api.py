@@ -218,6 +218,14 @@ def test_delete():
     )
 
 @with_setup(mock, unmock)
+def test_forbidden_delete():
+    graph = GraphAPI('<access token>')
+
+    mock_request.return_value.content = 'false'
+
+    assert_raises(GraphAPI.FacebookError, graph.delete, 'me')
+
+@with_setup(mock, unmock)
 def test_search():
     graph = GraphAPI('<access token>')
 
