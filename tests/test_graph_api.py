@@ -21,7 +21,6 @@ def unmock():
 def test_get():
     graph = GraphAPI('<access token>')
 
-    # Test a simple get
     mock_request.return_value.content = json.dumps({
         'id': 1,
         'name': 'Thomas \'Herc\' Hauk',
@@ -40,7 +39,10 @@ def test_get():
         }
     )
 
-    # Test a get that specifies fields
+@with_setup(mock, unmock)
+def test_get_with_fields():
+    graph = GraphAPI('<access token>')
+
     mock_request.return_value.content = json.dumps({
         'id': 1,
         'first_name': 'Thomas',
@@ -57,7 +59,10 @@ def test_get():
         }
     )
 
-    # Test a paged get
+@with_setup(mock, unmock)
+def test_paged_get():
+    graph = GraphAPI('<access token>')
+
     mock_request.return_value.content = json.dumps({
         'data': [
             {
@@ -81,45 +86,34 @@ def test_get():
         }
     )
 
-    # Test rasing errors
+@with_setup(mock, unmock)
+def test_get_with_errors():
+    graph = GraphAPI('<access token>')
+
+    # Test errors 
+    mock_request.return_value.content = json.dumps({
+        'error': {
+            'code': 1,
+            'message': 'An unknown error occurred'
+        }
+    })
+
+    assert_raises(GraphAPI.FacebookError, graph.get, 'me')
+
+    # Test legacy errors 
     mock_request.return_value.content = json.dumps({
         'error_code': 1,
         'error_msg': 'An unknown error occurred',
     })
 
-    try:
-        graph.get('me')
-    except GraphAPI.FacebookError as e:
-        assert e.code == 1
-    else:
-        assert False, "Error shoud have been raised."
+    assert_raises(GraphAPI.FacebookError, graph.get, 'me')
 
-    mock_request.assert_called_with('GET', 'https://graph.facebook.com/me',
-        allow_redirects = True,
-        params = {
-          'access_token': '<access token>'
-        }
-    )
-
-    # Test raising errors without an error code
+    # Test legacy errors without an error code
     mock_request.return_value.content = json.dumps({
         'error_msg': 'The action you\'re trying to publish is invalid'
     })
 
-    try:
-        graph.get('me')
-    except GraphAPI.FacebookError as e:
-        assert e.message == 'The action you\'re trying to publish is invalid'
-        assert e.code == None
-    else:
-        assert False, "Error without error code should have been raised"
-
-    mock_request.assert_called_with('GET', 'https://graph.facebook.com/me',
-        allow_redirects = True,
-        params = {
-          'access_token': '<access token>'
-        }
-    )
+    assert_raises(GraphAPI.FacebookError, graph.get, 'me')
 
 @with_setup(mock, unmock)
 def test_get_with_retries():
@@ -149,6 +143,7 @@ def test_get_with_retries():
 @with_setup(mock, unmock)
 def test_fql():
     graph = GraphAPI('<access token>')
+
     mock_request.return_value.content = json.dumps({
         'id': 1,
         'name': 'Thomas \'Herc\' Hauk',
@@ -169,7 +164,6 @@ def test_fql():
             'access_token': '<access token>'
         }
     )
-
 
 @with_setup(mock, unmock)
 def test_post():
@@ -196,8 +190,6 @@ def test_post():
 def test_delete():
     graph = GraphAPI('<access token>')
 
-    # Yes; this is, in fact, what the Graph API returns upon successfully
-    # deleting an item.
     mock_request.return_value.content = 'true'
 
     graph.delete(1)
@@ -224,7 +216,6 @@ def test_search():
         ]
     })
 
-    # Test a simple search
     graph.search(
         term = 'shaft quotes',
         type = 'post'
