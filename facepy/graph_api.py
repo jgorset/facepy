@@ -28,6 +28,7 @@ class GraphAPI(object):
         :param page: A boolean describing whether to return a generator that
                      iterates over each page of results.
         :param options: Graph API parameters such as 'limit', 'offset' or 'since'.
+        :param retry: An integer describing how many times the request should be retried.
 
         See `Facebook's Graph API documentation <http://developers.facebook.com/docs/reference/api/>`_
         for an exhaustive list of parameters.
@@ -113,7 +114,7 @@ class GraphAPI(object):
 
         :param requests: A list of dictionaries with keys 'method', 'relative_url' and optionally 'body'.
 
-        Yields a list of responses and/or GraphAPI.FacebookError, GraphAPI.HTTPError instances.
+        Yields a list of responses and/or exceptions.
         """
         responses = self.post(
             batch = json.dumps(requests)
