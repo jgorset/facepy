@@ -345,6 +345,13 @@ def test_batch_with_errors():
 
     mock_request.return_value.content = json.dumps([
         {
+            'code': 200,
+            'headers': [
+                { 'name': 'Content-Type', 'value': 'text/javascript; charset=UTF-8' }
+            ],
+            'body': '{"foo": "bar"}'
+        },
+        {
             'code': 500,
             'headers': [
                 { 'name': 'Content-Type', 'value': 'text/javascript; charset=UTF-8' }
@@ -353,13 +360,41 @@ def test_batch_with_errors():
         }
     ])
 
-    requests = [{ 'method': 'GET', 'relative_url': 'me' }]
+    requests = [
+        { 'method': 'GET', 'relative_url': 'me/friends' },
+        { 'method': 'GET', 'relative_url': 'me' }
+    ]
 
     batch = graph.batch(requests)
 
-    for item in batch:
-        assert isinstance(item, Exception)
-        assert_equal(requests[0], item.request)
+    responses = list(batch)
+
+    assert isinstance(responses[0], dict)
+    assert isinstance(responses[1], Exception)
+
+@with_setup(mock, unmock)
+def test_batch_error_references_request():
+    graph = GraphAPI('<access token>')
+
+    mock_request.return_value.content = json.dumps([
+        {
+            'code': 500,
+            'headers': [
+                { 'name': 'Content-Type', 'value': 'text/javascript; charset=UTF-8' }
+            ],
+            'body': '{"error_code": 1, "error_msg": "An unknown error occurred"}'
+        }
+    ])
+
+    requests = [
+        { 'method': 'GET', 'relative_url': 'me' }
+    ]
+
+    batch = graph.batch(requests)
+
+    responses = list(batch)
+
+    assert_equal(responses[0].request, requests[0])
 
 @with_setup(mock, unmock)
 def test_oauth_error():
