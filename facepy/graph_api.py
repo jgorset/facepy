@@ -34,6 +34,9 @@ class GraphAPI(object):
         """
         response = self._query('GET', path, options, page)
 
+        if isinstance(response, Exception):
+            raise response
+
         if response is False:
             raise self.FacebookError('Could not get "%s".' % path)
 
@@ -52,6 +55,9 @@ class GraphAPI(object):
 
         response = self._query('POST', path, data)
 
+        if isinstance(response, Exception):
+            raise response
+
         if response is False:
             raise self.FacebookError('Could not post to "%s"' % path)
 
@@ -65,6 +71,9 @@ class GraphAPI(object):
         """
 
         response = self._query('DELETE', path)
+
+        if isinstance(response, Exception):
+            raise response
 
         if response is False:
             raise self.FacebookError('Could not delete "%s"' % path)
@@ -97,6 +106,9 @@ class GraphAPI(object):
         }, **options)
 
         response = self._query('GET', 'search', options, page)
+
+        if isinstance(response, Exception):
+            raise response
 
         return response
 
