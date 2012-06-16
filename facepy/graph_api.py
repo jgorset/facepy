@@ -20,56 +20,74 @@ class GraphAPI(object):
         self.session = requests.session()
         self.url = url.strip('/')
 
-    def get(self, path='', page=False, **options):
+    def get(self, path='', page=False, retry=3, **options):
         """
         Get an item from the Graph API.
 
         :param path: A string describing the path to the item.
         :param page: A boolean describing whether to return a generator that
                      iterates over each page of results.
+        :param retry: An integer describing how many times the request may be retried.
         :param options: Graph API parameters such as 'limit', 'offset' or 'since'.
 
         See `Facebook's Graph API documentation <http://developers.facebook.com/docs/reference/api/>`_
         for an exhaustive list of parameters.
         """
-        response = self._query('GET', path, options, page)
+        response = self._query(
+            method = 'GET',
+            path = path,
+            data = options,
+            page = page,
+            retry = retry
+        )
 
         if response is False:
             raise self.FacebookError('Could not get "%s".' % path)
 
         return response
 
-    def post(self, path='', **data):
+    def post(self, path='', retry=0, **data):
         """
         Post an item to the Graph API.
 
         :param path: A string describing the path to the item.
-        :param options: Graph API parameters.
+        :param retry: An integer describing how many times the request may be retried.
+        :param data: Graph API parameters such as 'message' or 'source'.
 
         See `Facebook's Graph API documentation <http://developers.facebook.com/docs/reference/api/>`_
         for an exhaustive list of options.
         """
-        response = self._query('POST', path, data)
+        response = self._query(
+            method = 'POST',
+            path = path,
+            data = data,
+            retry = retry
+        )
 
         if response is False:
             raise self.FacebookError('Could not post to "%s"' % path)
 
         return response
 
-    def delete(self, path):
+    def delete(self, path, retry=3):
         """
         Delete an item in the Graph API.
 
         :param path: A string describing the path to the item.
+        :param retry: An integer describing how many times the request may be retried.
         """
-        response = self._query('DELETE', path)
+        response = self._query(
+            method = 'DELETE',
+            path = path,
+            retry = retry
+        )
 
         if response is False:
             raise self.FacebookError('Could not delete "%s"' % path)
 
         return response
 
-    def search(self, term, type, page=False, **options):
+    def search(self, term, type, page=False, retry=3, **options):
         """
         Search for an item in the Graph API.
 
@@ -77,6 +95,7 @@ class GraphAPI(object):
         :param type: A string describing the type of items to search for.
         :param page: A boolean describing whether to return a generator that
                      iterates over each page of results.
+        :param retry: An integer describing how many times the request may be retried.
         :param options: Graph API parameters, such as 'center' and 'distance'.
 
         Supported types are ``post``, ``user``, ``page``, ``event``, ``group``, ``place`` and ``checkin``.
@@ -93,7 +112,7 @@ class GraphAPI(object):
             'type': type,
         }, **options)
 
-        response = self._query('GET', 'search', options, page)
+        response = self._query('GET', 'search', options, page, retry)
 
         return response
 
@@ -124,18 +143,23 @@ class GraphAPI(object):
                 exception.request = request
                 yield exception
 
-    def fql(self, query):
+    def fql(self, query, retry=3):
         """
         Use FQL to powerfully extract data from Facebook.
 
         :param query: A FQL query or FQL multiquery ({'query_name': "query",...})
+        :param retry: An integer describing how many times the request may be retried.
 
         See `Facebook's FQL documentation <http://developers.facebook.com/docs/reference/fql/>`_
         for an exhaustive list of details.
         """
-        return self._query('GET', 'fql?%s' % urlencode({'q': query}))
+        return self._query(
+            method = 'GET',
+            path = 'fql?%s' % urlencode({'q': query}),
+            retry = retry
+        )
 
-    def _query(self, method, path, data=None, page=False):
+    def _query(self, method, path, data=None, page=False, retry=0):
         """
         Fetch an object from the Graph API and parse the output, returning a tuple where the first item
         is the object yielded by the Graph API and the second is the URL for the next page of results, or
@@ -200,10 +224,16 @@ class GraphAPI(object):
         if self.oauth_token:
             data['access_token'] = self.oauth_token
 
-        if page:
-            return paginate(method, url, data)
-        else:
-            return load(method, url, data)[0]
+        try:
+            if page:
+                return paginate(method, url, data)
+            else:
+                return load(method, url, data)[0]
+        except FacepyError:
+            if retry:
+                return self._query(method, path, data, page, retry - 1)
+            else:
+                raise
 
     def _parse(self, data):
         """

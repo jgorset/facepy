@@ -395,3 +395,17 @@ def test_query_transport_error():
     mock_request.side_effect = ConnectionError('Max retries exceeded with url: /')
 
     assert_raises(GraphAPI.HTTPError, graph.get, 'me')
+
+@with_setup(mock, unmock)
+def test_retry():
+    graph = GraphAPI('<access token>')
+
+    mock_request.return_value.content = json.dumps({
+        'error': {
+            'code': 1,
+            'message': 'An unknown error occurred'
+        }
+    })
+
+    assert_raises(GraphAPI.FacebookError, graph.get, 'me', retry=3)
+    assert_equal(len(mock_request.call_args_list), 4)
