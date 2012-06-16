@@ -145,10 +145,7 @@ def test_get_with_retries():
         }
     })
 
-    try:
-        graph.get('me', retry=3)
-    except GraphAPI.FacebookError:
-        pass
+    assert_raises(GraphAPI.FacebookError, graph.get, 'me', retry=3)
 
     assert mock_request.call_args_list == [
         call('GET', 'https://graph.facebook.com/me',
