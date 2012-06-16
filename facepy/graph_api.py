@@ -52,7 +52,6 @@ class GraphAPI(object):
         See `Facebook's Graph API documentation <http://developers.facebook.com/docs/reference/api/>`_
         for an exhaustive list of options.
         """
-
         response = self._query('POST', path, data)
 
         if isinstance(response, Exception):
@@ -69,7 +68,6 @@ class GraphAPI(object):
 
         :param path: A string describing the path to the item.
         """
-
         response = self._query('DELETE', path)
 
         if isinstance(response, Exception):
@@ -95,7 +93,6 @@ class GraphAPI(object):
         See `Facebook's Graph API documentation <http://developers.facebook.com/docs/reference/api/>`_
         for an exhaustive list of options.
         """
-
         SUPPORTED_TYPES = ['post', 'user', 'page', 'event', 'group', 'place', 'checkin']
         if type not in SUPPORTED_TYPES:
             raise ValueError('Unsupported type "%s". Supported types are %s' % (type, ', '.join(SUPPORTED_TYPES)))
@@ -230,7 +227,6 @@ class GraphAPI(object):
 
         :param data: A string describing the Graph API's response.
         """
-
         try:
             data = json.loads(data)
         except ValueError:
