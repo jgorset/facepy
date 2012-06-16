@@ -34,9 +34,6 @@ class GraphAPI(object):
         """
         response = self._query('GET', path, options, page)
 
-        if isinstance(response, Exception):
-            raise response
-
         if response is False:
             raise self.FacebookError('Could not get "%s".' % path)
 
@@ -54,9 +51,6 @@ class GraphAPI(object):
         """
         response = self._query('POST', path, data)
 
-        if isinstance(response, Exception):
-            raise response
-
         if response is False:
             raise self.FacebookError('Could not post to "%s"' % path)
 
@@ -69,9 +63,6 @@ class GraphAPI(object):
         :param path: A string describing the path to the item.
         """
         response = self._query('DELETE', path)
-
-        if isinstance(response, Exception):
-            raise response
 
         if response is False:
             raise self.FacebookError('Could not delete "%s"' % path)
@@ -104,9 +95,6 @@ class GraphAPI(object):
 
         response = self._query('GET', 'search', options, page)
 
-        if isinstance(response, Exception):
-            raise response
-
         return response
 
     def batch(self, requests):
@@ -130,15 +118,11 @@ class GraphAPI(object):
                 yield None
                 continue
 
-            data = self._parse(response['body'])
-
-            if isinstance(data, Exception):
-                data.request = request
-
-                yield data
-                continue
-
-            yield data
+            try:
+                yield self._parse(response['body'])
+            except FacepyError as exception:
+                exception.request = request
+                yield exception
 
     def fql(self, query):
         """
@@ -254,14 +238,14 @@ class GraphAPI(object):
                 else:
                     exception = self.FacebookError
 
-                return exception(
+                raise exception(
                     error.get('message'),
                     error.get('code', None)
                 )
 
             # Facebook occasionally reports errors in its legacy error format.
             if 'error_msg' in data:
-                return self.FacebookError(
+                raise self.FacebookError(
                     data.get('error_msg'),
                     data.get('error_code', None)
                 )
