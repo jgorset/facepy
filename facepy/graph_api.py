@@ -20,7 +20,7 @@ class GraphAPI(object):
         self.session = requests.session()
         self.url = url.strip('/')
 
-    def get(self, path='', page=False, retry=3, **options):
+    def get(self, path='', page=False, **options):
         """
         Get an item from the Graph API.
 
@@ -28,19 +28,11 @@ class GraphAPI(object):
         :param page: A boolean describing whether to return a generator that
                      iterates over each page of results.
         :param options: Graph API parameters such as 'limit', 'offset' or 'since'.
-        :param retry: An integer describing how many times the request should be retried.
 
         See `Facebook's Graph API documentation <http://developers.facebook.com/docs/reference/api/>`_
         for an exhaustive list of parameters.
         """
         response = self._query('GET', path, options, page)
-
-        if isinstance(response, Exception):
-            if retry > 1:
-                retry -= 1
-                return self.get(path, page, retry, **options)
-            else:
-                raise response
 
         if response is False:
             raise self.FacebookError('Could not get "%s".' % path)

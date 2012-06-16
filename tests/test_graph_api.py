@@ -135,28 +135,6 @@ def test_get_with_errors():
     assert_raises(GraphAPI.FacebookError, graph.get, 'me')
 
 @with_setup(mock, unmock)
-def test_get_with_retries():
-    graph = GraphAPI('<access token>')
-
-    mock_request.return_value.content = json.dumps({
-        'error': {
-            'message': 'An unknown error occurred.',
-            'code': 500
-        }
-    })
-
-    assert_raises(GraphAPI.FacebookError, graph.get, 'me', retry=3)
-
-    assert mock_request.call_args_list == [
-        call('GET', 'https://graph.facebook.com/me',
-            allow_redirects = True, params = {
-                'access_token': '<access token>'
-            }
-        )
-    ] * 3
-
-
-@with_setup(mock, unmock)
 def test_fql():
     graph = GraphAPI('<access token>')
 
