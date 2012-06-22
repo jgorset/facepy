@@ -2,7 +2,7 @@
 
 import random
 import json
-from mock import patch, call, Mock as mock
+from mock import patch, call, Mock as mock, MagicMock
 from nose.tools import *
 from requests.exceptions import ConnectionError
 
@@ -81,54 +81,58 @@ def test_forbidden_get():
 @with_setup(mock, unmock)
 def test_paged_get():
     graph = GraphAPI('<access token>')
+    limit = 2
 
-    mock_request.return_value.content = json.dumps({
-        'data': [
-            {
-                'message': 'He\'s a complicated man. And the only one that understands him is his woman'
+    responses = [
+        {
+            'data': [
+                {
+                    'message': 'He\'s a complicated man. And the only one that understands him is his woman'
+                }
+            ] * 2,
+            'paging': {
+                'next': 'https://graph.facebook.com/herc/posts?limit=%(limit)s&offset=%(limit)s&access_token=<access token>' % {
+                    'limit': limit
+                }
             }
-        ] * 100,
-        'paging': {
-            'next': '...'
+        },
+        {
+            'data': [
+                {
+                    'message': 'He\'s a complicated man. And the only one that understands him is his woman'
+                }
+            ],
+            'paging': {
+                'next': 'https://graph.facebook.com/herc/posts?limit=%(limit)s&offset=%(limit)s&access_token=<access token>' % {
+                    'limit': limit
+                }
+            }
+        },
+        {
+            'data': [],
+            'paging': {
+                'next': 'https://graph.facebook.com/herc/posts?limit=%(limit)s&offset=%(limit)s&access_token=<access token>' % {
+                    'limit': limit
+                }
+            }
         }
-    })
+    ]
+
+    def side_effect(*args, **kwargs):
+        response = responses.pop(0)
+
+        return MagicMock(
+            content = json.dumps(response)
+        )
+
+    mock_request.side_effect = side_effect
 
     pages = graph.get('herc/posts', page=True)
 
     for index, page in enumerate(pages):
-        break
-
-    mock_request.assert_called_with('GET', 'https://graph.facebook.com/herc/posts',
-        allow_redirects = True,
-        params = {
-            'access_token': '<access token>'
-        }
-    )
-
-@with_setup(mock, unmock)
-def test_paged_get_avoid_extra_request():
-    graph = GraphAPI('<access token>')
-    limit = 2
-
-    mock_request.return_value.content = json.dumps({
-        'data': [
-            {
-                'message': 'He\'s a complicated man. And the only one that understands him is his woman',
-            },
-        ],
-        'paging': {
-            'next': 'https://graph.facebook.com/herc/posts?limit=%(limit)s&offset=%(limit)s&value=1&access_token=<access token>' % {
-                'limit': limit
-            }
-        }
-    })
-
-    pages = graph.get('herc/posts', page=True, limit=limit)
-
-    for index, page in enumerate(pages):
         pass
 
-    assert_equal(index, 0)
+    assert_equal(index, 1)
 
 @with_setup(mock, unmock)
 def test_get_with_errors():
