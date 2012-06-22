@@ -160,6 +160,31 @@ def test_fql():
     )
 
 @with_setup(mock, unmock)
+def test_paged_get_avoid_extra_request():
+    graph = GraphAPI('<access token>')
+    limit = 2
+
+    mock_request.return_value.content = json.dumps({
+        'data': [
+            {
+                'message': 'He\'s a complicated man. And the only one that understands him is his woman',
+            },
+        ],
+        'paging': {
+            'next': 'https://graph.facebook.com/herc/posts?limit=%(limit)s&offset=%(limit)s&value=1&access_token=<access token>' % {
+                'limit': limit
+            }
+        }
+    })
+
+    pages = graph.get('herc/posts', page=True, limit=limit)
+
+    for index, page in enumerate(pages):
+        pass
+
+    assert_equal(index, 0)
+
+@with_setup(mock, unmock)
 def test_post():
     graph = GraphAPI('<access token>')
 
