@@ -135,6 +135,28 @@ def test_paged_get():
     assert_equal(index, 1)
 
 @with_setup(mock, unmock)
+def test_pagination_without_paging_next():
+    graph = GraphAPI('<access token>')
+    limit = 2
+
+    mock_request.return_value.content = json.dumps({
+        'data': [
+            {
+                'message': 'He\'s a complicated man. And the only one that understands him is his woman',
+            },
+        ],
+        'paging': {
+        }
+    })
+
+    pages = graph.get('herc/posts', page=True, limit=limit)
+
+    for index, page in enumerate(pages):
+        pass
+
+    assert_equal(index, 0)
+
+@with_setup(mock, unmock)
 def test_get_with_errors():
     graph = GraphAPI('<access token>')
 

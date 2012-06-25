@@ -198,7 +198,7 @@ class GraphAPI(object):
             try:
                 next_url = result['paging']['next']
             except (KeyError, TypeError):
-                next_url = None
+                next_url = ''
 
             return result, next_url
 
