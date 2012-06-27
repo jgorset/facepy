@@ -198,7 +198,7 @@ class GraphAPI(object):
             try:
                 next_url = result['paging']['next']
             except (KeyError, TypeError):
-                next_url = ''
+                next_url = None
 
             return result, next_url
 
@@ -207,11 +207,12 @@ class GraphAPI(object):
                 result, url = load(method, url, data)
 
                 # If number of results is smaller than the limit parameter passed, there's no need to query an extra page
-                qs = parse_qs(urlparse(url).query)
-                if 'limit' in qs:
-                    limit = int(qs['limit'][0])
-                    if len(result['data']) < limit:
-                        url = None
+                if url:
+                    qs = parse_qs(urlparse(url).query)
+                    if 'limit' in qs:
+                        limit = int(qs['limit'][0])
+                        if len(result['data']) < limit:
+                            url = None
 
                 # Reset pagination parameters.
                 for key in ['offset', 'until', 'since']:
