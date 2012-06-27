@@ -208,9 +208,9 @@ class GraphAPI(object):
 
                 # If number of results is smaller than the limit parameter passed, there's no need to query an extra page
                 if url:
-                    qs = parse_qs(urlparse(url).query)
-                    if 'limit' in qs:
-                        limit = int(qs['limit'][0])
+                    query = parse_qs(urlparse(url).query)
+                    if 'limit' in query:
+                        limit = int(query['limit'][0])
                         if len(result['data']) < limit:
                             url = None
 
