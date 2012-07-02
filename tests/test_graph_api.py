@@ -111,7 +111,7 @@ def test_paged_get():
         {
             'data': [],
             'paging': {
-                'next': 'https://graph.facebook.com/herc/posts?limit=%(limit)s&offset=%(limit)s&access_token=<access token>' % {
+                'previous': 'https://graph.facebook.com/herc/posts?limit=%(limit)s&offset=%(limit)s&access_token=<access token>' % {
                     'limit': limit
                 }
             }
@@ -132,7 +132,7 @@ def test_paged_get():
     for index, page in enumerate(pages):
         pass
 
-    assert_equal(index, 1)
+    assert_equal(index, 2)
 
 @with_setup(mock, unmock)
 def test_pagination_without_paging_next():
