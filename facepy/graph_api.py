@@ -296,7 +296,7 @@ class GraphAPI(object):
     class HTTPError(FacepyError):
         """Exception for transport errors."""
 
-# Define the nested Exception in the module scope so they can be pickled
+# Define the GraphAPI nested exception classes in the module scope so they can be found by cPickle (used by celery)
 FacebookError = GraphAPI.FacebookError
 OAuthError = GraphAPI.OAuthError
 HTTPError = GraphAPI.HTTPError
