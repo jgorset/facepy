@@ -1,6 +1,11 @@
 History
 -------
 
+0.8.1
++++++
+
+* Fixed a bug that caused pagination to stop prematurely.
+
 0.8.0
 +++++
 
