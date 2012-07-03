@@ -1,6 +1,11 @@
 History
 -------
 
+0.8.2
++++++
+
+* Facepy exceptions may now be pickled.
+
 0.8.1
 +++++
 
