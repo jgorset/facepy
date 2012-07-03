@@ -2,6 +2,8 @@
 
 from datetime import datetime, timedelta
 
+from nose.tools import *
+
 from facepy import SignedRequest
 
 TEST_ACCESS_TOKEN = '181259711925270|1570a553ad6605705d1b7a5f.1-499729129|8XqMRhCWDKtpG-i_zRkHBDSsqqk'
@@ -33,6 +35,12 @@ def test_parse_signed_request():
         },
         'issued_at': 1306179904
     }
+
+def test_parse_invalid_signed_request():
+    assert_raises(SignedRequest.Error, SignedRequest,
+        signed_request = "<invalid signed request>",
+        application_secret_key = TEST_FACEBOOK_APPLICATION_SECRET_KEY
+    )
 
 def test_initialize_signed_request():
     signed_request = SignedRequest(

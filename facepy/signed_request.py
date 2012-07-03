@@ -10,7 +10,7 @@ try:
 except ImportError:
     import json
 
-from .exceptions import FacepyError
+from .exceptions import *
 
 class SignedRequest(object):
     """
@@ -78,16 +78,16 @@ class SignedRequest(object):
             signature = decode(encoded_signature)
             signed_request_data = json.loads(decode(encoded_payload))
         except IndexError:
-            raise cls.Error("Signed request malformed")
+            raise SignedRequestError("Signed request malformed")
         except (TypeError, ValueError):
-            raise cls.Error("Signed request had a corrupted payload")
+            raise SignedRequestError("Signed request had a corrupted payload")
 
         if signed_request_data.get('algorithm', '').upper() != 'HMAC-SHA256':
-            raise cls.Error("Signed request is using an unknown algorithm")
+            raise SignedRequestError("Signed request is using an unknown algorithm")
 
         expected_signature = hmac.new(application_secret_key, msg=encoded_payload, digestmod=hashlib.sha256).digest()
         if signature != expected_signature:
-            raise cls.Error("Signed request signature mismatch")
+            raise SignedRequestError("Signed request signature mismatch")
 
         return signed_request_data
 
@@ -243,5 +243,5 @@ class SignedRequest(object):
                 else:
                     return self.expires_at < datetime.now()
 
-    class Error(FacepyError):
-        """Exception raised for invalid signed_request processing."""
+    # Proxy exceptions for ease of use and backwards compatibility.
+    Error = SignedRequestError

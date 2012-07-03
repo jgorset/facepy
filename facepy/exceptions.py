@@ -16,3 +16,6 @@ class OAuthError(FacebookError):
 
 class HTTPError(FacepyError):
     """Exception for transport errors."""
+
+class SignedRequestError(FacepyError):
+    """Exception for invalid signed requests."""
