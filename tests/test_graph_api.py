@@ -324,7 +324,8 @@ def test_batch():
 
     requests = [
         { 'method': 'GET', 'relative_url': 'me/friends' },
-        { 'method': 'GET', 'relative_url': 'me/photos' }
+        { 'method': 'GET', 'relative_url': 'me/photos' },
+        { 'method': 'POST', 'relative_url': 'me/feed', 'body': { 'message': 'Hi me.' } }
     ]
 
     batch = graph.batch(
@@ -337,7 +338,11 @@ def test_batch():
     mock_request.assert_called_with('POST', 'https://graph.facebook.com/',
         files = {},
         data = {
-            'batch': json.dumps(requests),
+            'batch': json.dumps([
+                { 'method': 'GET', 'relative_url': 'me/friends' },
+                { 'method': 'GET', 'relative_url': 'me/photos' },
+                { 'method': 'POST', 'relative_url': 'me/feed', 'body': 'message=Hi+me.' }
+            ]),
             'access_token': '<access token>'
         }
     )

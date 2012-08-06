@@ -125,6 +125,11 @@ class GraphAPI(object):
 
         Yields a list of responses and/or exceptions.
         """
+
+        for request in requests:
+            if 'body' in request:
+                request['body'] = urlencode(request['body'])
+
         responses = self.post(
             batch = json.dumps(requests)
         )
