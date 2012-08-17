@@ -1,6 +1,6 @@
 """Tests for the ``utils`` module."""
 
-from mock import patch, Mock as mock
+from mock import patch
 from nose.tools import *
 
 from facepy import *
@@ -30,7 +30,7 @@ def test_get_application_access_token():
         }
     )
 
-    assert access_token == '...'
+    assert_equal(access_token, '...')
 
 @with_setup(mock, unmock)
 def test_get_application_access_token_raises_error():
