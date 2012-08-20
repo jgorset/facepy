@@ -33,7 +33,7 @@ def test_delete_user(delete):
     """Test deleting a test user."""
     manager = TestUserManager('<application id>', '<access token>')
 
-    user = FacebookTestUser(
+    user = User(
         id = '<id>',
         access_token = '<access token>',
         login_url = '<login url>',

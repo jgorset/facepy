@@ -1,19 +1,20 @@
-import facepy
+from facepy import GraphAPI
 
+class User(object):
+    def __init__(self, id, access_token, login_url, email, password):
+        self.id = id
+        self.access_token = access_token
+        self.login_url = login_url
+        self.email = email
+        self.password = password
 
-class FacebookTestUser(object):
-    def __init__(self, **kwargs):
-        fields = ('id', 'access_token', 'login_url', 'email', 'password')
-        for field in fields:
-            setattr(self, field, kwargs[field])
-        self.graph = facepy.GraphAPI(self.access_token)
-
+        self.graph = GraphAPI(access_token)
 
 class TestUserManager(object):
-    def __init__(self, app_id, app_secret):
-        access_token = facepy.get_application_access_token(app_id, app_secret)
-        self.graph = facepy.GraphAPI(access_token)
-        self.app_id = app_id
+    def __init__(self, application_id, access_token):
+        self.application_id = application_id
+        self.access_token = access_token
+        self.graph = GraphAPI(access_token)
 
     def create_user(self, **parameters):
         """ creates facebook test user
@@ -26,8 +27,8 @@ class TestUserManager(object):
 
         """
 
-        url =  "%s/accounts/test-users" % self.app_id
-        return FacebookTestUser(**self.graph.post(url, **parameters))
+        url =  "%s/accounts/test-users" % self.application_id
+        return User(**self.graph.post(url, **parameters))
 
     def delete_user(self, user):
         self.graph.delete(str(user.id))
