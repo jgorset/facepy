@@ -30,14 +30,8 @@ class User(object):
         """
         self.graph.delete(self.id)
 
-class TestUser(object):
-    def __init__(self, manager, **user_params):
-        self.manager = manager
-        self.user_params = user_params
-
     def __enter__(self):
-        self._user = self.manager.create_user(**self.user_params)
-        return self._user
+        return self
 
-    def __exit__(self, exc_type=None, exc_value=None, traceback=None):
-        self.manager.delete_user(self._user)
+    def __exit__(self, *args, **kwargs):
+        self.delete()
