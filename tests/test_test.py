@@ -18,9 +18,19 @@ def test_create_user(post):
 
     post.return_value = response   
 
-    manager = TestUserManager('<application id>', '<access token>')
+    user = User.create('<application id>', '<access token>',
+        permissions = ['read_stream'],
+        locale = 'en_US',
+        name = 'John Doe',
+        installed = True
+    )
 
-    user = manager.create_user()
+    post.assert_called_with('<application id>/accounts/test-users',
+        permissions = ['read_stream'],
+        locale = 'en_US',
+        name = 'John Doe',
+        installed = True
+    )
 
     assert_equal(user.id, response['id'])
     assert_equal(user.access_token, response['access_token'])
@@ -31,8 +41,6 @@ def test_create_user(post):
 @patch('facepy.GraphAPI.delete')
 def test_delete_user(delete):
     """Test deleting a test user."""
-    manager = TestUserManager('<application id>', '<access token>')
-
     user = User(
         id = '<id>',
         access_token = '<access token>',
@@ -41,6 +49,6 @@ def test_delete_user(delete):
         password = '<password'
     )
 
-    manager.delete_user(user)
+    user.delete()
 
     delete.assert_called_with('<id>')

@@ -10,29 +10,25 @@ class User(object):
 
         self.graph = GraphAPI(access_token)
 
-class TestUserManager(object):
-    def __init__(self, application_id, access_token):
-        self.application_id = application_id
-        self.access_token = access_token
-        self.graph = GraphAPI(access_token)
-
-    def create_user(self, **parameters):
-        """ creates facebook test user
-
-            Valid parameters (with default values):
-              installed = true
-              name = FULL_NAME
-              locale = en_US
-              permissions = read_stream
-
+    @classmethod
+    def create(self, application_id, access_token, **parameters):
         """
+        Create a new Facebook test user.
 
-        url =  "%s/accounts/test-users" % self.application_id
-        return User(**self.graph.post(url, **parameters))
+        :param application_id: A string describing the Facebook application ID.
+        :param access_token: A string describing the application's access token.
+        :param name: An optional string describing the user's name (defaults to a generated name).
+        :param permissions: An optional list describing permissions.
+        :param locale: An optional string describing the user's locale (defaults to ``en_US``).
+        :param installed: A boolean describing whether the user has installed your application (defaults to ``True``).
+        """
+        return User(**GraphAPI(access_token).post('%s/accounts/test-users' % application_id, **parameters))
 
-    def delete_user(self, user):
-        self.graph.delete(str(user.id))
-
+    def delete(self):
+        """
+        Delete the test user.
+        """
+        self.graph.delete(self.id)
 
 class TestUser(object):
     def __init__(self, manager, **user_params):
