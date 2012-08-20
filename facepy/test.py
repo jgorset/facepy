@@ -1,7 +1,18 @@
 from facepy import GraphAPI
 
 class User(object):
+    """Instances of the User class represent Facebook test users."""
+
     def __init__(self, id, access_token, login_url, email, password):
+        """
+        Initialize a Facebook test user.
+
+        :param id: A string describing the user's Facebook ID.
+        :param access_token: A string describing the user's access token.
+        :param login_url: A string describing the user's login URL.
+        :param email: A string describing the user's email.
+        :param password: A string describing the user's password.
+        """
         self.id = id
         self.access_token = access_token
         self.login_url = login_url
