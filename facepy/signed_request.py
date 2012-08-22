@@ -77,8 +77,6 @@ class SignedRequest(object):
             encoded_signature, encoded_payload = (str(string) for string in signed_request.split('.', 2))
             signature = decode(encoded_signature)
             signed_request_data = json.loads(decode(encoded_payload))
-        except IndexError:
-            raise SignedRequestError("Signed request malformed")
         except (TypeError, ValueError):
             raise SignedRequestError("Signed request had a corrupted payload")
 
