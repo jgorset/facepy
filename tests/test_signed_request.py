@@ -142,3 +142,14 @@ def test_parse_signed_request_unknown_algorithm():
             signed_request = TEST_SIGNED_REQUEST__UNKNOWN_ALGORITHM,
             application_secret_key = TEST_FACEBOOK_APPLICATION_SECRET_KEY
     )
+
+def test_parse_signed_request_incorrect_signature():
+    encoded_signature, _ = (str(string) for string in TEST_SIGNED_REQUEST__UNKNOWN_ALGORITHM.split('.', 2))
+    _, encoded_payload = (str(string) for string in TEST_SIGNED_REQUEST.split('.', 2))
+
+    assert_raises(
+        SignedRequest.Error,
+        SignedRequest.parse,
+            signed_request = u"%s.%s" % (encoded_signature, encoded_payload),
+            application_secret_key = TEST_FACEBOOK_APPLICATION_SECRET_KEY
+    )
