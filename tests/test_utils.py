@@ -1,5 +1,7 @@
 """Tests for the ``utils`` module."""
 
+from datetime import datetime
+
 from mock import patch
 from nose.tools import *
 
@@ -14,6 +16,25 @@ def mock():
 
 def unmock():
     patch.stop()
+
+@with_setup(mock, unmock)
+def test_get_extended_access_token():
+    mock_request.return_value.content = 'access_token=<extended access token>&expires=5183994'
+
+    access_token, expires_at = get_extended_access_token('<access token>', '<application id>', '<application secret key>')
+
+    mock_request.assert_called_with('GET', 'https://graph.facebook.com/oauth/access_token',
+        allow_redirects = True,
+        params = {
+            'client_id': '<application id>',
+            'client_secret': '<application secret key>',
+            'grant_type': 'fb_exchange_token',
+            'fb_exchange_token': '<access token>'
+        }
+    )
+
+    assert_equal(access_token, '<extended access token>')
+    assert isinstance(expires_at, datetime)
 
 @with_setup(mock, unmock)
 def test_get_application_access_token():
