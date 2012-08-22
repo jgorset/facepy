@@ -32,7 +32,7 @@ def get_extended_access_token(access_token, application_id, application_secret_k
 
 def get_application_access_token(application_id, application_secret_key):
     """
-    Query Facebook for an OAuth access token for the given application.
+    Get an OAuth access token for the given application.
 
     :param application_id: An integer describing a Facebook application's ID.
     :param application_secret_key: A string describing a Facebook application's secret key.
