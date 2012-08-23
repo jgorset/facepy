@@ -226,7 +226,11 @@ class GraphAPI(object):
             if isinstance(data[key], (list, set, tuple)) and all([isinstance(item, basestring) for item in data[key]]):
                 data[key] = ','.join(data[key])
 
-        url = '%s/%s' % (self.url, path)
+        # Support absolute paths too
+        if not path.startswith('/'):
+            path = '/' + str(path)
+
+        url = '%s%s' % (self.url, path)
 
         if self.oauth_token:
             data['access_token'] = self.oauth_token
