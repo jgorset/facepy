@@ -172,9 +172,10 @@ class GraphAPI(object):
         ``None`` if results have been exhausted.
 
         :param method: A string describing the HTTP method.
-        :param url: A string describing the URL.
+        :param path: A string describing the object in the Graph API.
         :param data: A dictionary of HTTP GET parameters (for GET requests) or POST data (for POST requests).
         :param page: A boolean describing whether to return an iterator that iterates over each page of results.
+        :param retry: An integer describing how many times the request may be retried.
         """
         data = data or {}
 
