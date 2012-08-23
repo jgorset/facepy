@@ -214,10 +214,8 @@ class GraphAPI(object):
 
                 # Reset pagination parameters.
                 for key in ['offset', 'until', 'since']:
-                    try:
+                    if key in data:
                         del data[key]
-                    except KeyError:
-                        pass
 
                 yield result
 
