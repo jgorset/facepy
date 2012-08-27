@@ -1,9 +1,10 @@
 """Tests for the ``test`` module."""
 
-from mock import patch, DEFAULT
 from nose.tools import *
+from mock import patch, DEFAULT
 
 from facepy.test import *
+
 
 @patch('facepy.GraphAPI.post')
 def test_create_user(post):
@@ -16,20 +17,23 @@ def test_create_user(post):
         'password': '<password>'
     }
 
-    post.return_value = response   
+    post.return_value = response
 
-    user = User.create('<application id>', '<access token>',
-        permissions = ['read_stream'],
-        locale = 'en_US',
-        name = 'John Doe',
-        installed = True
+    user = User.create(
+        '<application id>',
+        '<access token>',
+        permissions=['read_stream'],
+        locale='en_US',
+        name='John Doe',
+        installed=True
     )
 
-    post.assert_called_with('<application id>/accounts/test-users',
-        permissions = ['read_stream'],
-        locale = 'en_US',
-        name = 'John Doe',
-        installed = True
+    post.assert_called_with(
+        '<application id>/accounts/test-users',
+        permissions=['read_stream'],
+        locale='en_US',
+        name='John Doe',
+        installed=True
     )
 
     assert_equal(user.id, response['id'])
@@ -58,16 +62,17 @@ def test_context_manager(post, delete):
         assert_equal(user.password, post.return_value['password'])
 
     delete.assert_called_with(post.return_value['id'])
-        
+
+
 @patch('facepy.GraphAPI.delete')
 def test_delete_user(delete):
     """Test deleting a test user."""
     user = User(
-        id = '<id>',
-        access_token = '<access token>',
-        login_url = '<login url>',
-        email = '<email>',
-        password = '<password'
+        id='<id>',
+        access_token='<access token>',
+        login_url='<login url>',
+        email='<email>',
+        password='<password'
     )
 
     user.delete()

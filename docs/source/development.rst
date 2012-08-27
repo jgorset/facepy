@@ -23,6 +23,12 @@ There are a number of ways to get involved with Facepy:
 
 * **Submit patches or new features.** Create a fork and send me a pull request on `Github`_!
 
+Please note that, although difficult, facepy tries to be as PEP8 compliant as
+possible. Thus, before contributing, please try to see if you have PEP8
+warnings in your source by running::
+
+    $ make pep8
+
 Tests
 -----
 

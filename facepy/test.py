@@ -1,5 +1,6 @@
 from facepy import GraphAPI
 
+
 class User(object):
     """Instances of the User class represent Facebook test users."""
 

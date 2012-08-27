@@ -1,16 +1,15 @@
-from urllib import urlencode
-from urlparse import urlparse, parse_qs
-import requests
-
-from .exceptions import *
-
 try:
     import simplejson as json
 except ImportError:
-    import json
+    import json  # flake8: noqa
+import requests
+
+from urllib import urlencode
+
+from facepy.exceptions import *
+
 
 class GraphAPI(object):
-
     def __init__(self, oauth_token=False, url='https://graph.facebook.com'):
         """
         Initialize GraphAPI with an OAuth access token.
@@ -35,11 +34,11 @@ class GraphAPI(object):
         for an exhaustive list of parameters.
         """
         response = self._query(
-            method = 'GET',
-            path = path,
-            data = options,
-            page = page,
-            retry = retry
+            method='GET',
+            path=path,
+            data=options,
+            page=page,
+            retry=retry
         )
 
         if response is False:
@@ -59,10 +58,10 @@ class GraphAPI(object):
         for an exhaustive list of options.
         """
         response = self._query(
-            method = 'POST',
-            path = path,
-            data = data,
-            retry = retry
+            method='POST',
+            path=path,
+            data=data,
+            retry=retry
         )
 
         if response is False:
@@ -78,9 +77,9 @@ class GraphAPI(object):
         :param retry: An integer describing how many times the request may be retried.
         """
         response = self._query(
-            method = 'DELETE',
-            path = path,
-            retry = retry
+            method='DELETE',
+            path=path,
+            retry=retry
         )
 
         if response is False:
@@ -105,6 +104,7 @@ class GraphAPI(object):
         for an exhaustive list of options.
         """
         SUPPORTED_TYPES = ['post', 'user', 'page', 'event', 'group', 'place', 'checkin']
+
         if type not in SUPPORTED_TYPES:
             raise ValueError('Unsupported type "%s". Supported types are %s' % (type, ', '.join(SUPPORTED_TYPES)))
 
@@ -131,7 +131,7 @@ class GraphAPI(object):
                 request['body'] = urlencode(request['body'])
 
         responses = self.post(
-            batch = json.dumps(requests)
+            batch=json.dumps(requests)
         )
 
         for response, request in zip(responses, requests):
@@ -160,9 +160,9 @@ class GraphAPI(object):
         for an exhaustive list of details.
         """
         return self._query(
-            method = 'GET',
-            path = 'fql?%s' % urlencode({'q': query}),
-            retry = retry
+            method='GET',
+            path='fql?%s' % urlencode({'q': query}),
+            retry=retry
         )
 
     def _query(self, method, path, data=None, page=False, retry=0):
@@ -179,7 +179,6 @@ class GraphAPI(object):
         data = data or {}
 
         def load(method, url, data):
-
             try:
                 if method in ['GET', 'DELETE']:
                     response = self.session.request(method, url, params=data, allow_redirects=True)
