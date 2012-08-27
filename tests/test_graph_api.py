@@ -278,7 +278,7 @@ def test_delete():
 
     mock_request.return_value.content = 'true'
 
-    graph.delete(1)
+    graph.delete('1')
 
     mock_request.assert_called_with(
         'DELETE',

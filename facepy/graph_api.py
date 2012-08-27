@@ -172,9 +172,10 @@ class GraphAPI(object):
         ``None`` if results have been exhausted.
 
         :param method: A string describing the HTTP method.
-        :param url: A string describing the URL.
+        :param path: A string describing the object in the Graph API.
         :param data: A dictionary of HTTP GET parameters (for GET requests) or POST data (for POST requests).
         :param page: A boolean describing whether to return an iterator that iterates over each page of results.
+        :param retry: An integer describing how many times the request may be retried.
         """
         data = data or {}
 
@@ -212,10 +213,8 @@ class GraphAPI(object):
 
                 # Reset pagination parameters.
                 for key in ['offset', 'until', 'since']:
-                    try:
+                    if key in data:
                         del data[key]
-                    except KeyError:
-                        pass
 
                 yield result
 
@@ -224,7 +223,11 @@ class GraphAPI(object):
             if isinstance(data[key], (list, set, tuple)) and all([isinstance(item, basestring) for item in data[key]]):
                 data[key] = ','.join(data[key])
 
-        url = '%s/%s' % (self.url, path)
+        # Support absolute paths too
+        if not path.startswith('/'):
+            path = '/' + str(path)
+
+        url = '%s%s' % (self.url, path)
 
         if self.oauth_token:
             data['access_token'] = self.oauth_token

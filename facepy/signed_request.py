@@ -79,7 +79,7 @@ class SignedRequest(object):
         except IndexError:
             raise SignedRequestError("Signed request malformed")
         except (TypeError, ValueError):
-            raise SignedRequestError("Signed request had a corrupted payload")
+            raise SignedRequestError("Signed request had a corrupt payload")
 
         if signed_request_data.get('algorithm', '').upper() != 'HMAC-SHA256':
             raise SignedRequestError("Signed request is using an unknown algorithm")
