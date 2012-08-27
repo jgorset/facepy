@@ -1,7 +1,5 @@
 class FacepyError(Exception):
     """Base class for exceptions raised by Facepy."""
-    def __init__(self, message):
-        self.message = message
 
 
 class FacebookError(FacepyError):
@@ -9,6 +7,11 @@ class FacebookError(FacepyError):
     def __init__(self, message=None, code=None):
         self.message = message
         self.code = code
+
+        if self.code:
+            message = '[%s] %s' % (self.code, self.message)
+
+        super(FacebookError, self).__init__(message)
 
 
 class OAuthError(FacebookError):
