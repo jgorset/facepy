@@ -1,15 +1,15 @@
-from urllib import urlencode
-import requests
-
-from .exceptions import FacepyError
-
 try:
     import simplejson as json
 except ImportError:
-    import json
+    import json  # flake8: noqa
+import requests
+
+from urllib import urlencode
+
+from facepy.exceptions import *
+
 
 class GraphAPI(object):
-
     def __init__(self, oauth_token=False, url='https://graph.facebook.com'):
         """
         Initialize GraphAPI with an OAuth access token.
@@ -34,15 +34,15 @@ class GraphAPI(object):
         for an exhaustive list of parameters.
         """
         response = self._query(
-            method = 'GET',
-            path = path,
-            data = options,
-            page = page,
-            retry = retry
+            method='GET',
+            path=path,
+            data=options,
+            page=page,
+            retry=retry
         )
 
         if response is False:
-            raise self.FacebookError('Could not get "%s".' % path)
+            raise FacebookError('Could not get "%s".' % path)
 
         return response
 
@@ -58,14 +58,14 @@ class GraphAPI(object):
         for an exhaustive list of options.
         """
         response = self._query(
-            method = 'POST',
-            path = path,
-            data = data,
-            retry = retry
+            method='POST',
+            path=path,
+            data=data,
+            retry=retry
         )
 
         if response is False:
-            raise self.FacebookError('Could not post to "%s"' % path)
+            raise FacebookError('Could not post to "%s"' % path)
 
         return response
 
@@ -77,13 +77,13 @@ class GraphAPI(object):
         :param retry: An integer describing how many times the request may be retried.
         """
         response = self._query(
-            method = 'DELETE',
-            path = path,
-            retry = retry
+            method='DELETE',
+            path=path,
+            retry=retry
         )
 
         if response is False:
-            raise self.FacebookError('Could not delete "%s"' % path)
+            raise FacebookError('Could not delete "%s"' % path)
 
         return response
 
@@ -104,6 +104,7 @@ class GraphAPI(object):
         for an exhaustive list of options.
         """
         SUPPORTED_TYPES = ['post', 'user', 'page', 'event', 'group', 'place', 'checkin']
+
         if type not in SUPPORTED_TYPES:
             raise ValueError('Unsupported type "%s". Supported types are %s' % (type, ', '.join(SUPPORTED_TYPES)))
 
@@ -124,8 +125,13 @@ class GraphAPI(object):
 
         Yields a list of responses and/or exceptions.
         """
+
+        for request in requests:
+            if 'body' in request:
+                request['body'] = urlencode(request['body'])
+
         responses = self.post(
-            batch = json.dumps(requests)
+            batch=json.dumps(requests)
         )
 
         for response, request in zip(responses, requests):
@@ -154,9 +160,9 @@ class GraphAPI(object):
         for an exhaustive list of details.
         """
         return self._query(
-            method = 'GET',
-            path = 'fql?%s' % urlencode({'q': query}),
-            retry = retry
+            method='GET',
+            path='fql?%s' % urlencode({'q': query}),
+            retry=retry
         )
 
     def _query(self, method, path, data=None, page=False, retry=0):
@@ -166,14 +172,14 @@ class GraphAPI(object):
         ``None`` if results have been exhausted.
 
         :param method: A string describing the HTTP method.
-        :param url: A string describing the URL.
+        :param path: A string describing the object in the Graph API.
         :param data: A dictionary of HTTP GET parameters (for GET requests) or POST data (for POST requests).
         :param page: A boolean describing whether to return an iterator that iterates over each page of results.
+        :param retry: An integer describing how many times the request may be retried.
         """
         data = data or {}
 
         def load(method, url, data):
-
             try:
                 if method in ['GET', 'DELETE']:
                     response = self.session.request(method, url, params=data, allow_redirects=True)
@@ -190,7 +196,7 @@ class GraphAPI(object):
 
                     response = self.session.request(method, url, data=data, files=files)
             except requests.RequestException as exception:
-                raise self.HTTPError(exception.message)
+                raise HTTPError(exception.message)
 
             result = self._parse(response.content)
 
@@ -207,10 +213,8 @@ class GraphAPI(object):
 
                 # Reset pagination parameters.
                 for key in ['offset', 'until', 'since']:
-                    try:
+                    if key in data:
                         del data[key]
-                    except KeyError:
-                        pass
 
                 yield result
 
@@ -219,7 +223,11 @@ class GraphAPI(object):
             if isinstance(data[key], (list, set, tuple)) and all([isinstance(item, basestring) for item in data[key]]):
                 data[key] = ','.join(data[key])
 
-        url = '%s/%s' % (self.url, path)
+        # Support absolute paths too
+        if not path.startswith('/'):
+            path = '/' + str(path)
+
+        url = '%s%s' % (self.url, path)
 
         if self.oauth_token:
             data['access_token'] = self.oauth_token
@@ -264,9 +272,9 @@ class GraphAPI(object):
                 error = data['error']
 
                 if error.get('type') == "OAuthException":
-                    exception = self.OAuthError
+                    exception = OAuthError
                 else:
-                    exception = self.FacebookError
+                    exception = FacebookError
 
                 raise exception(
                     error.get('message'),
@@ -275,22 +283,12 @@ class GraphAPI(object):
 
             # Facebook occasionally reports errors in its legacy error format.
             if 'error_msg' in data:
-                raise self.FacebookError(
+                raise FacebookError(
                     data.get('error_msg'),
                     data.get('error_code', None)
                 )
 
         return data
 
-    class FacebookError(FacepyError):
-        """Exception for errors returned by the Graph API."""
-
-        def __init__(self, message=None, code=None):
-            self.message = message
-            self.code = code
-
-    class OAuthError(FacebookError):
-        """Exception for errors specifically related to OAuth."""
-
-    class HTTPError(FacepyError):
-        """Exception for transport errors."""
+    # Proxy exceptions for ease of use and backwards compatibility.
+    FacebookError, OAuthError, HTTPError = FacebookError, OAuthError, HTTPError

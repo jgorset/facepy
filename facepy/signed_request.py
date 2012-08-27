@@ -1,16 +1,16 @@
-from datetime import datetime
-
 import base64
 import hashlib
 import hmac
-import time
-
 try:
     import simplejson as json
 except ImportError:
-    import json
+    import json  # flake8: noqa
+import time
 
-from .exceptions import FacepyError
+from datetime import datetime
+
+from facepy.exceptions import *
+
 
 class SignedRequest(object):
     """
@@ -38,7 +38,6 @@ class SignedRequest(object):
         :param signed_request: A string describing a signed request.
         :param application_secret_key: A string describing a Facebook application's secret key.
         """
-
         self.signed_request = signed_request
         self.application_secret_key = application_secret_key
 
@@ -47,23 +46,23 @@ class SignedRequest(object):
         self.data = self.raw.get('app_data', None)
 
         self.page = self.Page(
-            id = self.raw['page']['id'],
-            is_liked = self.raw['page']['liked'],
-            is_admin = self.raw['page']['admin']
+            id=self.raw['page']['id'],
+            is_liked=self.raw['page']['liked'],
+            is_admin=self.raw['page']['admin']
         ) if 'page' in self.raw else None
 
         self.user = self.User(
-            id = self.raw.get('user_id'),
-            locale = self.raw['user'].get('locale', None),
-            country = self.raw['user'].get('country', None),
-            age = range(
+            id=self.raw.get('user_id'),
+            locale=self.raw['user'].get('locale', None),
+            country=self.raw['user'].get('country', None),
+            age=range(
                 self.raw['user']['age']['min'],
                 self.raw['user']['age']['max'] + 1 if 'max' in self.raw['user']['age'] else 100
             ) if 'age' in self.raw['user'] else None,
-            oauth_token = self.User.OAuthToken(
-                token = self.raw['oauth_token'],
-                issued_at = datetime.fromtimestamp(self.raw['issued_at']),
-                expires_at = datetime.fromtimestamp(self.raw['expires']) if self.raw['expires'] > 0 else None
+            oauth_token=self.User.OAuthToken(
+                token=self.raw['oauth_token'],
+                issued_at=datetime.fromtimestamp(self.raw['issued_at']),
+                expires_at=datetime.fromtimestamp(self.raw['expires']) if self.raw['expires'] > 0 else None
             ) if 'oauth_token' in self.raw else None,
         )
 
@@ -77,17 +76,15 @@ class SignedRequest(object):
             encoded_signature, encoded_payload = (str(string) for string in signed_request.split('.', 2))
             signature = decode(encoded_signature)
             signed_request_data = json.loads(decode(encoded_payload))
-        except IndexError:
-            raise cls.Error("Signed request malformed")
         except (TypeError, ValueError):
-            raise cls.Error("Signed request had a corrupted payload")
+            raise SignedRequestError("Signed request had a corrupt payload")
 
         if signed_request_data.get('algorithm', '').upper() != 'HMAC-SHA256':
-            raise cls.Error("Signed request is using an unknown algorithm")
+            raise SignedRequestError("Signed request is using an unknown algorithm")
 
         expected_signature = hmac.new(application_secret_key, msg=encoded_payload, digestmod=hashlib.sha256).digest()
         if signature != expected_signature:
-            raise cls.Error("Signed request signature mismatch")
+            raise SignedRequestError("Signed request signature mismatch")
 
         return signed_request_data
 
@@ -149,7 +146,11 @@ class SignedRequest(object):
             json.dumps(payload, separators=(',', ':'))
         )
 
-        encoded_signature = base64.urlsafe_b64encode(hmac.new(self.application_secret_key, encoded_payload, hashlib.sha256).digest())
+        encoded_signature = base64.urlsafe_b64encode(hmac.new(
+            self.application_secret_key,
+            encoded_payload,
+            hashlib.sha256
+        ).digest())
 
         return '%(signature)s.%(payload)s' % {
             'signature': encoded_signature,
@@ -243,5 +244,5 @@ class SignedRequest(object):
                 else:
                     return self.expires_at < datetime.now()
 
-    class Error(FacepyError):
-        """Exception raised for invalid signed_request processing."""
+    # Proxy exceptions for ease of use and backwards compatibility.
+    Error = SignedRequestError
