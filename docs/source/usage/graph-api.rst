@@ -18,16 +18,14 @@ You may interact with Facebook's Graph API using the ``GraphAPI`` class::
         source = open('parrot.jpg')
     )
 
-    # Do a FQL query:
-    query = 'SELECT name FROM user WHERE uid = me()'
-    graph.fql(query)
+    # Make a FQL query
+    graph.fql('SELECT name FROM user WHERE uid = me()')
 
-    # Do a FQL multiquery:
-    queries = {
-        'rsvp_status': "SELECT uid, rsvp_status FROM event_member WHERE eid=12345678",
-        'details': "SELECT name, url, pic FROM profile WHERE id IN (SELECT uid FROM #rsvp_status)"
+    # Make a FQL multiquery
+    graph.fql({
+        'rsvp_status': 'SELECT uid, rsvp_status FROM event_member WHERE eid=12345678',
+        'details': 'SELECT name, url, pic FROM profile WHERE id IN (SELECT uid FROM #rsvp_status)'
     }
-    graph.fql(queries)
 
 .. autoclass:: facepy.GraphAPI
     :members: get, post, delete, search, batch, fql
