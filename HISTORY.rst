@@ -1,6 +1,14 @@
 History
 -------
 
+0.8.3
++++++
+
+* Fixed a bug that caused batch requests with a body to fail.
+* You may now extend access tokens with ``get_extended_access_token``.
+* Fixed a bug that caused paths that started with a slash to fail.
+* Fixed a bug that caused exception messages to be omitted.
+
 0.8.2
 +++++
 
