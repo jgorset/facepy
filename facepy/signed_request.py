@@ -31,7 +31,7 @@ class SignedRequest(object):
     raw = None
     """A string describing the signed request in its original format."""
 
-    def __init__(self, signed_request=None, application_secret_key=None):
+    def __init__(self, signed_request=None, application_secret_key=None, application_id=None):
         """
         Initialize a signed request.
 
@@ -40,6 +40,7 @@ class SignedRequest(object):
         """
         self.signed_request = signed_request
         self.application_secret_key = application_secret_key
+        self.application_id = application_id
 
         self.raw = self.parse(signed_request, application_secret_key)
 
@@ -50,6 +51,9 @@ class SignedRequest(object):
             is_liked=self.raw['page']['liked'],
             is_admin=self.raw['page']['admin']
         ) if 'page' in self.raw else None
+
+        if not self.raw.has_key('user'):
+            self.fetch_user_data_and_token()
 
         self.user = self.User(
             id=self.raw.get('user_id'),
@@ -65,6 +69,19 @@ class SignedRequest(object):
                 expires_at=datetime.fromtimestamp(self.raw['expires']) if self.raw['expires'] > 0 else None
             ) if 'oauth_token' in self.raw else None,
         )
+
+    def fetch_user_data_and_token(self):
+        from urlparse import parse_qs
+        from . import GraphAPI, get_application_access_token
+
+        app_token = get_application_access_token(self.application_id, self.application_secret_key)
+        graph = GraphAPI(app_token)
+        
+        qs = graph.get('oauth/access_token', code=self.raw['code'], redirect_uri='', client_id=self.application_id, client_secret=self.application_secret_key)
+        self.raw['oauth_token'] = parse_qs(qs)['access_token'][0]
+        #import ipdb; ipdb.set_trace()
+        self.raw['expires'] = time.time() + int(parse_qs(qs)['expires'][0])
+        self.raw['user'] = graph.get(self.raw['user_id'])
 
     def parse(cls, signed_request, application_secret_key):
         """Parse a signed request, returning a dictionary describing its payload."""
