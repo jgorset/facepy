@@ -46,9 +46,9 @@ class SignedRequest(object):
         self.data = self.raw.get('app_data', None)
 
         self.page = self.Page(
-            id=self.raw['page']['id'],
-            is_liked=self.raw['page']['liked'],
-            is_admin=self.raw['page']['admin']
+            id=self.raw['page'].get('id'),
+            is_liked=self.raw['page'].get('liked'),
+            is_admin=self.raw['page'].get('admin')
         ) if 'page' in self.raw else None
 
         self.user = self.User(
