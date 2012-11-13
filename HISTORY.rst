@@ -1,6 +1,12 @@
 History
 -------
 
+0.8.4
++++++
+
+* Fixed a bug that caused a KeyError for signed requests that were missing
+  some keys for its "page" attribute.
+
 0.8.3
 +++++
 
