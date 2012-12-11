@@ -48,6 +48,32 @@ def test_get():
 
 
 @with_setup(mock, unmock)
+def test_get_with_nested_parameters():
+    graph = GraphAPI('<access token>')
+
+    mock_request.return_value.content = json.dumps({
+        'id': 1,
+        'name': 'Thomas \'Herc\' Hauk',
+        'first_name': 'Thomas',
+        'last_name': 'Hauk',
+        'link': 'http://facebook.com/herc',
+        'username': 'herc',
+    })
+
+    graph.get('me', foo={'bar': 'baz'})
+
+    mock_request.assert_called_with(
+        'GET',
+        'https://graph.facebook.com/me',
+        allow_redirects=True,
+        params={
+            'access_token': '<access token>',
+            'foo': '{"bar": "baz"}'
+        }
+    )
+
+
+@with_setup(mock, unmock)
 def test_get_with_fields():
     graph = GraphAPI('<access token>')
 

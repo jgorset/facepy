@@ -180,6 +180,12 @@ class GraphAPI(object):
         data = data or {}
 
         def load(method, url, data):
+            for key in data:
+                value = data[key]
+
+                if isinstance(value, (list, dict, set)):
+                    data[key] = json.dumps(value)
+
             try:
                 if method in ['GET', 'DELETE']:
                     response = self.session.request(method, url, params=data, allow_redirects=True)
