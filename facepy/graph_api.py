@@ -10,7 +10,7 @@ from facepy.exceptions import *
 
 
 class GraphAPI(object):
-    def __init__(self, oauth_token=False, url='https://graph.facebook.com'):
+    def __init__(self, oauth_token=False, url='https://graph.facebook.com', verify_ssl_certificate=True):
         """
         Initialize GraphAPI with an OAuth access token.
 
@@ -19,6 +19,7 @@ class GraphAPI(object):
         self.oauth_token = oauth_token
         self.session = requests.session()
         self.url = url.strip('/')
+        self.verify_ssl_certificate = verify_ssl_certificate
 
     def get(self, path='', page=False, retry=3, **options):
         """
@@ -188,7 +189,8 @@ class GraphAPI(object):
 
             try:
                 if method in ['GET', 'DELETE']:
-                    response = self.session.request(method, url, params=data, allow_redirects=True)
+                    response = self.session.request(method, url, params=data, allow_redirects=True,
+                     verify=self.verify_ssl_certificate)
 
                 if method in ['POST', 'PUT']:
                     files = {}
@@ -200,7 +202,8 @@ class GraphAPI(object):
                     for key in files:
                         data.pop(key)
 
-                    response = self.session.request(method, url, data=data, files=files)
+                    response = self.session.request(method, url, data=data, files=files, 
+                        verify=self.verify_ssl_certificate)
             except requests.RequestException as exception:
                 raise HTTPError(exception.message)
 
