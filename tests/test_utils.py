@@ -34,6 +34,7 @@ def test_get_extended_access_token():
         'GET',
         'https://graph.facebook.com/oauth/access_token',
         allow_redirects=True,
+        verify=True,
         params={
             'client_id': '<application id>',
             'client_secret': '<application secret key>',
@@ -56,6 +57,7 @@ def test_get_application_access_token():
         'GET',
         'https://graph.facebook.com/oauth/access_token',
         allow_redirects=True,
+        verify=True,
         params={
             'client_id': '<application id>',
             'client_secret': '<application secret key>',
