@@ -1,6 +1,14 @@
 History
 -------
 
+Unreleased
+++++++++++
+
+* Changed ``GraphAPI`` methods to return ``decimal.Decimal`` instances for
+  floating-point numbers instead of ``float``, which can cause precision
+  losses not acceptable for financial operations.
+
+
 0.8.4
 +++++
 
