@@ -1,6 +1,7 @@
 """Tests for the ``graph_api`` module."""
 
 import json
+import decimal
 
 from nose.tools import *
 from mock import patch, MagicMock
@@ -110,6 +111,16 @@ def test_get_with_fields():
             'fields': 'id,first_name,last_name'
         }
     )
+
+
+@with_setup(mock, unmock)
+def test_get_with_fpnum():
+    graph = GraphAPI('<access token>')
+    mock_request.return_value.content = '{"payout": 0.94}'
+
+    resp = graph.get('<paymend_id>')
+
+    assert_equal(resp, {'payout': decimal.Decimal('0.94')})
 
 
 @with_setup(mock, unmock)

@@ -5,6 +5,7 @@ except ImportError:
 import requests
 
 from urllib import urlencode
+from decimal import Decimal
 
 from facepy.exceptions import *
 
@@ -30,6 +31,9 @@ class GraphAPI(object):
                      iterates over each page of results.
         :param retry: An integer describing how many times the request may be retried.
         :param options: Graph API parameters such as 'limit', 'offset' or 'since'.
+
+        Floating-point numbers will be returned as :class:`decimal.Decimal`
+        instances.
 
         See `Facebook's Graph API documentation <http://developers.facebook.com/docs/reference/api/>`_
         for an exhaustive list of parameters.
@@ -259,7 +263,7 @@ class GraphAPI(object):
         :param data: A string describing the Graph API's response.
         """
         try:
-            data = json.loads(data)
+            data = json.loads(data, parse_float=Decimal)
         except ValueError:
             return data
 
