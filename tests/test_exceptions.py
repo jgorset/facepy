@@ -18,7 +18,6 @@ def test_facepy_error():
         assert_equal(exception.message, '<message>')
         assert_equal(exception.__str__(), '<message>')
         assert_equal(exception.__repr__(), 'FacepyError(\'<message>\',)')
-        assert_equal(exception.__unicode__(), u'<message>')
 
 
 def test_facebook_error():
@@ -29,7 +28,6 @@ def test_facebook_error():
         assert_equal(exception.code, 100)
         assert_equal(exception.__str__(), '[100] <message>')
         assert_equal(exception.__repr__(), 'FacebookError(\'[100] <message>\',)')
-        assert_equal(exception.__unicode__(), u'[100] <message>')
 
 
 def test_facebookerror_can_be_pickled():
