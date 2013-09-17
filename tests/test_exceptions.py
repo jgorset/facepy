@@ -1,6 +1,9 @@
 """Tests for the ``exceptions`` module."""
+try:
+    import cPickle as pickle
+except ImportError:
+    import pickle
 
-import cPickle
 
 from nose.tools import *
 
@@ -33,18 +36,18 @@ def test_facebookerror_can_be_pickled():
     try:
         raise GraphAPI.FacebookError('<message>', '<code>')
     except FacepyError as exception:
-        cPickle.dumps(exception)
+        pickle.dumps(exception)
 
 
 def test_oautherror_can_be_pickled():
     try:
         raise GraphAPI.OAuthError('<message>', '<code>')
     except FacepyError as exception:
-        cPickle.dumps(exception)
+        pickle.dumps(exception)
 
 
 def test_httperror_can_be_pickled():
     try:
         raise GraphAPI.HTTPError('<message>')
     except FacepyError as exception:
-        cPickle.dumps(exception)
+        pickle.dumps(exception)

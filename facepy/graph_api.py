@@ -4,7 +4,10 @@ except ImportError:
     import json  # flake8: noqa
 import requests
 
-from urllib import urlencode
+try:
+    from urllib.parse import urlencode
+except ImportError:
+    from urllib import urlencode
 from decimal import Decimal
 
 from facepy.exceptions import *
