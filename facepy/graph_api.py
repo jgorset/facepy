@@ -212,7 +212,7 @@ class GraphAPI(object):
                     response = self.session.request(method, url, data=data, files=files, 
                         verify=self.verify_ssl_certificate)
             except requests.RequestException as exception:
-                raise HTTPError(exception.message)
+                raise HTTPError(exception)
 
             result = self._parse(response.content)
 
