@@ -7,11 +7,10 @@ history = open('HISTORY.rst').read()
 # cause setuptools to attempt to import dependencies that we have no
 # guarantee exist on the system yet, so we'll have to use ``execfile`` to
 # import the file that contains the version specifically.
-execfile('facepy/version.py')
 
 setup(
     name='facepy',
-    version=__version__,  # flake8: noqa
+    version='0.8.4',  # flake8: noqa
     description='Facepy makes it really easy to interact with Facebook\'s Graph API',
     long_description=readme + '\n\n' + history,
     author='Johannes Gorset',

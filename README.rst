@@ -22,7 +22,7 @@ Usage
     # Post a photo of a parrot
     graph.post(
         path = 'me/photos',
-        source = open('parrot.jpg')
+        source = open('parrot.jpg', 'rb')
     )
 
 Facepy can do more than reading your latest posts and posting photographs of parrots, but you'll have to

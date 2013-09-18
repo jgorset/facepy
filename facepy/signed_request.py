@@ -52,7 +52,7 @@ class SignedRequest(object):
             is_admin=self.raw['page'].get('admin')
         ) if 'page' in self.raw else None
 
-        if not self.raw.has_key('user'):
+        if not 'user' in self.raw:
             self.fetch_user_data_and_token()
 
         self.user = self.User(
@@ -92,14 +92,15 @@ class SignedRequest(object):
         try:
             encoded_signature, encoded_payload = (str(string) for string in signed_request.split('.', 2))
             signature = decode(encoded_signature)
-            signed_request_data = json.loads(decode(encoded_payload))
+            signed_request_data = json.loads(decode(encoded_payload).decode('utf-8'))
         except (TypeError, ValueError):
             raise SignedRequestError("Signed request had a corrupt payload")
 
         if signed_request_data.get('algorithm', '').upper() != 'HMAC-SHA256':
             raise SignedRequestError("Signed request is using an unknown algorithm")
 
-        expected_signature = hmac.new(application_secret_key, msg=encoded_payload, digestmod=hashlib.sha256).digest()
+        expected_signature = hmac.new(application_secret_key.encode('utf-8'), msg=encoded_payload.encode('utf-8'),
+                                      digestmod=hashlib.sha256).digest()
         if signature != expected_signature:
             raise SignedRequestError("Signed request signature mismatch")
 
@@ -160,11 +161,11 @@ class SignedRequest(object):
             payload['user_id'] = self.user.id
 
         encoded_payload = base64.urlsafe_b64encode(
-            json.dumps(payload, separators=(',', ':'))
+            json.dumps(payload, separators=(',', ':')).encode('utf-8')
         )
 
         encoded_signature = base64.urlsafe_b64encode(hmac.new(
-            self.application_secret_key,
+            self.application_secret_key.encode('utf-8'),
             encoded_payload,
             hashlib.sha256
         ).digest())

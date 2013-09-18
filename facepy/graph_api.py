@@ -4,7 +4,10 @@ except ImportError:
     import json  # flake8: noqa
 import requests
 
-from urllib import urlencode
+try:
+    from urllib.parse import urlencode
+except ImportError:
+    from urllib import urlencode
 from decimal import Decimal
 
 from facepy.exceptions import *
@@ -209,7 +212,7 @@ class GraphAPI(object):
                     response = self.session.request(method, url, data=data, files=files, 
                         verify=self.verify_ssl_certificate)
             except requests.RequestException as exception:
-                raise HTTPError(exception.message)
+                raise HTTPError(exception)
 
             result = self._parse(response.content)
 
@@ -233,7 +236,7 @@ class GraphAPI(object):
 
         # Convert option lists to comma-separated values.
         for key in data:
-            if isinstance(data[key], (list, set, tuple)) and all([isinstance(item, basestring) for item in data[key]]):
+            if isinstance(data[key], (list, set, tuple)) and all([isinstance(item, str) for item in data[key]]):
                 data[key] = ','.join(data[key])
 
         # Support absolute paths too
@@ -262,6 +265,9 @@ class GraphAPI(object):
 
         :param data: A string describing the Graph API's response.
         """
+        # tests seems to pass a str, while real usage bytes which should be expected
+        if type(data) == type(bytes()):
+            data = data.decode('utf-8')
         try:
             data = json.loads(data, parse_float=Decimal)
         except ValueError:
