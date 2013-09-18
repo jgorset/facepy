@@ -52,7 +52,7 @@ class SignedRequest(object):
             is_admin=self.raw['page'].get('admin')
         ) if 'page' in self.raw else None
 
-        if not self.raw.has_key('user'):
+        if not 'user' in self.raw:
             self.fetch_user_data_and_token()
 
         self.user = self.User(
@@ -161,11 +161,11 @@ class SignedRequest(object):
             payload['user_id'] = self.user.id
 
         encoded_payload = base64.urlsafe_b64encode(
-            json.dumps(payload, separators=(',', ':'))
+            json.dumps(payload, separators=(',', ':')).encode('utf-8')
         )
 
         encoded_signature = base64.urlsafe_b64encode(hmac.new(
-            self.application_secret_key,
+            self.application_secret_key.encode('utf-8'),
             encoded_payload,
             hashlib.sha256
         ).digest())
