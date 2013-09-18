@@ -15,7 +15,8 @@ def test_facepy_error():
     try:
         raise FacepyError('<message>')
     except FacepyError as exception:
-        assert_equal(exception.message, '<message>')
+        if hasattr(exception, "message"):
+            assert_equal(exception.message, '<message>')
         assert_equal(exception.__str__(), '<message>')
         assert_equal(exception.__repr__(), 'FacepyError(\'<message>\',)')
 
