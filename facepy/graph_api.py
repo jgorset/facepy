@@ -25,6 +25,18 @@ class GraphAPI(object):
         self.url = url.strip('/')
         self.verify_ssl_certificate = verify_ssl_certificate
 
+    @classmethod
+    def for_application(self, id, secret_key):
+        """
+        Initialize GraphAPI with an OAuth access token for an application.
+
+        :param id: An integer describing a Facebook application.
+        :param secret_key: A String describing the Facebook application's secret key.
+        """
+        from facepy.utils import get_application_access_token
+
+        return GraphAPI(get_application_access_token(id, secret_key))
+
     def get(self, path='', page=False, retry=3, **options):
         """
         Get an item from the Graph API.
