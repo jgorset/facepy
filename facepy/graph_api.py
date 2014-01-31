@@ -197,6 +197,10 @@ class GraphAPI(object):
         :param page: A boolean describing whether to return an iterator that iterates over each page of results.
         :param retry: An integer describing how many times the request may be retried.
         """
+        
+        if(data):
+            data = dict(
+                 (k.replace('__', ':'), v) for k, v in data.items())
         data = data or {}
 
         def load(method, url, data):
