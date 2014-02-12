@@ -1,12 +1,18 @@
 History
 -------
 
-Unreleased
-++++++++++
+0.9.0
++++++
 
 * Changed ``GraphAPI`` methods to return ``decimal.Decimal`` instances for
   floating-point numbers instead of ``float``, which can cause precision
   losses not acceptable for financial operations.
+* Fixed a bug that caused parsing signed requests to fail when the ``user`` key
+  is not present.
+* Nested dictionaries, lists and sets are now automatically encoded as JSON.
+* You may now elect to not verify Facebook's SSL certificate.
+* You may now substitute colons with underscores in keys such as ``fb:explicitly_shared``.
+* Facepy is now compatible with Python 3.
 
 
 0.8.4
