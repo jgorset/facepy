@@ -252,12 +252,12 @@ class GraphAPI(object):
 
         # Convert option lists to comma-separated values.
         for key in data:
-            if isinstance(data[key], (list, set, tuple)) and all([isinstance(item, str) for item in data[key]]):
+            if isinstance(data[key], (list, set, tuple)) and all([isinstance(item, basestring) for item in data[key]]):
                 data[key] = ','.join(data[key])
 
         # Support absolute paths too
         if not path.startswith('/'):
-            path = '/' + str(path)
+            path = '/' + unicode(path.decode('utf-8'))
 
         url = '%s%s' % (self.url, path)
 
