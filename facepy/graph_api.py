@@ -166,6 +166,7 @@ class GraphAPI(object):
         responses = []
 
         # Maximum batch size for Facebook is 50 so split up requests
+        # https://developers.facebook.com/docs/graph-api/making-multiple-requests/#limits
         for group in _grouper(requests, 50):
             responses += self.post(
                 batch=json.dumps(group)

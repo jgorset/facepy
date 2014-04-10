@@ -513,6 +513,30 @@ def test_batch_error_references_request():
 
 
 @with_setup(mock, unmock)
+def test_batch_over_50_requests():
+    graph = GraphAPI('<access_token')
+
+    mock_request.return_value.content = json.dumps([{
+            'code': 200,
+            'headers': [
+                {'name': 'Content-Type', 'value': 'text/javascript; charset=UTF-8'}
+            ],
+            'body': '{"foo": "bar"}'
+        } for i in xrange(60)
+    ])
+
+    requests = [dict(method="GET", relative_url="me?fields=username") for i in xrange(60)]
+
+    batch = graph.batch(
+        requests=requests
+    )
+
+    responses = list(batch)
+
+    assert len(responses) == 60
+
+
+@with_setup(mock, unmock)
 def test_oauth_error():
     graph = GraphAPI('<access token>')
 
