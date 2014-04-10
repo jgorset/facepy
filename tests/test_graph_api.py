@@ -516,7 +516,8 @@ def test_batch_error_references_request():
 def test_batch_over_50_requests():
     graph = GraphAPI('<access_token')
 
-    mock_request.return_value.content = json.dumps([{
+    mock_request.return_value.content = json.dumps([
+        {
             'code': 200,
             'headers': [
                 {'name': 'Content-Type', 'value': 'text/javascript; charset=UTF-8'}
