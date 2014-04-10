@@ -516,15 +516,22 @@ def test_batch_error_references_request():
 def test_batch_over_50_requests():
     graph = GraphAPI('<access_token')
 
-    mock_request.return_value.content = json.dumps([
-        {
-            'code': 200,
-            'headers': [
-                {'name': 'Content-Type', 'value': 'text/javascript; charset=UTF-8'}
-            ],
-            'body': '{"foo": "bar"}'
-        } for i in xrange(60)
-    ])
+    def side_effect_batch_size(*args, **kwargs):
+        batch_size = len(json.loads(kwargs['data']['batch']))
+        if batch_size > 50:
+            return MagicMock(content='{"error":{"message":"Too many requests in batch message. Maximum batch size is 50","type":"GraphBatchException"}}')
+        else:
+            return MagicMock(content=json.dumps([
+                {
+                    'code': 200,
+                    'headers': [
+                        {'name': 'Content-Type', 'value': 'text/javascript; charset=UTF-8'}
+                    ],
+                    'body': '{"foo": "bar"}'
+                } for i in xrange(batch_size)
+            ]))
+
+    mock_request.side_effect = side_effect_batch_size
 
     requests = [dict(method="GET", relative_url="me?fields=username") for i in xrange(60)]
 
