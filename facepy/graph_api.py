@@ -168,7 +168,7 @@ class GraphAPI(object):
         # Maximum batch size for Facebook is 50 so split up requests
         for group in _grouper(requests, 50):
             responses += self.post(
-                batch=json.dumps(requests)
+                batch=json.dumps(group)
             )
 
         for response, request in zip(responses, requests):
