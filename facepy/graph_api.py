@@ -150,9 +150,27 @@ class GraphAPI(object):
             if 'body' in request:
                 request['body'] = urlencode(request['body'])
 
-        responses = self.post(
-            batch=json.dumps(requests)
-        )
+        def _grouper(complete_list, n=1):
+            """
+            Batches a list into constant size chunks.
+
+            :param complete_list: A input list (not a generator).
+            :param n: The size of the chunk.
+
+            Adapted from <http://stackoverflow.com/questions/312443/how-do-you-split-a-list-into-evenly-sized-chunks-in-python>
+            """
+
+            for i in range(0, len(complete_list), n):
+                yield complete_list[i:i + n]
+
+        responses = []
+
+        # Maximum batch size for Facebook is 50 so split up requests
+        # https://developers.facebook.com/docs/graph-api/making-multiple-requests/#limits
+        for group in _grouper(requests, 50):
+            responses += self.post(
+                batch=json.dumps(group)
+            )
 
         for response, request in zip(responses, requests):
 
