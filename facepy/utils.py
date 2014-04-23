@@ -32,7 +32,11 @@ def get_extended_access_token(access_token, application_id, application_secret_k
     components = parse_qs(response)
 
     token = components['access_token'][0]
-    expires_at = datetime.now() + timedelta(seconds=int(components['expires'][0]))
+
+    try:
+        expires_at = datetime.now() + timedelta(seconds=int(components['expires'][0]))
+    except KeyError:  # there is no expiration
+        expires_at = None
 
     return token, expires_at
 

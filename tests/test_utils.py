@@ -48,6 +48,32 @@ def test_get_extended_access_token():
 
 
 @with_setup(mock, unmock)
+def test_get_extended_access_token_no_expiry():
+    mock_request.return_value.content = 'access_token=<extended access token>'
+
+    access_token, expires_at = get_extended_access_token(
+        '<access token>',
+        '<application id>',
+        '<application secret key>'
+    )
+
+    mock_request.assert_called_with(
+        'GET',
+        'https://graph.facebook.com/oauth/access_token',
+        allow_redirects=True,
+        verify=True,
+        params={
+            'client_id': '<application id>',
+            'client_secret': '<application secret key>',
+            'grant_type': 'fb_exchange_token',
+            'fb_exchange_token': '<access token>'
+        }
+    )
+
+    assert_equal(access_token, '<extended access token>')
+    assert expires_at is None
+
+@with_setup(mock, unmock)
 def test_get_application_access_token():
     mock_request.return_value.content = 'access_token=...'
 
