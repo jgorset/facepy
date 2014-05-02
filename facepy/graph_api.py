@@ -202,9 +202,9 @@ class GraphAPI(object):
             data = dict(
                  (k.replace('__', ':'), v) for k, v in data.items())
             data = dict(
-                 (k.replace('___', '['), v) for k, v in data.items())
+                 (k.replace('__sqbro__', '['), v) for k, v in data.items())
             data = dict(
-                 (k.replace('____', ']'), v) for k, v in data.items())
+                 (k.replace('__sqbrc__', ']'), v) for k, v in data.items())
         data = data or {}
 
         def load(method, url, data):
