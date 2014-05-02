@@ -197,10 +197,14 @@ class GraphAPI(object):
         :param page: A boolean describing whether to return an iterator that iterates over each page of results.
         :param retry: An integer describing how many times the request may be retried.
         """
-        
+
         if(data):
             data = dict(
                  (k.replace('__', ':'), v) for k, v in data.items())
+            data = dict(
+                 (k.replace('___', '['), v) for k, v in data.items())
+            data = dict(
+                 (k.replace('____', ']'), v) for k, v in data.items())
         data = data or {}
 
         def load(method, url, data):
@@ -225,7 +229,7 @@ class GraphAPI(object):
                     for key in files:
                         data.pop(key)
 
-                    response = self.session.request(method, url, data=data, files=files, 
+                    response = self.session.request(method, url, data=data, files=files,
                         verify=self.verify_ssl_certificate)
             except requests.RequestException as exception:
                 raise HTTPError(exception)
