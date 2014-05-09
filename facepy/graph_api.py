@@ -3,6 +3,8 @@ try:
 except ImportError:
     import json  # flake8: noqa
 import requests
+import hashlib
+import hmac
 
 try:
     from urllib.parse import urlencode
@@ -14,7 +16,7 @@ from facepy.exceptions import *
 
 
 class GraphAPI(object):
-    def __init__(self, oauth_token=False, url='https://graph.facebook.com', verify_ssl_certificate=True):
+    def __init__(self, oauth_token=False, url='https://graph.facebook.com', verify_ssl_certificate=True, appsecret=False):
         """
         Initialize GraphAPI with an OAuth access token.
 
@@ -24,6 +26,7 @@ class GraphAPI(object):
         self.session = requests.session()
         self.url = url.strip('/')
         self.verify_ssl_certificate = verify_ssl_certificate
+        self.appsecret = appsecret
 
     @classmethod
     def for_application(self, id, secret_key):
@@ -215,7 +218,7 @@ class GraphAPI(object):
         :param page: A boolean describing whether to return an iterator that iterates over each page of results.
         :param retry: An integer describing how many times the request may be retried.
         """
-        
+
         if(data):
             data = dict(
                  (k.replace('__', ':'), v) for k, v in data.items())
@@ -243,7 +246,7 @@ class GraphAPI(object):
                     for key in files:
                         data.pop(key)
 
-                    response = self.session.request(method, url, data=data, files=files, 
+                    response = self.session.request(method, url, data=data, files=files,
                         verify=self.verify_ssl_certificate)
             except requests.RequestException as exception:
                 raise HTTPError(exception)
@@ -281,6 +284,9 @@ class GraphAPI(object):
 
         if self.oauth_token:
             data['access_token'] = self.oauth_token
+
+        if self.appsecret and self.oauth_token:
+            data['appsecret_proof'] = self._generate_appsecret_proof()
 
         try:
             if page:
@@ -342,6 +348,13 @@ class GraphAPI(object):
                 )
 
         return data
+
+    def _generate_appsecret_proof(self):
+        """
+        Returns a SHA256 of the oauth_token signed by appsecret.
+        https://developers.facebook.com/docs/graph-api/securing-requests/
+        """
+        return hmac.new(self.appsecret, self.oauth_token, hashlib.sha256).hexdigest()
 
     # Proxy exceptions for ease of use and backwards compatibility.
     FacebookError, OAuthError, HTTPError = FacebookError, OAuthError, HTTPError
