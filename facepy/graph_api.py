@@ -10,6 +10,8 @@ except ImportError:
     from urllib import urlencode
 from decimal import Decimal
 
+import six
+
 from facepy.exceptions import *
 
 
@@ -270,12 +272,15 @@ class GraphAPI(object):
 
         # Convert option lists to comma-separated values.
         for key in data:
-            if isinstance(data[key], (list, set, tuple)) and all([isinstance(item, basestring) for item in data[key]]):
+            if isinstance(data[key], (list, set, tuple)) and all([isinstance(item, six.string_types) for item in data[key]]):
                 data[key] = ','.join(data[key])
 
         # Support absolute paths too
         if not path.startswith('/'):
-            path = '/' + unicode(path.decode('utf-8'))
+            if six.PY2:
+                path = '/' + six.text_type(path.decode('utf-8'))
+            else:
+                path = '/' + path
 
         url = '%s%s' % (self.url, path)
 
