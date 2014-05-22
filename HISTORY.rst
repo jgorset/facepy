@@ -1,6 +1,12 @@
 History
 -------
 
+1.0.1
+++++
+
+* Fixed an issue where *six* would cause an ``ImportError`` unless already
+  installed. It is now a direct dependency.
+
 1.0.0
 +++++
 
