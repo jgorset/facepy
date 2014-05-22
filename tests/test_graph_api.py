@@ -93,9 +93,6 @@ def test_get_with_appsecret():
 
     graph.get('me')
 
-    def generate_appsecret_proof(appsecret, access_token):
-        return hmac.new(appsecret, access_token, hashlib.sha256).hexdigest()
-
     mock_request.assert_called_with(
         'GET',
         'https://graph.facebook.com/me',
@@ -103,7 +100,7 @@ def test_get_with_appsecret():
         verify=True,
         params={
             'access_token': '<access token>',
-            'appsecret_proof': generate_appsecret_proof('<appsecret>', '<access token>')
+            'appsecret_proof': graph._generate_appsecret_proof()
         }
     )
 
