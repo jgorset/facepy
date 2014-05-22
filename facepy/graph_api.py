@@ -363,7 +363,14 @@ class GraphAPI(object):
         Returns a SHA256 of the oauth_token signed by appsecret.
         https://developers.facebook.com/docs/graph-api/securing-requests/
         """
-        return hmac.new(self.appsecret, self.oauth_token, hashlib.sha256).hexdigest()
+        if six.PY2:
+            key = self.appsecret
+            message = self.oauth_token
+        else:
+            key = bytes(self.appsecret, 'utf-8')
+            message = bytes(self.oauth_token, 'utf-8')
+
+        return hmac.new(key, message, hashlib.sha256).hexdigest()
 
     # Proxy exceptions for ease of use and backwards compatibility.
     FacebookError, OAuthError, HTTPError = FacebookError, OAuthError, HTTPError
