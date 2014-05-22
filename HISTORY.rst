@@ -1,6 +1,16 @@
 History
 -------
 
+1.0.0
++++++
+
+* ``GraphAPI`` now supports securing Graph API requests with application secret proofs.
+* ``GraphAPI#post`` now supports user-generated images.
+* The last bit of the tuple returned from ``get_extended_access_token`` is now ``None``
+  if the access token won't expire.
+* ``GraphAPI#batch`` can now handle more than 50 requests at a time.
+* Fixed a bug that caused unicode URLs to fail.
+
 0.9.0
 +++++
 
