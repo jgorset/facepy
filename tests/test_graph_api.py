@@ -1,5 +1,6 @@
-"""Tests for the ``graph_api`` module."""
+# -*- coding:utf-8 -*-
 
+"""Tests for the ``graph_api`` module."""
 import json
 import decimal
 import hashlib
@@ -557,12 +558,12 @@ def test_batch_over_50_requests():
                         {'name': 'Content-Type', 'value': 'text/javascript; charset=UTF-8'}
                     ],
                     'body': '{"foo": "bar"}'
-                } for i in xrange(batch_size)
+                } for i in range(batch_size)
             ]))
 
     mock_request.side_effect = side_effect_batch_size
 
-    requests = [dict(method="GET", relative_url="me?fields=username") for i in xrange(60)]
+    requests = [dict(method="GET", relative_url="me?fields=username") for i in range(60)]
 
     batch = graph.batch(
         requests=requests
@@ -610,3 +611,15 @@ def test_retry():
 
     assert_raises(GraphAPI.FacebookError, graph.get, 'me', retry=3)
     assert_equal(len(mock_request.call_args_list), 4)
+
+
+@with_setup(mock, unmock)
+def test_get_unicode_url():
+    graph = GraphAPI('<access token>')
+
+    mock_request.return_value.content = json.dumps({})
+
+    response = graph.get('https://www.facebook.com/christophernewportuniversity‎')
+
+    assert_true(mock_request.called)
+    assert_equal({}, response)
