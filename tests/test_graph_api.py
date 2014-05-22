@@ -2,6 +2,8 @@
 
 import json
 import decimal
+import hashlib
+import hmac
 
 from nose.tools import *
 from mock import patch, MagicMock
@@ -72,6 +74,33 @@ def test_get_with_nested_parameters():
         params={
             'access_token': '<access token>',
             'foo': '{"bar": "baz"}'
+        }
+    )
+
+
+@with_setup(mock, unmock)
+def test_get_with_appsecret():
+    graph = GraphAPI('<access token>', appsecret='<appsecret>')
+
+    mock_request.return_value.content = json.dumps({
+        'id': 1,
+        'name': 'Thomas \'Herc\' Hauk',
+        'first_name': 'Thomas',
+        'last_name': 'Hauk',
+        'link': 'http://facebook.com/herc',
+        'username': 'herc',
+    })
+
+    graph.get('me')
+
+    mock_request.assert_called_with(
+        'GET',
+        'https://graph.facebook.com/me',
+        allow_redirects=True,
+        verify=True,
+        params={
+            'access_token': '<access token>',
+            'appsecret_proof': graph._generate_appsecret_proof()
         }
     )
 
