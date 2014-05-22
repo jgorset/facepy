@@ -18,7 +18,7 @@ from facepy.exceptions import *
 
 
 class GraphAPI(object):
-    def __init__(self, oauth_token=False, url='https://graph.facebook.com', verify_ssl_certificate=True, appsecret=False):
+    def __init__(self, oauth_token=False, url='https://graph.facebook.com', verify_ssl_certificate=True, appsecret=False, timeout=None):
         """
         Initialize GraphAPI with an OAuth access token.
 
@@ -29,6 +29,7 @@ class GraphAPI(object):
         self.url = url.strip('/')
         self.verify_ssl_certificate = verify_ssl_certificate
         self.appsecret = appsecret
+        self.timeout = timeout
 
     @classmethod
     def for_application(self, id, secret_key):
@@ -240,7 +241,7 @@ class GraphAPI(object):
             try:
                 if method in ['GET', 'DELETE']:
                     response = self.session.request(method, url, params=data, allow_redirects=True,
-                     verify=self.verify_ssl_certificate)
+                     verify=self.verify_ssl_certificate, timeout=self.timeout)
 
                 if method in ['POST', 'PUT']:
                     files = {}
@@ -253,7 +254,7 @@ class GraphAPI(object):
                         data.pop(key)
 
                     response = self.session.request(method, url, data=data, files=files,
-                        verify=self.verify_ssl_certificate)
+                        verify=self.verify_ssl_certificate, timeout=self.timeout)
             except requests.RequestException as exception:
                 raise HTTPError(exception)
 

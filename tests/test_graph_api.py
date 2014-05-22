@@ -46,6 +46,7 @@ def test_get():
         'https://graph.facebook.com/me',
         allow_redirects=True,
         verify=True,
+        timeout=None,
         params={
             'access_token': '<access token>'
         }
@@ -72,6 +73,7 @@ def test_get_with_nested_parameters():
         'https://graph.facebook.com/me',
         allow_redirects=True,
         verify=True,
+        timeout=None,
         params={
             'access_token': '<access token>',
             'foo': '{"bar": "baz"}'
@@ -99,6 +101,7 @@ def test_get_with_appsecret():
         'https://graph.facebook.com/me',
         allow_redirects=True,
         verify=True,
+        timeout=None,
         params={
             'access_token': '<access token>',
             'appsecret_proof': graph._generate_appsecret_proof()
@@ -123,6 +126,7 @@ def test_get_with_fields():
         'https://graph.facebook.com/me',
         allow_redirects=True,
         verify=True,
+        timeout=None,
         params={
             'access_token': '<access token>',
             'fields': 'id,first_name,last_name'
@@ -136,6 +140,7 @@ def test_get_with_fields():
         'https://graph.facebook.com/me',
         allow_redirects=True,
         verify=True,
+        timeout=None,
         params={
             'access_token': '<access token>',
             'fields': 'id,first_name,last_name'
@@ -293,6 +298,7 @@ def test_fql():
         'https://graph.facebook.com/fql?q=SELECT+id%2Cname%2Cfirst_name%2Clast_name%2Cusername+FROM+user+WHERE+uid%3Dme%28%29',
         allow_redirects=True,
         verify=True,
+        timeout=None,
         params={
             'access_token': '<access token>'
         }
@@ -317,6 +323,7 @@ def test_post():
         'https://graph.facebook.com/me/feed',
         files={},
         verify=True,
+        timeout=None,
         data={
             'message': 'He\'s a complicated man. And the only one that understands him is his woman',
             'access_token': '<access token>'
@@ -358,6 +365,7 @@ def test_delete():
         'https://graph.facebook.com/1',
         allow_redirects=True,
         verify=True,
+        timeout=None,
         params={
             'access_token': '<access token>'
         }
@@ -398,6 +406,7 @@ def test_search():
         'https://graph.facebook.com/search',
         allow_redirects=True,
         verify=True,
+        timeout=None,
         params={
             'q': 'shaft quotes',
             'type': 'post',
@@ -445,6 +454,7 @@ def test_batch():
         'https://graph.facebook.com/',
         files={},
         verify=True,
+        timeout=None,
         data={
             'batch': json.dumps([
                 {'method': 'GET', 'relative_url': 'me/friends'},
@@ -623,3 +633,23 @@ def test_get_unicode_url():
 
     assert_true(mock_request.called)
     assert_equal({}, response)
+
+
+@with_setup(mock, unmock)
+def test_timeouts():
+    graph = GraphAPI('<access token>', timeout=1)
+
+    mock_request.return_value.content = json.dumps({})
+
+    graph.get('me')
+
+    mock_request.assert_called_with(
+        'GET',
+        'https://graph.facebook.com/me',
+        allow_redirects=True,
+        verify=True,
+        timeout=1,
+        params={
+            'access_token': '<access token>'
+        }
+    )
