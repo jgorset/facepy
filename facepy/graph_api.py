@@ -223,6 +223,10 @@ class GraphAPI(object):
 
         if(data):
             data = dict(
+                 (k.replace('_sqbro_', '['), v) for k, v in data.items())
+            data = dict(
+                 (k.replace('_sqbrc_', ']'), v) for k, v in data.items())
+            data = dict(
                  (k.replace('__', ':'), v) for k, v in data.items())
         data = data or {}
 
