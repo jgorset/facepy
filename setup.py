@@ -10,7 +10,7 @@ history = open('HISTORY.rst').read()
 
 setup(
     name='facepy',
-    version='1.0.1',  # flake8: noqa
+    version='1.0.2',  # flake8: noqa
     description='Facepy makes it really easy to interact with Facebook\'s Graph API',
     long_description=readme + '\n\n' + history,
     author='Johannes Gorset',

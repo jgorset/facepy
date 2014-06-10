@@ -1,6 +1,12 @@
 History
 -------
 
+1.0.2
++++++
+
+* ``GraphAPI`` now accepts an argument ``timeout``, which can be either ``None`` or an
+  integer describing how many seconds to wait for a response.
+
 1.0.1
 ++++
 
