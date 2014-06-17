@@ -1,6 +1,13 @@
 History
 -------
 
+1.0.3
++++++
+
+* `FacebookError`, `HTTPError`, `OAuthError` and `SignedRequestError` are now available
+  from the `facepy` module for convenience.
+* `GraphAPI` now raises `FacebookError` upon receiving HTTP 500 from Facebook.
+
 1.0.2
 +++++
 
