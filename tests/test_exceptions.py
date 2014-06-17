@@ -8,7 +8,6 @@ except ImportError:
 from nose.tools import *
 
 from facepy import *
-from facepy.exceptions import FacebookError
 
 
 def test_facepy_error():
