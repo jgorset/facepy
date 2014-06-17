@@ -607,6 +607,14 @@ def test_query_transport_error():
 
     assert_raises(GraphAPI.HTTPError, graph.get, 'me')
 
+@with_setup(mock, unmock)
+def test_if_raises_error_on_facebook_500():
+    graph = GraphAPI('<access token>')
+
+    mock_request.return_value.status_code = 500
+    mock_request.return_value.content = ''
+
+    assert_raises(GraphAPI.FacebookError, graph.get, 'me')
 
 @with_setup(mock, unmock)
 def test_retry():
