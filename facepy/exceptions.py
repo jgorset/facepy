@@ -24,3 +24,6 @@ class HTTPError(FacepyError):
 
 class SignedRequestError(FacepyError):
     """Exception for invalid signed requests."""
+
+class InternalFacebookError(FacebookError):
+    """Exception for Facebook internal server error."""
