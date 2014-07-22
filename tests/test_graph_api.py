@@ -38,6 +38,7 @@ def test_get():
         'link': 'http://facebook.com/herc',
         'username': 'herc',
     })
+    mock_request.return_value.status_code = 200
 
     graph.get('me')
 
@@ -65,6 +66,7 @@ def test_get_with_nested_parameters():
         'link': 'http://facebook.com/herc',
         'username': 'herc',
     })
+    mock_request.return_value.status_code = 200
 
     graph.get('me', foo={'bar': 'baz'})
 
@@ -93,6 +95,7 @@ def test_get_with_appsecret():
         'link': 'http://facebook.com/herc',
         'username': 'herc',
     })
+    mock_request.return_value.status_code = 200
 
     graph.get('me')
 
@@ -118,6 +121,7 @@ def test_get_with_fields():
         'first_name': 'Thomas',
         'last_name': 'Hauk'
     })
+    mock_request.return_value.status_code = 200
 
     graph.get('me', fields=['id', 'first_name', 'last_name'])
 
@@ -152,6 +156,7 @@ def test_get_with_fields():
 def test_get_with_fpnum():
     graph = GraphAPI('<access token>')
     mock_request.return_value.content = '{"payout": 0.94}'
+    mock_request.return_value.status_code = 200
 
     resp = graph.get('<paymend_id>')
 
@@ -163,6 +168,7 @@ def test_forbidden_get():
     graph = GraphAPI('<access token>')
 
     mock_request.return_value.content = 'false'
+    mock_request.return_value.status_code = 200
 
     assert_raises(GraphAPI.FacebookError, graph.get, 'me')
 
@@ -210,7 +216,7 @@ def test_paged_get():
     def side_effect(*args, **kwargs):
         response = responses.pop(0)
 
-        return MagicMock(content=json.dumps(response))
+        return MagicMock(content=json.dumps(response), status_code=200)
 
     mock_request.side_effect = side_effect
 
@@ -236,6 +242,7 @@ def test_pagination_without_paging_next():
         'paging': {
         }
     })
+    mock_request.return_value.status_code = 200
 
     pages = graph.get('herc/posts', page=True, limit=limit)
 
@@ -256,6 +263,7 @@ def test_get_with_errors():
             'message': 'An unknown error occurred'
         }
     })
+    mock_request.return_value.status_code = 200
 
     assert_raises(GraphAPI.FacebookError, graph.get, 'me')
 
@@ -264,6 +272,7 @@ def test_get_with_errors():
         'error_code': 1,
         'error_msg': 'An unknown error occurred',
     })
+    mock_request.return_value.status_code = 200
 
     assert_raises(GraphAPI.FacebookError, graph.get, 'me')
 
@@ -271,6 +280,7 @@ def test_get_with_errors():
     mock_request.return_value.content = json.dumps({
         'error_msg': 'The action you\'re trying to publish is invalid'
     })
+    mock_request.return_value.status_code = 200
 
     assert_raises(GraphAPI.FacebookError, graph.get, 'me')
 
@@ -287,6 +297,7 @@ def test_fql():
         'link': 'http://facebook.com/herc',
         'username': 'herc',
     })
+    mock_request.return_value.status_code = 200
 
     try:
         graph.fql('SELECT id,name,first_name,last_name,username FROM user WHERE uid=me()')
@@ -312,6 +323,7 @@ def test_post():
     mock_request.return_value.content = json.dumps({
         'id': 1
     })
+    mock_request.return_value.status_code = 200
 
     graph.post(
         path='me/feed',
@@ -336,6 +348,7 @@ def test_post_with_files():
     graph = GraphAPI('<access token>')
 
     mock_request.return_value.content = 'true'
+    mock_request.return_value.status_code = 200
 
     graph.post(
         path='me/photos',
@@ -348,6 +361,7 @@ def test_forbidden_post():
     graph = GraphAPI('<access token>')
 
     mock_request.return_value.content = 'false'
+    mock_request.return_value.status_code = 200
 
     assert_raises(GraphAPI.FacebookError, graph.post, 'me')
 
@@ -357,6 +371,7 @@ def test_delete():
     graph = GraphAPI('<access token>')
 
     mock_request.return_value.content = 'true'
+    mock_request.return_value.status_code = 200
 
     graph.delete('1')
 
@@ -377,6 +392,7 @@ def test_forbidden_delete():
     graph = GraphAPI('<access token>')
 
     mock_request.return_value.content = 'false'
+    mock_request.return_value.status_code = 200
 
     assert_raises(GraphAPI.FacebookError, graph.delete, 'me')
 
@@ -395,6 +411,7 @@ def test_search():
             }
         ]
     })
+    mock_request.return_value.status_code = 200
 
     graph.search(
         term='shaft quotes',
@@ -435,6 +452,7 @@ def test_batch():
             'body': '{"foo": "bar"}'
         }
     ])
+    mock_request.return_value.status_code = 200
 
     requests = [
         {'method': 'GET', 'relative_url': 'me/friends'},
@@ -480,6 +498,7 @@ def test_batch_with_empty_responses():
             'body': '{"foo": "bar"}'
         }
     ])
+    mock_request.return_value.status_code = 200
 
     requests = [
         {'method': 'GET', 'relative_url': 'me/friends'},
@@ -513,6 +532,7 @@ def test_batch_with_errors():
             'body': '{"error_code": 1, "error_msg": "An unknown error occurred"}'
         }
     ])
+    mock_request.return_value.status_code = 200
 
     requests = [
         {'method': 'GET', 'relative_url': 'me/friends'},
@@ -540,6 +560,7 @@ def test_batch_error_references_request():
             'body': '{"error_code": 1, "error_msg": "An unknown error occurred"}'
         }
     ])
+    mock_request.return_value.status_code = 200
 
     requests = [
         {'method': 'GET', 'relative_url': 'me'}
@@ -559,7 +580,8 @@ def test_batch_over_50_requests():
     def side_effect_batch_size(*args, **kwargs):
         batch_size = len(json.loads(kwargs['data']['batch']))
         if batch_size > 50:
-            return MagicMock(content='{"error":{"message":"Too many requests in batch message. Maximum batch size is 50","type":"GraphBatchException"}}')
+            return MagicMock(content='{"error":{"message":"Too many requests in batch message. Maximum batch size is 50","type":"GraphBatchException"}}',
+                             status_code=200)
         else:
             return MagicMock(content=json.dumps([
                 {
@@ -569,7 +591,7 @@ def test_batch_over_50_requests():
                     ],
                     'body': '{"foo": "bar"}'
                 } for i in range(batch_size)
-            ]))
+            ]), status_code=200)
 
     mock_request.side_effect = side_effect_batch_size
 
@@ -595,6 +617,7 @@ def test_oauth_error():
             'code': 2500
         }
     })
+    mock_request.return_value.status_code = 200
 
     assert_raises(GraphAPI.OAuthError, graph.get, 'me')
 
@@ -626,6 +649,7 @@ def test_retry():
             'message': 'An unknown error occurred'
         }
     })
+    mock_request.return_value.status_code = 200
 
     assert_raises(GraphAPI.FacebookError, graph.get, 'me', retry=3)
     assert_equal(len(mock_request.call_args_list), 4)
@@ -636,6 +660,7 @@ def test_get_unicode_url():
     graph = GraphAPI('<access token>')
 
     mock_request.return_value.content = json.dumps({})
+    mock_request.return_value.status_code = 200
 
     response = graph.get('https://www.facebook.com/christophernewportuniversity‎')
 
@@ -648,6 +673,7 @@ def test_timeouts():
     graph = GraphAPI('<access token>', timeout=1)
 
     mock_request.return_value.content = json.dumps({})
+    mock_request.return_value.status_code = 200
 
     graph.get('me')
 
