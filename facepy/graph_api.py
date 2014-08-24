@@ -255,8 +255,11 @@ class GraphAPI(object):
 
                     response = self.session.request(method, url, data=data, files=files,
                         verify=self.verify_ssl_certificate, timeout=self.timeout)
-                if response.status_code == 500:
-                    raise InternalFacebookError("Internal Facebook error ocurred.")
+
+                if 500 <= response.status_code < 600:
+                    raise FacebookError("Internal Facebook error occurred (%s)."
+                                        % response.status_code)
+
             except requests.RequestException as exception:
                 raise HTTPError(exception)
 
