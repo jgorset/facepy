@@ -5,6 +5,7 @@ except ImportError:
 import requests
 import hashlib
 import hmac
+import urlparse
 
 try:
     from urllib.parse import urlencode
@@ -295,7 +296,9 @@ class GraphAPI(object):
             else:
                 path = '/' + path
 
-        url = '%s%s' % (self.url, path)
+        parsed_url = urlparse.urlparse(path)
+        if parsed_url.netloc == '':
+            url = '%s%s' % (self.url, path)
 
         if self.oauth_token:
             data['access_token'] = self.oauth_token
