@@ -289,16 +289,20 @@ class GraphAPI(object):
             if isinstance(data[key], (list, set, tuple)) and all([isinstance(item, six.string_types) for item in data[key]]):
                 data[key] = ','.join(data[key])
 
-        # Support absolute paths too
-        if not path.startswith('/'):
-            if six.PY2:
-                path = '/' + six.text_type(path.decode('utf-8'))
-            else:
-                path = '/' + path
-
         parsed_url = urlparse.urlparse(path)
+
         if parsed_url.netloc == '':
-            url = '%s%s' % (self.url, path)
+            prepend_url = self.url
+            # Support absolute paths too
+            if not path.startswith('/'):
+                if six.PY2:
+                    path = '/' + six.text_type(path.decode('utf-8'))
+                else:
+                    path = '/' + path
+        else:
+            prepend_url = ''
+
+        url = '%s%s' % (prepend_url, path)
 
         if self.oauth_token:
             data['access_token'] = self.oauth_token
