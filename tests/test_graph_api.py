@@ -623,6 +623,30 @@ def test_oauth_error():
 
 
 @with_setup(mock, unmock)
+def test_error_message_on_500_response():
+    graph = GraphAPI('<access token>')
+
+    message = 'Ad Sets may not be added to deleted Campaigns.'
+    mock_request.return_value.status_code = 500
+    mock_request.return_value.content = json.dumps({
+        'error': {
+            'code': 1487634,
+            'type': 'Exception',
+            'is_transient': False,
+            'message': message,
+        }
+    })
+    try:
+        graph.get('act_xxxx/adcampaigns')
+    except GraphAPI.FacebookError as exc:
+        eq_(exc.message, message)
+    try:
+        graph.post('act_xxxx/adcampaigns')
+    except GraphAPI.FacebookError as exc:
+        eq_(exc.message, message)
+
+
+@with_setup(mock, unmock)
 def test_query_transport_error():
     graph = GraphAPI('<access token>')
 

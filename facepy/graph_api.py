@@ -257,8 +257,21 @@ class GraphAPI(object):
                         verify=self.verify_ssl_certificate, timeout=self.timeout)
 
                 if 500 <= response.status_code < 600:
-                    raise FacebookError("Internal Facebook error occurred (%s)."
-                                        % response.status_code)
+                    # Facebook 5XX errors usually come with helpful messages
+                    # as a JSON object describing the problem with the request.
+                    # If this is the case, an error will be raised and we just
+                    # need to re-raise it. This is most likely to happen
+                    # with the Ads API.
+                    # This will raise an exception if a JSON-like error object
+                    # comes in the response.
+                    self._parse(response.content)
+                    # If Facebook does not provide any JSON-formatted error
+                    # but just a plain-text, useless error, we'll just inform
+                    # about a Facebook Internal errror occurred.
+                    raise FacebookError(
+                        'Internal Facebook error occurred',
+                        response.status_code
+                    )
 
             except requests.RequestException as exception:
                 raise HTTPError(exception)
