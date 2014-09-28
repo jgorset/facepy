@@ -1,6 +1,13 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## Unreleased
+
+## 1.0.4 - 2014-09-28
+### Added
+- Facepy now proxies the error message from Facebook for 5XX responses.
+- Facepy now raises `FacebookError` on any response in the 5XX range.
+
 ## 1.0.3 - 2014-06-17
 ### Added
 - `FacebookError`, `HTTPError`, `OAuthError` and `SignedRequestError` are now available
