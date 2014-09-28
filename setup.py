@@ -1,7 +1,7 @@
 from setuptools import setup
 
 readme = open('README.rst').read()
-history = open('HISTORY.rst').read()
+history = open('CHANGELOG.md').read()
 
 # Loading the version with ``from facepy import __version__`` will
 # cause setuptools to attempt to import dependencies that we have no
