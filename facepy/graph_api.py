@@ -5,7 +5,10 @@ except ImportError:
 import requests
 import hashlib
 import hmac
-import urlparse
+try:
+    import urlparse
+except ImportError:
+    import urllib.parse as urlparse
 
 try:
     from urllib.parse import urlencode
