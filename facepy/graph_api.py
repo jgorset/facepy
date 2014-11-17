@@ -18,11 +18,12 @@ from facepy.exceptions import *
 
 
 class GraphAPI(object):
-    def __init__(self, oauth_token=False, url='https://graph.facebook.com', verify_ssl_certificate=True, appsecret=False, timeout=None):
+    def __init__(self, oauth_token=False, url='https://graph.facebook.com', verify_ssl_certificate=True, appsecret=False, timeout=None, version=None):
         """
         Initialize GraphAPI with an OAuth access token.
 
         :param oauth_token: A string describing an OAuth access token.
+        :param version: A string with version ex. '2.2'.
         """
         self.oauth_token = oauth_token
         self.session = requests.session()
@@ -30,9 +31,10 @@ class GraphAPI(object):
         self.verify_ssl_certificate = verify_ssl_certificate
         self.appsecret = appsecret
         self.timeout = timeout
+        self.version = version
 
     @classmethod
-    def for_application(self, id, secret_key):
+    def for_application(self, id, secret_key, api_version=None):
         """
         Initialize GraphAPI with an OAuth access token for an application.
 
@@ -41,7 +43,8 @@ class GraphAPI(object):
         """
         from facepy.utils import get_application_access_token
 
-        return GraphAPI(get_application_access_token(id, secret_key))
+        access_token = get_application_access_token(id, secret_key, api_version=api_version)
+        return GraphAPI(access_token, version=api_version)
 
     def get(self, path='', page=False, retry=3, **options):
         """
@@ -312,7 +315,7 @@ class GraphAPI(object):
             else:
                 path = '/' + path
 
-        url = '%s%s' % (self.url, path)
+        url = self._get_url(path)
 
         if self.oauth_token:
             data['access_token'] = self.oauth_token
@@ -330,6 +333,13 @@ class GraphAPI(object):
                 return self._query(method, path, data, page, retry - 1)
             else:
                 raise
+
+    def _get_url(self, path):
+        if self.version:
+            url = '%s/v%s%s' % (self.url, self.version, path)
+        else:
+            url = '%s%s' % (self.url, path)
+        return url
 
     def _parse(self, data):
         """

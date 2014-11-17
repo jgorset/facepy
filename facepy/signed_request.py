@@ -31,7 +31,7 @@ class SignedRequest(object):
     raw = None
     """A string describing the signed request in its original format."""
 
-    def __init__(self, signed_request=None, application_secret_key=None, application_id=None):
+    def __init__(self, signed_request=None, application_secret_key=None, application_id=None, api_version=None):
         """
         Initialize a signed request.
 
@@ -41,6 +41,7 @@ class SignedRequest(object):
         self.signed_request = signed_request
         self.application_secret_key = application_secret_key
         self.application_id = application_id
+        self.api_version = api_version
 
         self.raw = self.parse(signed_request, application_secret_key)
 
@@ -74,8 +75,8 @@ class SignedRequest(object):
         from urlparse import parse_qs
         from . import GraphAPI, get_application_access_token
 
-        app_token = get_application_access_token(self.application_id, self.application_secret_key)
-        graph = GraphAPI(app_token)
+        app_token = get_application_access_token(self.application_id, self.application_secret_key, api_version=self.api_version)
+        graph = GraphAPI(app_token, version=self.api_version)
 
         qs = graph.get('oauth/access_token', code=self.raw['code'], redirect_uri='', client_id=self.application_id, client_secret=self.application_secret_key)
         self.raw['oauth_token'] = parse_qs(qs)['access_token'][0]

@@ -111,6 +111,34 @@ def test_get_with_appsecret():
 
 
 @with_setup(mock, unmock)
+def test_get_with_new_version():
+    graph = GraphAPI('<access token>', version='2.0')
+
+    mock_request.return_value.content = json.dumps({
+        'id': 1,
+        'name': 'Thomas \'Herc\' Hauk',
+        'first_name': 'Thomas',
+        'last_name': 'Hauk',
+        'link': 'http://facebook.com/herc',
+        'username': 'herc',
+        })
+    mock_request.return_value.status_code = 200
+
+    graph.get('me')
+
+    mock_request.assert_called_with(
+        'GET',
+        'https://graph.facebook.com/v2.0/me',
+        allow_redirects=True,
+        verify=True,
+        timeout=None,
+        params={
+            'access_token': '<access token>',
+        }
+    )
+
+
+@with_setup(mock, unmock)
 def test_get_with_fields():
     graph = GraphAPI('<access token>')
 
