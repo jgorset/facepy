@@ -3,8 +3,6 @@
 """Tests for the ``graph_api`` module."""
 import json
 import decimal
-import hashlib
-import hmac
 
 from nose.tools import *
 from mock import patch, MagicMock
@@ -623,12 +621,37 @@ def test_oauth_error():
 
 
 @with_setup(mock, unmock)
+def test_error_message_on_500_response():
+    graph = GraphAPI('<access token>')
+
+    message = 'Ad Sets may not be added to deleted Campaigns.'
+    mock_request.return_value.status_code = 500
+    mock_request.return_value.content = json.dumps({
+        'error': {
+            'code': 1487634,
+            'type': 'Exception',
+            'is_transient': False,
+            'message': message,
+        }
+    })
+    try:
+        graph.get('act_xxxx/adcampaigns')
+    except GraphAPI.FacebookError as exc:
+        eq_(exc.message, message)
+    try:
+        graph.post('act_xxxx/adcampaigns')
+    except GraphAPI.FacebookError as exc:
+        eq_(exc.message, message)
+
+
+@with_setup(mock, unmock)
 def test_query_transport_error():
     graph = GraphAPI('<access token>')
 
     mock_request.side_effect = ConnectionError('Max retries exceeded with url: /')
 
     assert_raises(GraphAPI.HTTPError, graph.get, 'me')
+
 
 @with_setup(mock, unmock)
 def test_if_raises_error_on_facebook_500():
@@ -638,6 +661,7 @@ def test_if_raises_error_on_facebook_500():
     mock_request.return_value.content = ''
 
     assert_raises(GraphAPI.FacebookError, graph.get, 'me')
+
 
 @with_setup(mock, unmock)
 def test_retry():

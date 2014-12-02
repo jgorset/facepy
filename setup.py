@@ -1,7 +1,7 @@
 from setuptools import setup
 
 readme = open('README.rst').read()
-history = open('HISTORY.rst').read()
+history = open('CHANGELOG.md').read()
 
 # Loading the version with ``from facepy import __version__`` will
 # cause setuptools to attempt to import dependencies that we have no
@@ -10,7 +10,7 @@ history = open('HISTORY.rst').read()
 
 setup(
     name='facepy',
-    version='1.0.3',  # flake8: noqa
+    version='1.0.4',  # flake8: noqa
     description='Facepy makes it really easy to interact with Facebook\'s Graph API',
     long_description=readme + '\n\n' + history,
     author='Johannes Gorset',

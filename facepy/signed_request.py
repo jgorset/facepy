@@ -52,7 +52,7 @@ class SignedRequest(object):
             is_admin=self.raw['page'].get('admin')
         ) if 'page' in self.raw else None
 
-        if not 'user' in self.raw:
+        if 'user' not in self.raw:
             self.fetch_user_data_and_token()
 
         self.user = self.User(
@@ -76,10 +76,9 @@ class SignedRequest(object):
 
         app_token = get_application_access_token(self.application_id, self.application_secret_key)
         graph = GraphAPI(app_token)
-        
+
         qs = graph.get('oauth/access_token', code=self.raw['code'], redirect_uri='', client_id=self.application_id, client_secret=self.application_secret_key)
         self.raw['oauth_token'] = parse_qs(qs)['access_token'][0]
-        #import ipdb; ipdb.set_trace()
         self.raw['expires'] = time.time() + int(parse_qs(qs)['expires'][0])
         self.raw['user'] = graph.get(self.raw['user_id'])
 

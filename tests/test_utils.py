@@ -77,6 +77,7 @@ def test_get_extended_access_token_no_expiry():
     assert_equal(access_token, '<extended access token>')
     assert expires_at is None
 
+
 @with_setup(mock, unmock)
 def test_get_application_access_token():
     mock_request.return_value.status_code = 200
