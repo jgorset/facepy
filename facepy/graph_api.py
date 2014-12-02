@@ -11,9 +11,10 @@ except ImportError:
     import urllib.parse as urlparse
 
 try:
-    from urllib.parse import urlencode
-except ImportError:
     from urllib import urlencode
+except ImportError:
+    from urllib.parse import urlencode
+
 from decimal import Decimal
 
 import six
