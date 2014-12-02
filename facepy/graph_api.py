@@ -5,16 +5,13 @@ except ImportError:
 import requests
 import hashlib
 import hmac
+
 try:
-    import urlparse
-except ImportError:
     import urllib.parse as urlparse
-
-try:
-    from urllib import urlencode
-except ImportError:
     from urllib.parse import urlencode
-
+except ImportError:
+    from urllib import urlencode
+    import urlparse
 from decimal import Decimal
 
 import six
