@@ -7,9 +7,11 @@ import hashlib
 import hmac
 
 try:
+    import urllib.parse as urlparse
     from urllib.parse import urlencode
 except ImportError:
     from urllib import urlencode
+    import urlparse
 from decimal import Decimal
 
 import six
@@ -335,10 +337,19 @@ class GraphAPI(object):
                 raise
 
     def _get_url(self, path):
-        if self.version:
-            url = '%s/v%s%s' % (self.url, self.version, path)
+        # When Facebook returns nested resources (like comments for a post), it
+        # prepends 'https://graph.facebook.com' by itself and so we must take
+        # care not to prepend it again.
+        if urlparse.urlparse(path).netloc == '':
+            url = self.url
         else:
-            url = '%s%s' % (self.url, path)
+            url = ''
+
+        if self.version:
+            url = '%s/v%s%s' % (url, self.version, path)
+        else:
+            url = '%s%s' % (url, path)
+
         return url
 
     def _parse(self, data):
