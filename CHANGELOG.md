@@ -3,6 +3,10 @@ All notable changes to this project will be documented in this file.
 
 ## Unreleased
 
+## 1.0.5 - 2015-01-05
+### Added
+- You may now specify the API version to use with `GraphAPI`.
+
 ## 1.0.4 - 2014-09-28
 ### Added
 - Facepy now proxies the error message from Facebook for 5XX responses.
