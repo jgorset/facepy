@@ -3,6 +3,10 @@ All notable changes to this project will be documented in this file.
 
 ## Unreleased
 
+## 1.0.5 - 2015-01-07
+### Fixed
+- Fixed an issue where pagination of nested resources would break.
+
 ## 1.0.5 - 2015-01-05
 ### Added
 - You may now specify the API version to use with `GraphAPI`.
