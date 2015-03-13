@@ -1,4 +1,4 @@
-.. image::  https://raw.githubusercontent.com/jgorset/facepy/master/docs/logo.png
+.. image::  https://raw.githubusercontent.com/jgorset/facepy/master/docs/banner.png
 
 .. image:: https://secure.travis-ci.org/jgorset/facepy.png?branch=master
 
