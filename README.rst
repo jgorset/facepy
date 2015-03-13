@@ -1,5 +1,4 @@
-Facepy
-======
+.. image::  https://raw.githubusercontent.com/jgorset/facepy/master/docs/logo.png)  
 
 .. image:: https://secure.travis-ci.org/jgorset/facepy.png?branch=master
 
