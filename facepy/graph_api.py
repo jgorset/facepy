@@ -352,6 +352,18 @@ class GraphAPI(object):
 
         return url
 
+    def _get_error_params(self, error_obj):
+        error_params = {}
+        error_fields = ['message', 'code', 'error_subcode', 'error_user_msg',
+                        'is_transient', 'error_data', 'error_user_title']
+
+        if 'error' in error_obj:
+            error_obj = error_obj['error']
+
+        for field in error_fields:
+            error_params[field] = error_obj.get(field)
+        return error_params
+
     def _parse(self, data):
         """
         Parse the response from Facebook's Graph API.
@@ -388,17 +400,11 @@ class GraphAPI(object):
                 else:
                     exception = FacebookError
 
-                raise exception(
-                    error.get('message'),
-                    error.get('code', None)
-                )
+                raise exception(**self._get_error_params(data))
 
             # Facebook occasionally reports errors in its legacy error format.
             if 'error_msg' in data:
-                raise FacebookError(
-                    data.get('error_msg'),
-                    data.get('error_code', None)
-                )
+                raise FacebookError(**self._get_error_params(data))
 
         return data
 
