@@ -29,7 +29,10 @@ def get_extended_access_token(access_token, application_id, application_secret_k
         fb_exchange_token=access_token
     )
 
-    components = parse_qs(response)
+    try:
+        components = parse_qs(response)
+    except AttributeError:  # api_version >= 2.3 returns a dict
+        return response['access_token'], None
 
     token = components['access_token'][0]
 
