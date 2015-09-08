@@ -10,7 +10,7 @@ history = open('CHANGELOG.md').read()
 
 setup(
     name='facepy',
-    version='1.0.6',  # flake8: noqa
+    version='1.0.7',  # flake8: noqa
     description='Facepy makes it really easy to interact with Facebook\'s Graph API',
     long_description=readme + '\n\n' + history,
     author='Johannes Gorset',

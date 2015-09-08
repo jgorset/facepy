@@ -3,7 +3,13 @@ All notable changes to this project will be documented in this file.
 
 ## Unreleased
 
-## 1.0.5 - 2015-01-07
+## 1.0.7 - 2015-09-08
+### Fixed
+- Fixed an issue where `get_extended_access_token` using Graph API versions 2.3+ would
+  return JSON instead of a query string, resulting in an `AttributeError` to be thrown.
+- `FacebookError` instances now contain additional data about the error.
+
+## 1.0.6 - 2015-01-07
 ### Fixed
 - Fixed an issue where pagination of nested resources would break.
 
