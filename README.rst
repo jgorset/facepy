@@ -25,7 +25,7 @@ Usage
     )
 
 Facepy can do more than reading your latest posts and posting photographs of parrots, but you'll have to
-`read the documentation <http://readthedocs.org/docs/facepy>`_ to find out how.
+`read the documentation <http://facepy.rtfd.org>`_ to find out how.
 
 Please note that Facepy does *not* do authentication with Facebook; it only consumes its API. To get an
 access token to consume the API on behalf of a user, use a suitable OAuth library for your platform (if you're
