@@ -55,5 +55,6 @@ to work. In fact, you should tweet me anyway.
 I love Hyper
 ------------
 
-I work at Hyper with a bunch of awesome folks who are every bit as passionate about building things
-as I am. If you're using Facepy, we probably want to hire you.
+I work at `Hyper <https://github.com/hyperoslo>`_ with a bunch of awesome folks
+who are every bit as passionate about building things as I am. If you're using
+Facepy, we probably want to hire you.
