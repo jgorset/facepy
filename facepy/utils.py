@@ -60,9 +60,12 @@ def get_application_access_token(application_id, application_secret_key, api_ver
         grant_type='client_credentials'
     )
 
-    data = parse_qs(response)
-
     try:
-        return data['access_token'][0]
-    except KeyError:
-        raise GraphAPI.FacebookError('No access token given')
+        data = parse_qs(response)
+
+        try:
+            return data['access_token'][0]
+        except KeyError:
+            raise GraphAPI.FacebookError('No access token given')
+    except AttributeError:  # api_version >= 2.3 returns a dict
+        return response['access_token'], None

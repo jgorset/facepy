@@ -121,9 +121,12 @@ def test_get_extended_access_token_no_expiry():
 @with_setup(mock, unmock)
 def test_get_application_access_token():
     mock_request.return_value.status_code = 200
-    mock_request.return_value.content = 'access_token=...'
+    mock_request.return_value.content = 'access_token=<application access token>'
 
-    access_token = get_application_access_token('<application id>', '<application secret key>')
+    access_token = get_application_access_token(
+        '<application id>',
+        '<application secret key>'
+    )
 
     mock_request.assert_called_with(
         'GET',
@@ -138,8 +141,35 @@ def test_get_application_access_token():
         }
     )
 
-    assert_equal(access_token, '...')
+    assert_equal(access_token, '<application access token>')
 
+@with_setup(mock, unmock)
+def test_get_application_access_token_v23_plus():
+    mock_request.return_value.status_code = 200
+    mock_request.return_value.content = (
+        '{"access_token":"<application access token>","token_type":"bearer"}'
+    )
+
+    access_token, expires_at = get_application_access_token(
+        '<application id>',
+        '<application secret key>',
+        api_version='2.3'
+    )
+
+    mock_request.assert_called_with(
+        'GET',
+        'https://graph.facebook.com/v2.3/oauth/access_token',
+        allow_redirects=True,
+        verify=True,
+        timeout=None,
+        params={
+            'client_id': '<application id>',
+            'client_secret': '<application secret key>',
+            'grant_type': 'client_credentials'
+        }
+    )
+
+    assert_equal(access_token, '<application access token>')
 
 @with_setup(mock, unmock)
 def test_get_application_access_token_raises_error():
