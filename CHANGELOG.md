@@ -3,6 +3,11 @@ All notable changes to this project will be documented in this file.
 
 ## Unreleased
 
+## 1.0.8 - 2016-01-26
+### Fixed
+- Fixed an issue where `get_application_access_token` using Graph API versions 2.3+ would
+  return JSON instead of a query string, resulting in an `AttributeError` to be thrown.
+
 ## 1.0.7 - 2015-09-08
 ### Fixed
 - Fixed an issue where `get_extended_access_token` using Graph API versions 2.3+ would
