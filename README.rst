@@ -7,7 +7,7 @@
 Usage
 -----
 
-::
+.. code:: python
 
     from facepy import GraphAPI
 
@@ -34,7 +34,7 @@ using Django, for example, you might use `Fandjango <https://github.com/jgorset/
 Installation
 ------------
 
-::
+.. code:: bash
 
     $ pip install facepy
 
