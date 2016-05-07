@@ -382,11 +382,11 @@ class GraphAPI(object):
         :param data: A string describing the Graph API's response.
         """
         # tests seems to pass a str, while real usage bytes which should be expected
-        if type(data) == type(bytes()):
-            data = data.decode('utf-8')
         try:
-            data = json.loads(data, parse_float=Decimal)
-        except ValueError:
+            if type(data) == type(bytes()):
+                data = data.decode('utf-8')
+                data = json.loads(data, parse_float=Decimal)
+        except (ValueError, UnicodeDecodeError) as e:
             return data
 
         # Facebook's Graph API sometimes responds with 'true' or 'false'. Facebook offers no documentation
