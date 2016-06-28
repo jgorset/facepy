@@ -5,6 +5,7 @@ except ImportError:
 import requests
 import hashlib
 import hmac
+import logging
 
 try:
     import urllib.parse as urlparse
@@ -299,8 +300,13 @@ class GraphAPI(object):
             while True:
                 try:
                     return load(method, url, data)
-                except FacepyError:
-                    if remaining_retries:
+                except FacepyError as e:
+                    logging.warn("Exception on %s: %s, retries remaining: %s" % (
+                        url,
+                        e,
+                        remaining_retries,
+                    ))
+                    if remaining_retries > 0:
                         remaining_retries -= 1
                     else:
                         raise
