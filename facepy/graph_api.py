@@ -5,6 +5,7 @@ except ImportError:
 import requests
 import hashlib
 import hmac
+import logging
 
 try:
     import urllib.parse as urlparse
@@ -278,9 +279,25 @@ class GraphAPI(object):
 
             return result, next_url
 
+        def load_with_retry(method, url, data):
+            remaining_retries = retry
+            while True:
+                try:
+                    return load(method, url, data)
+                except FacepyError as e:
+                    logging.warn("Exception on %s: %s, retries remaining: %s" % (
+                        url,
+                        e,
+                        remaining_retries,
+                    ))
+                    if remaining_retries > 0:
+                        remaining_retries -= 1
+                    else:
+                        raise
+
         def paginate(method, url, data):
             while url:
-                result, url = load(method, url, data)
+                result, url = load_with_retry(method, url, data)
 
                 # Reset pagination parameters.
                 for key in ['offset', 'until', 'since']:
@@ -309,16 +326,10 @@ class GraphAPI(object):
         if self.appsecret and self.oauth_token:
             data['appsecret_proof'] = self._generate_appsecret_proof()
 
-        try:
-            if page:
-                return paginate(method, url, data)
-            else:
-                return load(method, url, data)[0]
-        except FacepyError:
-            if retry:
-                return self._query(method, path, data, page, retry - 1)
-            else:
-                raise
+        if page:
+            return paginate(method, url, data)
+        else:
+            return load_with_retry(method, url, data)[0]
 
     def _get_url(self, path):
         # When Facebook returns nested resources (like comments for a post), it

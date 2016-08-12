@@ -4,5 +4,8 @@ python:
   - "2.7"
   - "3.3"
   - "3.4"
-install: pip install -r requirements.txt --use-mirrors
+  - "3.5"
+install:
+  - pip install -U pip wheel
+  - pip install -r requirements.txt
 script: nosetests
