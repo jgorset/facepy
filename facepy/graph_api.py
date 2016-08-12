@@ -198,22 +198,6 @@ class GraphAPI(object):
                 exception.request = request
                 yield exception
 
-    def fql(self, query, retry=3):
-        """
-        Use FQL to powerfully extract data from Facebook.
-
-        :param query: A FQL query or FQL multiquery ({'query_name': "query",...})
-        :param retry: An integer describing how many times the request may be retried.
-
-        See `Facebook's FQL documentation <http://developers.facebook.com/docs/reference/fql/>`_
-        for an exhaustive list of details.
-        """
-        return self._query(
-            method='GET',
-            path='fql?%s' % urlencode({'q': query}),
-            retry=retry
-        )
-
     def _query(self, method, path, data=None, page=False, retry=0):
         """
         Fetch an object from the Graph API and parse the output, returning a tuple where the first item
