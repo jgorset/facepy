@@ -13,6 +13,7 @@ setup(
     version='1.0.8',  # flake8: noqa
     description='Facepy makes it really easy to use Facebook\'s Graph API',
     long_description=readme + '\n\n' + history,
+    license="MIT",
     author='Johannes Gorset',
     author_email='jgorset@gmail.com',
     url='http://github.com/jgorset/facepy',
