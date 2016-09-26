@@ -43,8 +43,12 @@ def get_extended_access_token(access_token, application_id, application_secret_k
             expiry_countdown = int(components['expires'][0])
         except KeyError:  # there is no expiration
             expiry_countdown = None
+    
+    if expiry_countdown is not None:
+        expires_at = datetime.now() + timedelta(seconds=expiry_countdown)
+    else:
+        expires_at = None
 
-    expires_at = datetime.now() + timedelta(seconds=expiry_countdown)
     return token, expires_at
 
 
