@@ -30,17 +30,21 @@ def get_extended_access_token(access_token, application_id, application_secret_k
     )
 
     try:
+        #api_version < 2.3 try to parse as it returns string formatted like url query
         components = parse_qs(response)
-    except AttributeError:  # api_version >= 2.3 returns a dict
-        return response['access_token'], None
+    except AttributeError:
+        # api_version >= 2.3 returns a dict
+        # Make tidier exception structure to handle expiry time on api_version >=2.3
+        token = response['access_token']
+        expiry_countdown = response['expires_in'] # already integer from json 
+    else:
+        token = components['access_token'][0]
+        try:
+            expiry_countdown = int(components['expires'][0])
+        except KeyError:  # there is no expiration
+            expiry_countdown = None
 
-    token = components['access_token'][0]
-
-    try:
-        expires_at = datetime.now() + timedelta(seconds=int(components['expires'][0]))
-    except KeyError:  # there is no expiration
-        expires_at = None
-
+    expires_at = datetime.now() + timedelta(seconds=expiry_countdown)
     return token, expires_at
 
 
