@@ -271,6 +271,8 @@ class GraphAPI(object):
                 raise HTTPError(exception)
 
             result = self._parse(response.content)
+            if isinstance(result, dict):
+                result['headers'] = response.headers
 
             try:
                 next_url = result['paging']['next']
