@@ -183,10 +183,11 @@ def test_get_with_fpnum():
     graph = GraphAPI('<access token>')
     mock_request.return_value.content = '{"payout": 0.94}'
     mock_request.return_value.status_code = 200
+    mock_request.return_value.headers = {}
 
     resp = graph.get('<paymend_id>')
 
-    assert_equal(resp, {'payout': decimal.Decimal('0.94')})
+    assert_equal(resp, {'payout': decimal.Decimal('0.94'), 'headers': {}})
 
 
 @with_setup(mock, unmock)
@@ -682,11 +683,12 @@ def test_get_unicode_url():
 
     mock_request.return_value.content = json.dumps({})
     mock_request.return_value.status_code = 200
+    mock_request.return_value.headers = {}
 
     response = graph.get('https://www.facebook.com/christophernewportuniversity‎')
 
     assert_true(mock_request.called)
-    assert_equal({}, response)
+    assert_equal({'headers': {}}, response)
 
 
 @with_setup(mock, unmock)
