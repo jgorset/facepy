@@ -52,9 +52,9 @@ I love you
 Johannes Gorset made this. You should `tweet me <http://twitter.com/jgorset>`_ if you can't get it
 to work. In fact, you should tweet me anyway.
 
-I love Hyper
-------------
+I love Schibsted
+----------------
 
-I work at `Hyper <https://github.com/hyperoslo>`_ with a bunch of awesome folks
+I work at `Schibsted Products & Technology <https://github.com/schibsted>`_ with a bunch of awesome folks
 who are every bit as passionate about building things as I am. If you're using
 Facepy, we probably want to hire you.
