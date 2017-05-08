@@ -21,7 +21,8 @@ TEST_ERROR_OBJ = {
     'error_subcode': 1234567,
     'is_transient': False,
     'error_user_title': '<error_user_title>',
-    'error_user_msg': '<error_user_msg>'
+    'error_user_msg': '<error_user_msg>',
+    'fbtrace_id': '<fbtrace_id>',
   }
 }
 

@@ -352,7 +352,8 @@ class GraphAPI(object):
     def _get_error_params(self, error_obj):
         error_params = {}
         error_fields = ['message', 'code', 'error_subcode', 'error_user_msg',
-                        'is_transient', 'error_data', 'error_user_title']
+                        'is_transient', 'error_data', 'error_user_title',
+                        'fbtrace_id']
 
         if 'error' in error_obj:
             error_obj = error_obj['error']
