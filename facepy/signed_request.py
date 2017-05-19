@@ -1,11 +1,18 @@
 import base64
 import hashlib
 import hmac
+import time
+
 try:
     import simplejson as json
 except ImportError:
     import json  # flake8: noqa
-import time
+
+try:
+    from urllib.parse import parse_qs
+except ImportError:
+    from urlparse import parse_qs
+
 
 from datetime import datetime
 
@@ -72,7 +79,6 @@ class SignedRequest(object):
         )
 
     def fetch_user_data_and_token(self):
-        from urlparse import parse_qs
         from . import GraphAPI, get_application_access_token
 
         app_token = get_application_access_token(self.application_id, self.application_secret_key, api_version=self.api_version)
