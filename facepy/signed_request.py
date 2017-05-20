@@ -1,11 +1,18 @@
 import base64
 import hashlib
 import hmac
+import time
+
 try:
     import simplejson as json
 except ImportError:
     import json  # flake8: noqa
-import time
+
+try:
+    from urllib.parse import parse_qs
+except ImportError:
+    from urlparse import parse_qs
+
 
 from datetime import datetime
 
@@ -72,15 +79,14 @@ class SignedRequest(object):
         )
 
     def fetch_user_data_and_token(self):
-        from urlparse import parse_qs
         from . import GraphAPI, get_application_access_token
 
         app_token = get_application_access_token(self.application_id, self.application_secret_key, api_version=self.api_version)
         graph = GraphAPI(app_token, version=self.api_version)
 
         qs = graph.get('oauth/access_token', code=self.raw['code'], redirect_uri='', client_id=self.application_id, client_secret=self.application_secret_key)
-        self.raw['oauth_token'] = parse_qs(qs)['access_token'][0]
-        self.raw['expires'] = time.time() + int(parse_qs(qs)['expires'][0])
+        self.raw['oauth_token'] = qs['access_token']
+        self.raw['expires'] = time.time() + qs['expires_in']
         self.raw['user'] = graph.get(self.raw['user_id'])
 
     def parse(cls, signed_request, application_secret_key):
@@ -150,9 +156,9 @@ class SignedRequest(object):
                     payload['oauth_token'] = self.user.oauth_token.token
 
                 if self.user.oauth_token.expires_at is None:
-                    payload['expires'] = 0
+                    payload['expires_in'] = 0
                 else:
-                    payload['expires'] = int(time.mktime(self.user.oauth_token.expires_at.timetuple()))
+                    payload['expires_in'] = int(time.mktime(self.user.oauth_token.expires_at.timetuple()))
 
                 if self.user.oauth_token.issued_at:
                     payload['issued_at'] = int(time.mktime(self.user.oauth_token.issued_at.timetuple()))
