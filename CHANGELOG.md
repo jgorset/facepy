@@ -2,8 +2,19 @@
 All notable changes to this project will be documented in this file.
 
 ## Unreleased
+
+## 1.0.9 - 2017-30-05
+### Added
+- The HTTP headers of the response are now available in `response['headers']`.
+- `FacebookError` now has `fbtrace_id` to aid in debugging.
+
 ### Fixed
 - Python 3 compatibility.
+- Paginated requests now retry same as the first.
+- Fixed a bug where image files would throw a UnicodeDecodeError.
+
+### Removed
+- FQL (which is not available since Graph API version 2.1)
 
 ## 1.0.8 - 2016-01-26
 ### Fixed
