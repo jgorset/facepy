@@ -36,7 +36,7 @@ def get_extended_access_token(access_token, application_id, application_secret_k
         # api_version >= 2.3 returns a dict
         # Make tidier exception structure to handle expiry time on api_version >=2.3
         token = response['access_token']
-        expiry_countdown = response['expires_in'] # already integer from json 
+        expiry_countdown = response.get('expires_in', 3600) # already integer from json
     else:
         token = components['access_token'][0]
         try:
