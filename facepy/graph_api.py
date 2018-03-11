@@ -19,6 +19,8 @@ import six
 
 from facepy.exceptions import *
 
+log = logging.getLogger(__name__)
+
 
 class GraphAPI(object):
     def __init__(self, oauth_token=False, url='https://graph.facebook.com', verify_ssl_certificate=True, appsecret=False, timeout=None, version=None):
@@ -287,11 +289,11 @@ class GraphAPI(object):
                 try:
                     return load(method, url, data)
                 except FacepyError as e:
-                    logging.warn("Exception on %s: %s, retries remaining: %s" % (
+                    log.warn("Exception on %s: %s, retries remaining: %s",
                         url,
                         e,
                         remaining_retries,
-                    ))
+                    )
                     if remaining_retries > 0:
                         remaining_retries -= 1
                     else:
