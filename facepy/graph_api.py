@@ -132,15 +132,15 @@ class GraphAPI(object):
         :param retry: An integer describing how many times the request may be retried.
         :param options: Graph API parameters, such as 'center' and 'distance'.
 
-        Supported types are ``post``, ``user``, ``page``, ``event``, ``group``, ``place`` and ``checkin``.
+        Supported only ``place`` type.
 
         See `Facebook's Graph API documentation <http://developers.facebook.com/docs/reference/api/>`_
         for an exhaustive list of options.
         """
-        SUPPORTED_TYPES = ['post', 'user', 'page', 'event', 'group', 'place', 'checkin']
+        
 
-        if type not in SUPPORTED_TYPES:
-            raise ValueError('Unsupported type "%s". Supported types are %s' % (type, ', '.join(SUPPORTED_TYPES)))
+        if type != 'place':
+            raise ValueError('Unsupported type "%s". Supported only place type ' % type)
 
         options = dict({
             'q': term,
