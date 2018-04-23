@@ -121,7 +121,7 @@ class GraphAPI(object):
 
         return response
 
-    def search(self, term, type, page=False, retry=3, **options):
+    def search(self, term, type='place', page=False, retry=3, **options):
         """
         Search for an item in the Graph API.
 
@@ -132,15 +132,15 @@ class GraphAPI(object):
         :param retry: An integer describing how many times the request may be retried.
         :param options: Graph API parameters, such as 'center' and 'distance'.
 
-        Supported only ``place`` type.
+        Supported types are only ``place`` since Graph API 2.0.
 
         See `Facebook's Graph API documentation <http://developers.facebook.com/docs/reference/api/>`_
         for an exhaustive list of options.
         """
-        
+
 
         if type != 'place':
-            raise ValueError('Unsupported type "%s". Supported only place type ' % type)
+            raise ValueError('Unsupported type "%s". The only supported type is "place" since Graph API 2.0.' % type)
 
         options = dict({
             'q': term,

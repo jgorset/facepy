@@ -411,7 +411,6 @@ def test_search():
 
     graph.search(
         term='shaft quotes',
-        type='place'
     )
 
     mock_request.assert_called_with(
