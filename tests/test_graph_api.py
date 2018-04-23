@@ -411,7 +411,7 @@ def test_search():
 
     graph.search(
         term='shaft quotes',
-        type='post'
+        type='place'
     )
 
     mock_request.assert_called_with(
@@ -422,7 +422,7 @@ def test_search():
         timeout=None,
         params={
             'q': 'shaft quotes',
-            'type': 'post',
+            'type': 'place',
             'access_token': '<access token>'
         }
     )
