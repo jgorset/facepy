@@ -23,6 +23,7 @@ log = logging.getLogger(__name__)
 
 
 class GraphAPI(object):
+
     def __init__(self, oauth_token=False, url='https://graph.facebook.com', verify_ssl_certificate=True, appsecret=False, timeout=None, version=None):
         """
         Initialize GraphAPI with an OAuth access token.
@@ -103,16 +104,21 @@ class GraphAPI(object):
 
         return response
 
-    def delete(self, path, retry=3):
+    def delete(self, path, retry=3, **data):
         """
         Delete an item in the Graph API.
 
         :param path: A string describing the path to the item.
         :param retry: An integer describing how many times the request may be retried.
+        :param data: Graph API parameters such as 'main_page_id' or 'location_page_id'.
+
+        See `Facebook's Graph API documentation <http://developers.facebook.com/docs/reference/api/>`_
+        for an exhaustive list of parameters.
         """
         response = self._query(
             method='DELETE',
             path=path,
+            data=data,
             retry=retry
         )
 
@@ -137,7 +143,6 @@ class GraphAPI(object):
         See `Facebook's Graph API documentation <http://developers.facebook.com/docs/reference/api/>`_
         for an exhaustive list of options.
         """
-
 
         if type != 'place':
             raise ValueError('Unsupported type "%s". The only supported type is "place" since Graph API 2.0.' % type)
@@ -290,10 +295,10 @@ class GraphAPI(object):
                     return load(method, url, data)
                 except FacepyError as e:
                     log.warn("Exception on %s: %s, retries remaining: %s",
-                        url,
-                        e,
-                        remaining_retries,
-                    )
+                             url,
+                             e,
+                             remaining_retries,
+                             )
                     if remaining_retries > 0:
                         remaining_retries -= 1
                     else:

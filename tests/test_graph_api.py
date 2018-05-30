@@ -121,7 +121,7 @@ def test_get_with_new_version():
         'last_name': 'Hauk',
         'link': 'http://facebook.com/herc',
         'username': 'herc',
-        })
+    })
     mock_request.return_value.status_code = 200
 
     graph.get('me')
@@ -369,7 +369,11 @@ def test_delete():
     mock_request.return_value.content = 'true'
     mock_request.return_value.status_code = 200
 
-    graph.delete('1')
+    graph.delete(
+        path='1',
+        main_page_id='112',
+        location_page_id='113',
+    )
 
     mock_request.assert_called_with(
         'DELETE',
@@ -378,6 +382,8 @@ def test_delete():
         verify=True,
         timeout=None,
         params={
+            'main_page_id': '112',
+            'location_page_id': '113',
             'access_token': '<access token>'
         }
     )
