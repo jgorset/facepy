@@ -32,7 +32,7 @@ warnings in your source by running::
 Tests
 -----
 
-Facepy has an exhaustive test suite that runs under Python 2.6, Python 2.7 and PyPy::
+Facepy has an exhaustive test suite that runs under various Python versions::
 
     $ make test
 
