@@ -3,7 +3,17 @@ All notable changes to this project will be documented in this file.
 
 ## Unreleased
 
-## 1.0.9 - 2017-30-05
+## 1.0.10 - 2019-04-17
+### Added
+- Support for Python 3.7 (to be fair, it already worked, just tests were failing).
+- The logger is now named so you can silence retries.
+- You may now send additional data with DELETE requests.
+
+### Fixed
+- You may no longer search for posts, users, events, groups or checkins, as Facebook no
+  longer allows it.
+
+## 1.0.9 - 2017-05-30
 ### Added
 - The HTTP headers of the response are now available in `response['headers']`.
 - `FacebookError` now has `fbtrace_id` to aid in debugging.
