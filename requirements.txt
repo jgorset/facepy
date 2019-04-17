@@ -7,3 +7,4 @@ tox
 flake8
 pep8
 six
+twine

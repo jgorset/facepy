@@ -1,8 +1,12 @@
 .. image::  https://raw.githubusercontent.com/jgorset/facepy/master/docs/banner.png
 
-.. image:: https://img.shields.io/travis/jgorset/facepy.svg
-.. image:: https://img.shields.io/github/license/jgorset/facepy.svg
-.. image:: https://img.shields.io/pypi/v/facepy.svg
+|version| |pythons| |downloads| |build| |license|
+
+.. |version| image:: https://img.shields.io/pypi/v/facepy.svg
+.. |pythons| image:: https://img.shields.io/pypi/pyversions/facepy.svg
+.. |downloads| image:: https://img.shields.io/pypi/dm/facepy.svg
+.. |build| image:: https://img.shields.io/travis/jgorset/facepy.svg
+.. |license| image:: https://img.shields.io/github/license/jgorset/facepy.svg
 
 Usage
 -----
