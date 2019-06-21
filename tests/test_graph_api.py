@@ -254,6 +254,54 @@ def test_paged_get():
 
     assert_equal(index, 2)
 
+@with_setup(mock, unmock)
+def test_pagination_with_nested_paging_next():
+    graph = GraphAPI('<access token>')
+    limit = 2
+
+    responses = [
+        {
+            'posts': {
+                'paging': {
+                    'next': 'https://graph.facebook.com/herc/posts?limit=%(limit)s&offset=%(limit)s&access_token=<access token>' % {
+                        'limit': limit
+                    }
+                }
+            }
+        },
+        {
+            'posts': {
+                'paging': {
+                    'next': 'https://graph.facebook.com/herc/posts?limit=%(limit)s&offset=%(limit)s&access_token=<access token>' % {
+                        'limit': limit
+                    }
+                }
+            }
+        },
+        {
+            'posts': {
+                'paging': {
+                    'previous': 'https://graph.facebook.com/herc/posts?limit=%(limit)s&offset=%(limit)s&access_token=<access token>' % {
+                        'limit': limit
+                    }
+                }
+            }
+        }
+    ]
+
+    def side_effect(*args, **kwargs):
+        response = responses.pop(0)
+
+        return MagicMock(content=json.dumps(response), status_code=200)
+
+    mock_request.side_effect = side_effect
+
+    pages = graph.get('herc/me?fields=posts', page=True)
+
+    for index, page in enumerate(pages):
+        pass
+
+    assert_equal(index, 2)
 
 @with_setup(mock, unmock)
 def test_pagination_without_paging_next():

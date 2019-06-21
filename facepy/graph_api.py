@@ -281,9 +281,25 @@ class GraphAPI(object):
             if isinstance(result, dict):
                 result['headers'] = response.headers
 
-            try:
-                next_url = result['paging']['next']
-            except (KeyError, TypeError):
+            def nested_get(needle, haystack):
+                """
+                Get the the given key anywhere in a nested dictionary.
+                """
+                if needle in haystack:
+                    return haystack[needle]
+                for key, value in haystack.items():
+                    if isinstance(value, dict):
+                        item = nested_get(needle, value)
+                        if item is not None:
+                            return item
+
+            if isinstance(result, dict):
+                paging = nested_get('paging', result)
+                if paging:
+                    next_url = paging.get('next', None)
+                else:
+                    next_url = None
+            else:
                 next_url = None
 
             return result, next_url
