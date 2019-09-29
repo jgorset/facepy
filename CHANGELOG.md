@@ -3,6 +3,10 @@ All notable changes to this project will be documented in this file.
 
 ## Unreleased
 
+## 1.0.11 - 2019-09-29
+### Fixed
+- Fixed a bug that caused `get_extended_access_token` to fail on newer Graph API versions.
+
 ## 1.0.10 - 2019-04-17
 ### Added
 - Support for Python 3.7 (to be fair, it already worked, just tests were failing).
