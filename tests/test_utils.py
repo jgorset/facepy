@@ -86,9 +86,7 @@ def test_get_extended_access_token_v23_plus():
     )
 
     assert_equal(access_token, '<extended access token>')
-    # there is data for expiration check on key 'expires_in', 
-    # so i comment this one
-    #assert not expires_at 
+    assert isinstance(expires_at, datetime)
 
 
 @with_setup(mock, unmock)
