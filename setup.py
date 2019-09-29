@@ -4,7 +4,6 @@ from setuptools import setup
 from codecs import open
 
 readme = open('README.rst').read()
-history = open('CHANGELOG.md').read()
 
 here = os.path.abspath(os.path.dirname(__file__))
 about = {}
@@ -15,7 +14,7 @@ setup(
     name='facepy',
     version=about['__version__'],
     description="Facepy makes it really easy to use Facebook's Graph API",
-    long_description=readme + '\n\n' + history,
+    long_description=readme,
     author='Johannes Gorset',
     author_email='jgorset@gmail.com',
     url='http://github.com/jgorset/facepy',
