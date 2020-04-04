@@ -3,6 +3,11 @@ All notable changes to this project will be documented in this file.
 
 ## Unreleased
 
+## 1.0.12 - 2020-04-04
+### Fixed
+- Mitigated a Facebook bug that causes `get_extended_access_token` to sometimes fail because
+  it does not include `expires_in`. This now defaults to 1 hour.
+
 ## 1.0.11 - 2019-09-29
 ### Fixed
 - Fixed a bug that caused `get_extended_access_token` to fail on newer Graph API versions.
